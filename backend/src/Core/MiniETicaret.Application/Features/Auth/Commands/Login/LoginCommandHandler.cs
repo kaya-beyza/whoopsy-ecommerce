@@ -1,7 +1,7 @@
 using MediatR;
 using MiniETicaret.Application.DTOs;
 using MiniETicaret.Application.Interfaces;
-namespace MiniETicaret.Applicatiın.Features.Auth.Commands.Login;
+namespace MiniETicaret.Application.Features.Auth.Commands.Login;
 /*  LoginCommand'ı hatırlıyorsun — sadece Email ve Password taşıyordu. Şimdi Handler bu bilgiyi alıp şunları yapacak:
 
   1. Email ile kullanıcıyı veritabanında ara
@@ -12,7 +12,7 @@ namespace MiniETicaret.Applicatiın.Features.Auth.Commands.Login;
   6. Refresh Token'ı veritabanına kaydet
   7. TokenDto olarak döndür*/
 
-public class LoginCommandHandler : IRequestHandler<LoginCommands, TokenDto>
+public class LoginCommandHandler : IRequestHandler<LoginCommand, TokenDto>
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenService _tokenService;
@@ -36,7 +36,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommands, TokenDto>
             throw new UnauthorizedAccessException("Geçersiz Email veya Şifre");
 
         // 2. Şifre Kontrolü (Bcraypt hash karşılaştırması)
-        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PsaswordHash);
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
         if (!isPasswordValid)
             throw new UnauthorizedAccessException("Geçersiz email veya Şifre");
@@ -46,7 +46,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommands, TokenDto>
         var refreshToken = _tokenService.GenerateRefreshToken();
 
         // 4.Refresh Token'ı Veritabanına kaydet
-        var refreshTokenEntity = new AppDomain.Entites.RefreshToken
+        var refreshTokenEntity = new MiniETicaret.Domain.Entities.RefreshToken
         {
             Token = refreshToken,
             ExpiresAt = DateTime.UtcNow.AddDays(7),
@@ -63,7 +63,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommands, TokenDto>
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            EcpiresAt = DateTime.UtcNow.AddMinutes(15)
+            ExpiresAt = DateTime.UtcNow.AddMinutes(15)
         };
     }
 }

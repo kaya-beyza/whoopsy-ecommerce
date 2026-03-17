@@ -2,7 +2,7 @@ using MediatR;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Domain.Entities;
 
-namespace MiniETicaret.Application.Features.Auth.Commends.Register;
+namespace MiniETicaret.Application.Features.Auth.Commands.Register;
 
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
 {
