@@ -1,5 +1,5 @@
 using MediatR;
-namespace MiniETicaret.Application.Features.Auth.Command.Register;
+namespace MiniETicaret.Application.Features.Auth.Commands.Register;
 
 /* Sırada kullanıcı kayıt olma işlemi var. Login'de kullanıcıyı buluyorduk, Register'da ise yeni kullanıcı oluşturacağız.                            
   Register'ın yapacağı işler:                                                                                                                      1. Bu email daha önce kullanılmış mı? → Kontrol et
