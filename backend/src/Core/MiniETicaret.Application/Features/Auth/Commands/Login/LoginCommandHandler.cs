@@ -23,14 +23,47 @@ public class LoginCommandHandler : IRequestHandler<LoginCommands, TokenDto>
           ITokenService tokenService,
           IUnitOfWork unitOfWork)
     {
-          _userRepository = userRepository;
-          _tokenService = tokenService;
-          _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
+        _tokenService = tokenService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<TokenDto> Handle(LoginCommand request, CancellationToken cancelllationToken)
     {
-         // 1. Email ile Kullanıcıyı bul
-         
+        // 1. Email ile Kullanıcıyı bul
+        var user = await _userRepository.GetByEmailAsync(request.Email);
+        if (user is null || !user.IsActive)
+            throw new UnauthorizedAccessException("Geçersiz Email veya Şifre");
+
+        // 2. Şifre Kontrolü (Bcraypt hash karşılaştırması)
+        bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PsaswordHash);
+
+        if (!isPasswordValid)
+            throw new UnauthorizedAccessException("Geçersiz email veya Şifre");
+
+        // 3.Token Üret
+        var accessToken = _tokenService.GenerateAccessToken(user);
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        // 4.Refresh Token'ı Veritabanına kaydet
+        var refreshTokenEntity = new AppDomain.Entites.RefreshToken
+        {
+            Token = refreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            IsRevoked = false,
+            AppUserId = user.Id
+        };
+
+        user.RefreshTokens.Add(refreshTokenEntity);
+        await _userRepository.UpdateAsync(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        // 5. Sonucu Döndür.
+        return new TokenDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+            EcpiresAt = DateTime.UtcNow.AddMinutes(15)
+        };
     }
 }
