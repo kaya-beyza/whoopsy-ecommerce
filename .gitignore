@@ -1,0 +1,29 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+
+# .NET
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+
+# NuGet
+**/packages/*
+*.nupkg
+
+# IDE
+.vs/
+.vscode/
+*.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# User-specific files
+appsettings.*.local.json

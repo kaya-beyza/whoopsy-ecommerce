@@ -1,15 +1,18 @@
-using MiniEticaret.Domain.Common;
-namespace MiniEticaret.Domain.Entities;
+using MiniETicaret.Domain.Common;
+
+namespace MiniETicaret.Domain.Entities;
+
 public class AppUser : BaseEntity
 {
-    public string FullName{get;set;} =string.Empty;
-    public string Email{get;set;}=string.Empty;
-    public string PasswordHash {get;set;} =string.Empty;
-    public bool IsActive{get;set;}=true;
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
+    public bool IsActive { get; set; } = true;
 
-    //Navigation Properties
-    public Guid RoleId{get;set;}
-    public Role Role {get;set;}=null;//?????
-    public ICollection<Order>Orders {get;set;}=newList<Order>();
-    public ICollection<RefreshToken> RefreshTokens{get;set;}=new List<RefreshToken>();
+    // Navigation Properties
+    public Guid RoleId { get; set; }
+    public Role Role { get; set; } = null!;
+    // TODO: Order entity yazıldığında eklenecek
+    // public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

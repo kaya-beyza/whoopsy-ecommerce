@@ -1,4 +1,4 @@
-namespace MiniEticaret.DOmain.Enums;
+namespace MiniETicaret.Domain.Enums;
 public enum OrderStatus
 {
     Pending=0,

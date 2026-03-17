@@ -1,6 +1,6 @@
-using MiniETicaret.Domain.Common;
+using MiniETicaret.Domain.Entities;
 
-namespace MiniETicaret.application.Interfaces;
+namespace MiniETicaret.Application.Interfaces;
 
 public interface ICategoryRepository
 {
