@@ -12,7 +12,6 @@ public class AppUser : BaseEntity
     // Navigation Properties
     public Guid RoleId { get; set; }
     public Role Role { get; set; } = null!;
-    // TODO: Order entity yazıldığında eklenecek
-    // public ICollection<Order> Orders { get; set; } = new List<Order>();
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

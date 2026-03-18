@@ -41,7 +41,7 @@ public class UserRepository : IUserRepository
     public async Task<AppUser?> GetByRefreshTokenAsync(string refreshToken) //"Kullanıcının token listesinde bu token var mı?" diye kontrol ediyor. .Any() = "herhangi biri eşleşiyor mu?"
     {
         return await _context.Users
-            .Include(u => u.RefreshTokens)     
+            .Include(u => u.RefreshTokens)
             .FirstOrDefaultAsync(u => u.RefreshTokens.Any(rt => rt.Token == refreshToken));
     }
     public async Task<int> GetTotalCountAsync()
@@ -61,5 +61,12 @@ public class UserRepository : IUserRepository
         await Task.CompletedTask;
     }
 
+    public async Task<AppUser?> GetByIdWithOrdersAsync(Guid id)
+    {
+        return await _context.Users
+            .Include(u => u.Orders)
+                .ThenInclude(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Product).FirstOrDefaultAsync(u => u.Id == id); // Her ürün kaleminin ürün bilgisini getir
+    }
 
 }
