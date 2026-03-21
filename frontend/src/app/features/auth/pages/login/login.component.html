@@ -1,0 +1,54 @@
+ <div class="login-shell">
+    <div class="login-card">
+      <div class="card-header">
+        <div class="brand-mark"></div>
+        <h1>Yönetim Paneli</h1>
+        <p>Devam etmek için giriş yapın</p>
+      </div>
+
+      <form (ngSubmit)="onLogin()" class="login-form">
+        <div class="field">
+          <label for="email">E-posta</label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            required
+            autocomplete="email"
+            placeholder="ornek@firma.com"
+          />
+        </div>
+
+        <div class="field">
+          <label for="password">Şifre</label>
+          <input
+            id="password"
+            type="password"
+            [(ngModel)]="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <div class="error-banner" *ngIf="errorMessage">
+          <span class="error-icon">!</span>
+          {{ errorMessage }}
+        </div>
+
+        <button type="submit" [disabled]="isLoading" class="login-btn">
+          <span *ngIf="!isLoading">Giriş Yap</span>
+          <span *ngIf="isLoading" class="loading-state">
+            <span class="spinner"></span>
+            Giriş Yapılıyor...
+          </span>
+        </button>
+      </form>
+
+      <div class="card-footer">
+        <span>Mini E-Ticaret &copy; 2026</span>
+      </div>
+    </div>
+  </div>
