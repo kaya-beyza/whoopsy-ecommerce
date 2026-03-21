@@ -60,7 +60,7 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<MiniETicaretDbContext>();
     await SeedData.SeedAsync(context);
 }
-    
+
 // Middleware Pipeline
 app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
