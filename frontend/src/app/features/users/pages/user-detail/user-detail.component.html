@@ -1,0 +1,100 @@
+<div class="user-detail-container">
+
+    <!-- Geri butonu -->
+    <button class="back-button" (click)="goBack()">
+      ← Kullanıcı Listesine Dön
+    </button>
+
+    <!-- Yükleniyor -->
+    <div *ngIf="loading" class="loading">
+      Yükleniyor...
+    </div>
+
+    <!-- Hata -->
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Kullanıcı bilgileri yüklendiyse göster -->
+    <div *ngIf="user && !loading">
+
+      <!-- ==================== KULLANICI BİLGİ KARTI ==================== -->
+      <div class="user-card">
+        <h1>{{ user.fullName }}</h1>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">E-posta</span>
+            <span class="info-value">{{ user.email }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Rol</span>
+            <span class="role-badge">{{ user.roleName }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Durum</span>
+            <span [class]="user.isActive ? 'status active' : 'status inactive'">
+              {{ user.isActive ? 'Aktif' : 'Pasif' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Kayıt Tarihi</span>
+            <span class="info-value">{{ user.createdDate | slice:0:10 }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SİPARİŞ GEÇMİŞİ ==================== -->
+      <div class="orders-section">
+        <h2>Sipariş Geçmişi ({{ orders.length }})</h2>
+
+        <!-- Sipariş yoksa -->
+        <div *ngIf="orders.length === 0" class="no-data">
+          Bu kullanıcının henüz siparişi bulunmuyor.
+        </div>
+
+        <!-- Sipariş kartları -->
+        <!-- Her sipariş için bir kart oluştur -->
+        <div *ngFor="let order of orders" class="order-card">
+
+          <!-- Sipariş başlık satırı -->
+          <div class="order-header">
+            <span class="order-date">{{ order.createdDate | slice:0:10 }}</span>
+            <span class="order-status">{{ getStatusText(order.status) }}</span>
+          </div>
+
+          <!-- Sipariş ürünleri tablosu -->
+          <table class="order-items-table">
+            <thead>
+              <tr>
+                <th>Ürün</th>
+                <th>Adet</th>
+                <th>Birim Fiyat</th>
+                <th>Toplam</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- İç içe *ngFor: her siparişin içindeki ürünleri listele -->
+              <tr *ngFor="let item of order.orderItems">
+                <td>{{ item.productName }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unitPrice }} ₺</td>
+                <td>{{ item.totalPrice }} ₺</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Sipariş alt bilgileri -->
+          <div class="order-footer">
+            <span class="shipping-address">📍 {{ order.shippingAddress }}</span>
+            <span class="order-total">Toplam: {{ order.totalAmount }} ₺</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>

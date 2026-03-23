@@ -1,0 +1,71 @@
+<div class="user-list-container">
+
+    <h1>Kullanıcı Yönetimi</h1>
+
+    <!-- loading true ise "Yükleniyor" göster -->
+    <!-- Login'deki *ngIf ile aynı mantık: koşul doğruysa göster, değilse gizle -->
+    <div *ngIf="loading" class="loading">
+        Yükleniyor...
+    </div>
+
+    <!-- Hata varsa göster -->
+    <!-- errorMessage boş string ('') ise falsy → div görünmez -->
+    <!-- errorMessage doluysa truthy → div görünür -->
+    <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+    </div>
+
+    <!-- loading bitti VE hata yok → tabloyu göster -->
+    <!-- '!' operatörü: "değilse" demek. !loading = loading false ise -->
+    <div *ngIf="!loading && !errorMessage">
+
+        <!-- Toplam kaç kullanıcı var göster -->
+        <!-- {{ }} → interpolation, .ts'deki değişkeni HTML'e basar -->
+        <p class="user-count">Toplam {{ users.length }} kullanıcı</p>
+
+        <!-- Kullanıcı tablosu -->
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>Ad Soyad</th>
+                    <th>E-posta</th>
+                    <th>Rol</th>
+                    <th>Durum</th>
+                    <th>Kayıt Tarihi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- *ngFor → users dizisindeki her eleman için bir <tr> oluşturur -->
+                <!-- Login'de *ngFor yoktu çünkü tek form vardı. Burada liste var. -->
+                <!-- (click) → satıra tıklanınca goToDetail çağrılır -->
+                <tr *ngFor="let user of users" (click)="goToDetail(user.id)" class="user-row">
+
+                    <!-- Her sütun, UserDto'nun bir property'sini gösteriyor -->
+                    <td>{{ user.fullName }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="role-badge">{{ user.roleName }}</span>
+                    </td>
+                    <td>
+                        <!-- Koşullu class: isActive true ise 'active', false ise 'inactive' -->
+                        <span [class]="user.isActive ? 'status active' : 'status inactive'">
+                            {{ user.isActive ? 'Aktif' : 'Pasif' }}
+                        </span>
+                    </td>
+                    <td>
+                        <!-- slice:0:10 → "2026-03-21T14:30:00" → "2026-03-21" -->
+                        <!-- Sadece tarih kısmını gösteriyoruz, saat kısmını kesiyoruz -->
+                        {{ user.createdDate | slice:0:10 }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Hiç kullanıcı yoksa bilgi mesajı göster -->
+        <div *ngIf="users.length === 0" class="no-data">
+            Henüz kayıtlı kullanıcı bulunmuyor.
+        </div>
+
+    </div>
+
+</div>
