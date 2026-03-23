@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using FluentValidation;
 
 namespace MiniETicaret.Application.Features.Categories.Commands.CreateCategory;
