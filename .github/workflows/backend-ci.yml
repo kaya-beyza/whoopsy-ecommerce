@@ -1,6 +1,5 @@
 name: Backend CI
-
-  on:
+on:
     push:
       branches: [ main ]
       paths:
@@ -9,7 +8,6 @@ name: Backend CI
       branches: [ main ]
       paths:
         - 'backend/**'
-
   # İş tanımları — her job bir "kontrol adımı"
   jobs:
     build-and-test:
