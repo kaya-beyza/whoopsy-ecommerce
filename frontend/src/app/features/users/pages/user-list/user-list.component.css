@@ -1,0 +1,116 @@
+/* Ana kapsayıcı — sayfanın genel düzeni */
+  .user-list-container {
+    max-width: 960px;
+    margin: 0 auto;        /* Ortala */
+    padding: 40px 20px;
+    font-family: 'DM Sans', sans-serif;
+    color: #e0e0e0;
+  }
+
+  /* Sayfa başlığı */
+  h1 {
+    font-family: 'Playfair Display', serif;
+    color: #d4af37;        /* Login'deki altın renk */
+    font-size: 2rem;
+    margin-bottom: 24px;
+  }
+
+  /* Yükleniyor yazısı */
+  .loading {
+    text-align: center;
+    padding: 60px 0;
+    font-size: 1.1rem;
+    color: #888;
+  }
+
+  /* Hata mesajı — kırmızı arka plan */
+  .error-message {
+    background: rgba(231, 76, 60, 0.15);
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Kullanıcı sayısı yazısı */
+  .user-count {
+    color: #888;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+  }
+
+  /* Tablo genel stili */
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;     /* Hücre arası boşlukları kaldır */
+    background: #1a1a2e;          /* Koyu arka plan */
+    border-radius: 12px;
+    overflow: hidden;              /* Border-radius'un tablo köşelerine uyması için */
+  }
+
+  /* Tablo başlık hücreleri */
+  .user-table thead th {
+    background: #16213e;
+    color: #d4af37;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.85rem;
+    text-transform: uppercase;    /* BÜYÜK HARF */
+    letter-spacing: 1px;
+  }
+
+  /* Tablo veri hücreleri */
+  .user-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2a2a4a;
+    font-size: 0.95rem;
+  }
+
+  /* Satır hover efekti — imleci üstüne getirince renk değişir */
+  .user-row {
+    cursor: pointer;              /* El işareti göster (tıklanabilir) */
+    transition: background 0.2s;  /* Yumuşak geçiş animasyonu */
+  }
+
+  .user-row:hover {
+    background: rgba(212, 175, 55, 0.08);  /* Hafif altın ton */
+  }
+
+  /* Rol etiketi — küçük badge */
+  .role-badge {
+    background: rgba(212, 175, 55, 0.15);
+    color: #d4af37;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Durum etiketi — Aktif/Pasif */
+  .status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Aktif kullanıcı — yeşil */
+  .status.active {
+    background: rgba(46, 204, 113, 0.15);
+    color: #2ecc71;
+  }
+
+  /* Pasif kullanıcı — kırmızı */
+  .status.inactive {
+    background: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+  }
+
+  /* Hiç kullanıcı yoksa gösterilen mesaj */
+  .no-data {
+    text-align: center;
+    padding: 40px 0;
+    color: #666;
+    font-size: 1rem;
+  }
