@@ -1,22 +1,14 @@
-# Docker image'larının düzgün build olup olmadığını kontrol eder
-  name: Docker Build
-
-  on:
-    push:
-      branches: [ main ]
-    pull_request:
-      branches: [ main ]
-
-  jobs:
-    docker-build:
-      runs-on: ubuntu-latest
-
-      steps:
-        # 1. Kodu çek
-        - name: Checkout code
-          uses: actions/checkout@v4
-
-        # 2. Docker Compose ile tüm servisleri build et
-        # --no-start → build et ama çalıştırma (sadece hata kontrolü)
-        - name: Build Docker images
-          run: docker compose build
+name: Docker Build
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build Docker images
+        run: docker compose build
