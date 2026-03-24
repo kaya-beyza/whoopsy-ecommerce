@@ -1,21 +1,17 @@
 name: Backend CI
 on:
-    push:
-      branches: [ main ]
-      paths:
-        - 'backend/**' # Sadece backend dosyaları değişince çalış
-    pull_request:
-      branches: [ main ]
-      paths:
-        - 'backend/**'
-  # İş tanımları — her job bir "kontrol adımı"
-  jobs:
-    build-and-test:
-      # Hangi makinede çalışacak? GitHub'ın ücretsiz Ubuntu sunucusu
-      runs-on: ubuntu-latest
-
-      # Adımlar — sırayla çalışır
-      steps:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
         # 1. Kodu çek — repo dosyalarını sunucuya indir
         - name: Checkout code
           uses: actions/checkout@v4
