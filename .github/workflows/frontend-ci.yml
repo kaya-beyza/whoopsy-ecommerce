@@ -1,21 +1,17 @@
- # Frontend için CI — Angular projesinin build kontrolü
-  name: Frontend CI
-
-  on:
-    push:
-      branches: [ main ]
-      paths:
-        - 'frontend/**'  # Sadece frontend dosyaları değişince çalış
-    pull_request:
-      branches: [ main ]
-      paths:
-        - 'frontend/**'
-
-  jobs:
-    build:
-      runs-on: ubuntu-latest
-
-      steps:
+name: Frontend CI
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
         # 1. Kodu çek
         - name: Checkout code
           uses: actions/checkout@v4
@@ -37,7 +33,6 @@
 
         # 4. Angular projesini build et
         # --configuration=production → üretim modu (daha sıkı kontrol)
-        # Backend'deki "dotnet build" karşılığı
         - name: Build
           run: npx ng build --configuration=production
           working-directory: frontend
