@@ -3,7 +3,7 @@ using MiniETicaret.Application.Features.Auth.Commands.Register;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Domain.Entities;
 
-namespace MiniETicaret.UnitTests.Features.Auth;
+namespace MiniETicaret.UnitTests.Features.Auth.CommandsTest;
 
 public class RegisterCommandHandlerTests
 {

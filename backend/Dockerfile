@@ -4,12 +4,13 @@
   WORKDIR /app
 
   # Önce sadece proje dosyalarını kopyala ve restore et
-  COPY MiniETicaret.slnx ./
+COPY MiniETicaret.slnx ./
   COPY src/Core/MiniETicaret.Domain/*.csproj src/Core/MiniETicaret.Domain/
   COPY src/Core/MiniETicaret.Application/*.csproj src/Core/MiniETicaret.Application/
   COPY src/Infrastructure/MiniETicaret.Infrastructure/*.csproj src/Infrastructure/MiniETicaret.Infrastructure/
   COPY src/Infrastructure/MiniETicaret.Persistence/*.csproj src/Infrastructure/MiniETicaret.Persistence/
   COPY src/Presentation/MiniETicaret.API/*.csproj src/Presentation/MiniETicaret.API/
+  COPY tests/MiniETicaret.UnitTests/*.csproj tests/MiniETicaret.UnitTests/
 
   RUN dotnet restore
 
