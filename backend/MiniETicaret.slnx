@@ -11,4 +11,7 @@
   <Folder Name="/src/Presentation/">
     <Project Path="src/Presentation/MiniETicaret.API/MiniETicaret.API.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MiniETicaret.UnitTests/MiniETicaret.UnitTests.csproj" />
+  </Folder>
 </Solution>
