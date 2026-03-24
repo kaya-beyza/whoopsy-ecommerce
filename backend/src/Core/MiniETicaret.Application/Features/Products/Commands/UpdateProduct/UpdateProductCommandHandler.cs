@@ -1,6 +1,6 @@
 using MediatR;
 using MiniETicaret.Application.Interfaces;
-using MiniETicaret.Domain.Entities;
+
 namespace MiniETicaret.Application.Features.Products.Commands.UpdateProduct;
 
 public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, bool>
