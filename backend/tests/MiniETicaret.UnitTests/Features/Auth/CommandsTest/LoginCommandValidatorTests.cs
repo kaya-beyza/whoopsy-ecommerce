@@ -1,6 +1,6 @@
 using MiniETicaret.Application.Features.Auth.Commands.Login;
 
-namespace MiniETicaret.UnitTests.Features.Auth;
+namespace MiniETicaret.UnitTests.Features.Auth.CommandsTest;
 
 public class LoginCommandValidatorTests
 {
