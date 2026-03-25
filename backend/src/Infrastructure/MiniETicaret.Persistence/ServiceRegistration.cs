@@ -16,6 +16,7 @@ public static class ServiceRegistration
 
         services.AddScoped<IUserRepository, UserRepository>(); // "Birisi IUserRepository isterse UserRepository ver"
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         return services;
     }
