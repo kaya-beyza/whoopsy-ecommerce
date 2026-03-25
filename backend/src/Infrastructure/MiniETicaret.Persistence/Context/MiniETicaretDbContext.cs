@@ -10,6 +10,8 @@ public class MiniETicaretDbContext : DbContext
     public DbSet<AppUser> Users { get; set; }  // "Veritabanında Users adında bir tablo olacak ve her satır bir AppUser" demek  
     public DbSet<Role> Roles { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> OrderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
