@@ -2,9 +2,6 @@ import { Injectable } from '@angular/core';
   @Injectable({ providedIn: 'root' })
   export class TokenService {
 
-    // localStorage'da kullanılacak anahtar isimleri (sabit değerler)
-    // Neden sabit? → Birden fazla yerde aynı string'i yazmak yerine tek yerde tanımlıyoruz.
-    // Yazım hatası riskini ortadan kaldırır.
     private readonly ACCESS_TOKEN_KEY = 'access_token';
     private readonly REFRESH_TOKEN_KEY = 'refresh_token';
 
