@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Domain.Entities;
 using MiniETicaret.Persistence.Context;
 using MiniETicaret.Persistence.Repositories;
 namespace MiniETicaret.Persistence;
@@ -14,10 +15,11 @@ public static class ServiceRegistration
         services.AddDbContext<MiniETicaretDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        services.AddScoped<IUserRepository, UserRepository>(); // "Birisi IUserRepository isterse UserRepository ver"
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         return services;
     }
 
