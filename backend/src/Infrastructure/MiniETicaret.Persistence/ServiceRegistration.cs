@@ -15,7 +15,7 @@ public static class ServiceRegistration
         services.AddDbContext<MiniETicaretDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserRepository, UserRepository>(); // "Birisi IUserRepository isterse UserRepository ver"
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
