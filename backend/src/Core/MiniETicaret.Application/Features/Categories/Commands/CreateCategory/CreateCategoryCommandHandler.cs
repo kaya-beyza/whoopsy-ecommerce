@@ -20,6 +20,7 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
             Name= request.Name,
             Description = request.Description,
             IsActive = true,
+            CreatedDate = DateTime.UtcNow.AddHours(3)
 
         };
 
