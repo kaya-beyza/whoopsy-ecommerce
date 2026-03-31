@@ -31,7 +31,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Guid>
             Email = request.Email,
             PasswordHash = passwordHash,
             IsActive = true,
-            RoleId = Guid.Parse("d7e350e8-1cb0-4b6e-9d0c-2e7a5b8f3a01") // Default: User rolü
+             RoleId = Guid.Parse("22222222-2222-2222-2222-222222222222") // Default: User rolü
         };
         // 4. Veritabanına kaydet                                                                                                              
         await _userRepository.AddAsync(user); //Kullanıcıyı EF Core'un hafızasına ekliyor (henüz veritabanına yazmadı!)

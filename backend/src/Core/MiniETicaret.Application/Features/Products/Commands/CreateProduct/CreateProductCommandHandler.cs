@@ -22,7 +22,8 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Price = request.Price,
             StockQuantity = request.StockQuantity,
             CategoryId = request.CategoryId,
-            IsActive = true
+            IsActive = true,
+            CreatedDate = DateTime.UtcNow.AddHours(3)
         };
 
         await _productRepository.AddAsync(product, cancellationToken);

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Domain.Entities;
 using MiniETicaret.Persistence.Context;
 using MiniETicaret.Persistence.Repositories;
 namespace MiniETicaret.Persistence;
@@ -16,7 +17,9 @@ public static class ServiceRegistration
 
         services.AddScoped<IUserRepository, UserRepository>(); // "Birisi IUserRepository isterse UserRepository ver"
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
         return services;
     }
 

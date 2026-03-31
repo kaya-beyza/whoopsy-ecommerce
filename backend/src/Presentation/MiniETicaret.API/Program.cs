@@ -61,7 +61,7 @@ using (var scope = app.Services.CreateScope())
     await SeedData.SeedAsync(context);
 }
 
-// Middleware Pipeline
+// Middleware Pipelinem 
 app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
