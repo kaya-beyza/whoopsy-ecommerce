@@ -11,8 +11,8 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<MiniETicar
     public MiniETicaretDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<MiniETicaretDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=MiniETicaretDb;Username=postgres;Password=postgres123");
-
+       //docker bağlantısı için optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=MiniETicaretDb;Username=postgres;Password=postgres123");
+        optionsBuilder.UseNpgsql("Host=ep-empty-dust-a9nzfxmr-pooler.gwc.azure.neon.tech;Port=5432;Database=neondb;Username=neondb_owner;Password=npg_ng5P3yBCOilf ;SSL Mode=Require;Trust Server Certificate=true");
         return new MiniETicaretDbContext(optionsBuilder.Options);
     }
 }
