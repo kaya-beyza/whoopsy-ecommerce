@@ -9,12 +9,14 @@ namespace MiniETicaret.UnitTests.Features.Orders.CommandsTest;
 public class UpdateOrderStatusCommandHandlerTests
 {
     private readonly Mock<IOrderRepository> _mockOrderRepo;
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
     private readonly UpdateOrderStatusCommandHandler _handler;
 
     public UpdateOrderStatusCommandHandlerTests()
     {
         _mockOrderRepo = new Mock<IOrderRepository>();
-        _handler = new UpdateOrderStatusCommandHandler(_mockOrderRepo.Object);
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _handler = new UpdateOrderStatusCommandHandler(_mockOrderRepo.Object, _mockUnitOfWork.Object);
     }
 
     // ══════════════════════════════════════════
