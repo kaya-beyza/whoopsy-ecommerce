@@ -1,0 +1,217 @@
+<!-- <div class="page-container">
+  <div class="page-header">
+    <h2>Sipariş Yönetimi</h2>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <label>Sipariş Durumu</label>
+      <select [(ngModel)]="selectedStatus">
+        <option value="">Tümü</option>
+        <option value="Bekliyor">Bekliyor</option>
+        <option value="Hazırlanıyor">Hazırlanıyor</option>
+        <option value="Kargolandı">Kargolandı</option>
+        <option value="Teslim Edildi">Teslim Edildi</option>
+        <option value="İptal Edildi">İptal Edildi</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label>Başlangıç Tarihi</label>
+      <input type="date" [(ngModel)]="startDate">
+    </div>
+
+    <div class="filter-group">
+      <label>Bitiş Tarihi</label>
+      <input type="date" [(ngModel)]="endDate">
+    </div>
+
+    <button class="btn-primary" (click)="applyFilters()">Ara / Filtrele</button>
+  </div>
+
+  @if(isLoading) {
+    <div class="state-box loading">Siparişler yükleniyor, lütfen bekleyin...</div>
+  } @else if(errorMessage) {
+    <div class="state-box error">{{ errorMessage }}</div>
+  } @else if(orders.length === 0) {
+    <div class="state-box empty">Belirtilen kriterlere uygun sipariş bulunamadı.</div>
+  } 
+  
+  @else {
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Sipariş No</th>
+            <th>Müşteri</th>
+            <th>Tarih</th>
+            <th>Tutar</th>
+            <th>Durum</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for(order of orders; track order.id) {
+            <tr>
+              <td>#{{ order.id.substring(0,8) }}</td>
+              <td>{{ order.customerName }}</td>
+              <td>{{ order.orderDate | date:'dd.MM.yyyy HH:mm' }}</td>
+              <td>{{ order.totalAmount }} ₺</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'bg-warning': order.status === 'Bekliyor' || order.status === 'Hazırlanıyor',
+                  'bg-info': order.status === 'Kargolandı',
+                  'bg-success': order.status === 'Teslim Edildi',
+                  'bg-danger': order.status === 'İptal Edildi'
+                }">
+                  {{ order.status }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-secondary" [routerLink]="['/orders', order.id]">Detay</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <button [disabled]="pageIndex === 1" (click)="changePage(pageIndex - 1)">Önceki</button>
+      <span>Sayfa {{ pageIndex }} / {{ totalPages }} (Toplam {{ totalCount }} Sipariş)</span>
+      <button [disabled]="pageIndex === totalPages" (click)="changePage(pageIndex + 1)">Sonraki</button>
+    </div>
+  }
+</div> -->
+<div class="toast-container">
+  @for(toast of toasts; track toast.id) {
+    <div class="toast" [ngClass]="toast.type">
+      @if(toast.type === 'success') { <span>✅</span> } @else { <span>❌</span> }
+      {{ toast.message }}
+    </div>
+  }
+</div>
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h2>Siparişler</h2>
+      <p class="subtitle">Tüm müşteri siparişlerini buradan yönetebilir ve durumlarını güncelleyebilirsiniz.</p>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-group">
+      <label>Sipariş Durumu</label>
+      <select [(ngModel)]="selectedStatus">
+        <option value="">Tüm Durumlar</option>
+        <option value="Bekliyor">Bekliyor</option>
+        <option value="Hazırlanıyor">Hazırlanıyor</option>
+        <option value="Kargolandı">Kargolandı</option>
+        <option value="Teslim Edildi">Teslim Edildi</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Başlangıç</label>
+      <input type="date" [(ngModel)]="startDate">
+    </div>
+    <div class="filter-group">
+      <label>Bitiş</label>
+      <input type="date" [(ngModel)]="endDate">
+    </div>
+    <div class="filter-actions">
+      <button class="btn-primary" (click)="applyFilters()">Filtrele</button>
+      <button class="btn-text" (click)="clearFilters()">Temizle</button>
+    </div>
+  </div>
+
+  @if(selectedOrderIds.size > 0) {
+    <div class="bulk-action-bar">
+      <span><strong>{{ selectedOrderIds.size }}</strong> sipariş seçildi</span>
+      <div class="bulk-buttons">
+        <button class="btn-secondary" (click)="bulkUpdate('Kargolandı')">🚚 Seçilenleri Kargola</button>
+        <button class="btn-secondary" (click)="bulkUpdate('İptal Edildi')">❌ Seçilenleri İptal Et</button>
+      </div>
+    </div>
+  }
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="checkbox-cell"><input type="checkbox" [checked]="isAllSelected" (change)="toggleAll($event)"></th>
+          <th>Sipariş No</th>
+          <th>Müşteri</th>
+          <th>Tarih</th>
+          <th>Tutar</th>
+          <th>Durum Yönetimi</th>
+          <th>İşlem</th>
+        </tr>
+      </thead>
+      
+      @if(isLoading) {
+        <tbody>
+          @for(i of [1,2,3,4,5]; track i) {
+            <tr class="skeleton-row">
+              <td><div class="skeleton-box checkbox-skel"></div></td>
+              <td><div class="skeleton-box short"></div></td>
+              <td><div class="skeleton-box medium"></div></td>
+              <td><div class="skeleton-box medium"></div></td>
+              <td><div class="skeleton-box short"></div></td>
+              <td><div class="skeleton-box dropdown-skel"></div></td>
+              <td><div class="skeleton-box button-skel"></div></td>
+            </tr>
+          }
+        </tbody>
+      } 
+      
+      @else if(orders.length > 0) {
+        <tbody>
+          @for(order of orders; track order.id) {
+            <tr [class.selected-row]="selectedOrderIds.has(order.id)">
+              <td class="checkbox-cell">
+                <input type="checkbox" [checked]="selectedOrderIds.has(order.id)" (change)="toggleSelection(order.id, $event)">
+              </td>
+              <td class="order-id">#{{ order.id.substring(0,8) }}</td>
+              <td class="fw-500">{{ order.customerName }}</td>
+              <td class="text-muted">{{ order.orderDate | date:'dd MMM yyyy, HH:mm' }}</td>
+              <td class="fw-600">{{ order.totalAmount }} ₺</td>
+              <td>
+                <select class="status-dropdown" [ngClass]="order.status === 'İptal Edildi' ? 'status-danger' : 'status-normal'" (change)="updateStatus(order.id, $event)">
+                  <option value="Bekliyor" [selected]="order.status === 'Bekliyor'">⏳ Bekliyor</option>
+                  <option value="Hazırlanıyor" [selected]="order.status === 'Hazırlanıyor'">📦 Hazırlanıyor</option>
+                  <option value="Kargolandı" [selected]="order.status === 'Kargolandı'">🚚 Kargolandı</option>
+                  <option value="Teslim Edildi" [selected]="order.status === 'Teslim Edildi'">✅ Teslim Edildi</option>
+                </select>
+              </td>
+              <td>
+                <button class="btn-icon" [routerLink]="['/orders', order.id]" title="Detaya Git">
+                  Detay →
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      }
+    </table>
+
+    @if(!isLoading && orders.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📂</div>
+        <h3>Sipariş Bulunamadı</h3>
+        <p>Seçtiğiniz filtrelere uygun bir sipariş kaydı veritabanında mevcut değil.</p>
+        <button class="btn-secondary mt-3" (click)="clearFilters()">Tüm Filtreleri Temizle</button>
+      </div>
+    }
+  </div>
+
+  @if(!isLoading && orders.length > 0) {
+    <div class="pagination">
+      <p class="page-info">Toplam <strong>{{ totalCount }}</strong> siparişten sayfa <strong>{{ pageIndex }}</strong> gösteriliyor.</p>
+      <div class="page-buttons">
+        <button [disabled]="pageIndex === 1" (click)="changePage(pageIndex - 1)">← Önceki</button>
+        <button [disabled]="pageIndex === totalPages" (click)="changePage(pageIndex + 1)">Sonraki →</button>
+      </div>
+    </div>
+  }
+</div>
