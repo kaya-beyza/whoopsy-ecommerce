@@ -8,10 +8,12 @@ namespace MiniETicaret.Application.Features.Orders.Commands.CreateOrder;
 public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Guid>
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateOrderCommandHandler(IOrderRepository orderRepository)
+    public CreateOrderCommandHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Guid> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -35,12 +37,12 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
             Status = OrderStatus.Pending,
             TotalAmount = totalAmount,
             OrderItems = orderItems,
-            CreatedDate = DateTime.UtcNow
+            CreatedDate = DateTime.UtcNow.AddHours(3)
         };
 
         // 4) Veritabanına kaydet
         await _orderRepository.AddAsync(order);
-
+        await _unitOfWork.SaveChangesAsync();
         // 5) Yeni siparişin Id'sini döndür
         return order.Id;
     }

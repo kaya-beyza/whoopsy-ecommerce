@@ -6,10 +6,12 @@ namespace MiniETicaret.Application.Features.Orders.Commands.UpdateOrderStatus;
 public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatusCommand, Unit>
 {
     private readonly IOrderRepository _orderRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UpdateOrderStatusCommandHandler(IOrderRepository orderRepository)
+    public UpdateOrderStatusCommandHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Unit> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
@@ -27,6 +29,7 @@ public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatus
 
         // 4) Veritabanına kaydet
         await _orderRepository.UpdateAsync(order);
+        await _unitOfWork.SaveChangesAsync();
 
         // 5) Geriye anlamlı bir şey dönmüyoruz
         return Unit.Value;

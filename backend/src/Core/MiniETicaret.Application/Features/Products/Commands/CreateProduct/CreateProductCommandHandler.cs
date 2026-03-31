@@ -29,5 +29,6 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         await _productRepository.AddAsync(product, cancellationToken);
         return product.Id;
     }
+
+
 }
-    

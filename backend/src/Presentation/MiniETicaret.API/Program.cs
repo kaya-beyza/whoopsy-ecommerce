@@ -45,6 +45,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")  // Angular'ın çalıştığı adres
+              .AllowAnyHeader()                       // Her türlü header'a izin ver
+              .AllowAnyMethod()                       // GET, POST, PUT, DELETE hepsine izin ver
+              .AllowCredentials();                    // Cookie/token göndermeye izin ver
+    });
+});
+
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
@@ -69,10 +81,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseCors("AllowFrontend"); // yukarıda tanımladığımız kuralı aktif eder frontendden gelen istekleri onaylar
 app.UseHttpsRedirection();
 app.UseAuthentication(); // Önce: "Kim bu kullanıcı?"
 app.UseAuthorization(); // Sonra: "Bu kullanıcının yetkisi var mı?"
 app.MapControllers(); // Son: Controller'lara yönlendir
 
 app.Run();
+
+// Test projesi Program sınıfına erişebilsin diye
+public partial class Program { }
