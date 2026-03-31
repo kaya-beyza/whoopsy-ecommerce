@@ -55,13 +55,13 @@ var app = builder.Build();
 // Seed Data
 /*Uygulama başlarken SeedData'yı çalıştır. İlk seferde Admin/User rolleri eklenir,
  sonraki seferlerde atlanır.*/
-/*using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<MiniETicaretDbContext>();
     await SeedData.SeedAsync(context);
-}*/
+}
 
-// Middleware Pipeline
+// Middleware Pipelinem 
 app.UseMiddleware<ExceptionMiddleware>();
 if (app.Environment.IsDevelopment())
 {
