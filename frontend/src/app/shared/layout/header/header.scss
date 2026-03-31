@@ -1,0 +1,155 @@
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+// ── Top bar ───────────────────────────────────
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 40px;
+  background: var(--color-primary-soft);
+  font-size: 11.5px;
+  color: var(--color-dark-mid);
+  border-bottom: 1px solid var(--color-border);
+
+  .top-links {
+    display: flex;
+    gap: 20px;
+
+    a {
+      color: var(--color-dark-mid);
+      font-weight: 500;
+      transition: color var(--transition-fast);
+      &:hover { color: var(--color-primary); }
+    }
+  }
+}
+
+// ── Ana satır ─────────────────────────────────
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 40px;
+  height: var(--header-height);
+}
+
+// ── Logo ──────────────────────────────────────
+.logo {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+  text-decoration: none;
+
+  // Soldan sağa leylak → gül geçişi
+  .l-v { color: #ddb8f0; }
+  .l-e { color: #c99ee0; }
+  .l-l { color: #b888d0; }
+  .l-u { color: #b06ab3; }
+  .l-r { color: #a0508a; }
+  .l-a { color: #6b2d7a; }
+
+  &:hover { opacity: 0.85; transition: opacity var(--transition-fast); }
+}
+
+// ── Arama ─────────────────────────────────────
+.search-wrapper {
+  flex: 1;
+  max-width: 560px;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  padding: 0 52px 0 22px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+
+  &::placeholder { color: var(--color-text-light); }
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(224, 120, 64, 0.12);
+  }
+}
+
+.search-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+
+  &:hover { background: var(--color-dark-mid); }
+}
+
+// ── Aksiyonlar ────────────────────────────────
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 12px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: 11px;
+  font-weight: 500;
+  transition: background var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+}
+
+.cart-wrap { position: relative; display: flex; }
+
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 17px;
+  height: 17px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 9px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
