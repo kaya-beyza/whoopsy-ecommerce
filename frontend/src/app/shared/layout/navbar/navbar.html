@@ -1,0 +1,20 @@
+<nav class="navbar" (mouseleave)="onMouseLeave()">
+  <ul class="nav-list">
+    @for (cat of categories; track cat.id) {
+      <li
+        class="nav-item"
+        [class.active]="activeCategory() === cat.id"
+        [class.highlight]="cat.highlight"
+        (mouseenter)="onMouseEnter(cat.id)"
+      >
+        <a class="nav-link" [routerLink]="['/category', cat.id]">
+          {{ cat.label }}
+        </a>
+
+        @if (activeCategory() === cat.id) {
+          <app-mega-menu [categoryId]="cat.id" />
+        }
+      </li>
+    }
+  </ul>
+</nav>

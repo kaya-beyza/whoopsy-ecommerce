@@ -1,0 +1,70 @@
+<header class="site-header">
+
+  <div class="top-bar">
+    <span>Ücretsiz Kargo — 4.000₺ ve üzeri siparişlerde</span>
+  </div>
+
+  <div class="header-main">
+
+    <a class="logo" routerLink="/">
+      <span class="l-v">v</span><span class="l-e">e</span><span
+        class="l-l">l</span><span class="l-u">u</span><span
+        class="l-r">r</span><span class="l-a">a</span>
+    </a>
+
+    <div class="search-wrapper">
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Ürün, kategori ya da marka ara..."
+        (input)="onSearch($event)"
+        autocomplete="off"
+      />
+      <button class="search-btn" aria-label="Ara">
+        <svg width="17" height="17" viewBox="0 0 18 18" fill="none">
+          <circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="header-actions">
+
+      <a class="action-btn" routerLink="/auth/login">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>Giriş Yap</span>
+      </a>
+
+      <a class="action-btn" routerLink="/favorites">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21C12 21 3 14.5 3 8.5a5 5 0 0 1 9-3 5 5 0 0 1 9 3C21 14.5 12 21 12 21Z"
+                stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span>Favorilerim</span>
+      </a>
+
+      <a class="action-btn" routerLink="/cart">
+        <div class="cart-wrap">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                  stroke="currentColor" stroke-width="1.5"/>
+            <path d="M16 10a4 4 0 0 1-8 0" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          @if (cartCount() > 0) {
+            <span class="cart-badge">{{ cartCount() }}</span>
+          }
+        </div>
+        <span>Sepetim</span>
+      </a>
+
+    </nav>
+  </div>
+
+  <app-navbar />
+
+</header>

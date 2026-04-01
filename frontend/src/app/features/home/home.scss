@@ -1,0 +1,236 @@
+/* --- RENK DEĞİŞKENLERİ --- */
+:root {
+  --color-primary: #b06ab3;
+  --color-primary-light: #c99ee0;
+  --color-accent: #9b4f6a;
+  --color-dark: #6b2d7a;
+  --color-text-primary: #3a1245;
+  --peach-gradient: linear-gradient(135deg, #b06ab3 0%, #9b4f6a 100%);
+  --color-bg-surface: #fdf8ff;
+  --shadow-md: 0 4px 20px rgba(176,106,179,0.12);
+}
+
+.home-wrapper {
+  width: 100%;
+  background-color: #ffffff;
+
+  /* --- 1. BÖLÜM: SLIDER (Video-3'ün Genişliğine Göre Ayarlı) --- */
+  .slider-container {
+    position: relative;
+    width: 100%;
+    // Yüksekliği 65vh yaparak video-3'ün o yayvan yapısını koruyoruz
+    height: 65vh; 
+    min-height: 450px; 
+    overflow: hidden;
+    background-color: #000;
+
+    .slide-item {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      display: none;
+
+      &.active {
+        opacity: 1;
+        display: block;
+      }
+
+      // Video ve Fotoğraf Ayarı (Tüm ekranı bozmadan doldurur)
+      img, video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; 
+        object-position: center;
+        filter: brightness(0.75); // Yazıların okunması için karartma
+      }
+
+      .slide-info {
+        position: absolute;
+        top: 50%;
+        left: 8%;
+        transform: translateY(-50%);
+        color: white;
+        z-index: 10;
+        max-width: 600px;
+
+        .hero-title {
+          font-size: 3.8rem; // Alan daraldığı için yazı boyutunu optimize ettik
+          font-weight: 900;
+          margin-bottom: 15px;
+          line-height: 1.1;
+          background: linear-gradient(to right, var(--color-primary-light), #ffffff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .hero-subtitle {
+          font-size: 1.3rem;
+          margin-bottom: 30px;
+          font-weight: 300;
+          letter-spacing: 1px;
+          animation: fadeInUp 0.8s ease 0.2s forwards;
+          opacity: 0;
+        }
+
+        .hero-btn {
+          padding: 14px 40px;
+          background: var(--peach-gradient);
+          color: white;
+          border: none;
+          border-radius: 50px;
+          font-weight: 700;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(155, 79, 106, 0.4);
+          animation: fadeInUp 0.8s ease 0.4s forwards;
+          opacity: 0;
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(155, 79, 106, 0.6);
+          }
+        }
+      }
+    }
+
+    /* Oklar (Navigasyon Butonları) */
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2); // Biraz daha belirgin cam efekti
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white; 
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 30; // En üstte durduğundan emin olalım
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: flex;         // İkonu tam ortalamak için
+      align-items: center;   // İkonu tam ortalamak için
+      justify-content: center; // İkonu tam ortalamak için
+
+      i {
+        font-size: 1.2rem; // Ok işaretinin boyutu
+        font-weight: 900;
+        color: white; // Ok rengi beyaz olsun
+      }
+
+      &:hover {
+        background: var(--color-primary); // Üzerine gelince senin mor rengin olsun
+        border-color: transparent;
+        transform: translateY(-50%) scale(1.1); // Hafif büyüme efekti
+      }
+
+      &.prev { left: 25px; }
+      &.next { right: 25px; }
+    }
+
+    /* Noktalar */
+    .slider-dots {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 20;
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        transition: 0.3s;
+        &.active { background: var(--color-primary-light); width: 30px; border-radius: 10px; }
+      }
+    }
+  }
+
+  /* --- 2. BÖLÜM: KATEGORİLER (Converse Tarzı Grid) --- */
+  .categories-section {
+    padding: 80px 6%;
+    background-color: var(--color-bg-surface);
+
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--color-text-primary);
+      margin-bottom: 40px;
+      text-align: center;
+      
+      &::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: var(--color-primary);
+        margin: 15px auto;
+        border-radius: 2px;
+      }
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+
+      .category-card {
+        position: relative;
+        height: 500px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 1.2s cubic-bezier(0.2, 1, 0.3, 1);
+        }
+
+        &:hover img { transform: scale(1.1); }
+
+        .card-label {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          padding: 30px;
+          background: linear-gradient(to top, rgba(58, 18, 69, 0.8), transparent);
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          span { font-size: 1.6rem; font-weight: 700; }
+          i { transition: 0.3s; }
+        }
+
+        &:hover .card-label i { transform: translateX(10px); }
+      }
+    }
+  }
+}
+
+/* --- ANİMASYON --- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- MOBİL UYUMLULUK --- */
+@media (max-width: 992px) {
+  .home-wrapper .category-grid { grid-template-columns: 1fr; }
+  .home-wrapper .slider-container { height: 50vh; }
+  .home-wrapper .slider-container .slide-info .hero-title { font-size: 2.5rem; }
+}

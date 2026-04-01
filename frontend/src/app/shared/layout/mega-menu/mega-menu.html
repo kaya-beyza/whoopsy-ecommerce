@@ -1,0 +1,32 @@
+@if (groups.length > 0) {
+  <div class="mega-menu">
+    <div class="mega-inner">
+
+      @for (group of groups; track group.title) {
+        <div class="menu-group">
+          <h4 class="group-title">{{ group.title }}</h4>
+          <ul class="group-list">
+            @for (item of group.items; track item.label) {
+              <li>
+                <a class="group-link" [routerLink]="item.link">
+                  {{ item.label }}
+                  @if (item.hot) {
+                    <span class="hot-badge">Trend</span>
+                  }
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      <div class="menu-promo">
+        <div class="promo-tag">Özel Teklif</div>
+        <div class="promo-title">Bu Haftanın Yıldızları</div>
+        <div class="promo-sub">Seçili ürünlerde %40'a varan indirim</div>
+        <a class="promo-btn" routerLink="/kampanya">Keşfet</a>
+      </div>
+
+    </div>
+  </div>
+}
