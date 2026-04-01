@@ -12,6 +12,7 @@
     <Project Path="src/Presentation/MiniETicaret.API/MiniETicaret.API.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/MiniETicaret.IntegrationTests/MiniETicaret.IntegrationTests.csproj" />
     <Project Path="tests/MiniETicaret.UnitTests/MiniETicaret.UnitTests.csproj" />
   </Folder>
 </Solution>

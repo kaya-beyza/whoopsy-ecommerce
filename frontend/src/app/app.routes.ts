@@ -18,7 +18,7 @@ export const routes: Routes = [
 
   // 3. SİPARİŞLER SAYFASI 
   {
-    path: 'orders',
+    path: 'orders', // www. jadaksd/orders
     // canActivate: [authGuard],
     loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
   },
