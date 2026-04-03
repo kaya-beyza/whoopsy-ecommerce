@@ -5,6 +5,7 @@ using MiniETicaret.Application.Features.Products.Commands.DeleteProduct;
 using MiniETicaret.Application.Features.Products.Commands.UpdateProduct;
 using MiniETicaret.Application.Features.Products.Queries.GetProducts;
 using MiniETicaret.Application.Features.Products.Queries.GetProductById;
+using MiniETicaret.Application.Features.Products.Queries.GetProductsByCategory;
 
 namespace MiniETicaret.API.Controllers;
 
@@ -33,6 +34,12 @@ public class ProductsController : ControllerBase
             return NotFound();
 
         return Ok(result);    
+    }
+    [HttpGet("by-category/{categoryId}")]
+    public async Task<IActionResult> GetByCategory(Guid categoryId)
+    {
+        var result = await _mediator.Send(new GetProductsByCategoryQuery(categoryId));
+        return Ok(result);
     }
 
     [HttpPost]

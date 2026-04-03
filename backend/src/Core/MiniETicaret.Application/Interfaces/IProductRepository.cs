@@ -9,4 +9,5 @@ public interface IProductRepository
     Task AddAsync(Product product, CancellationToken cancellationToken);
     Task UpdateAsync(Product product, CancellationToken cancellationToken);
     Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+    Task<List<Product>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken);
 }
