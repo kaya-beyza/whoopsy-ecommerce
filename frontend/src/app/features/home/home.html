@@ -1,81 +1,103 @@
-<div class="home-wrapper">
+<main class="home-wrapper">
 
-  <section class="slider-container">
+  <section class="hero-slider">
+    <div class="slides-container">
+      @for (slide of slides; track $index) {
+      <div class="slide" [class.active]="currentSlide === $index" [class.is-video]="slide.type === 'video'">
 
-    <div class="slide-item" [class.active]="currentSlide === 0">
-      <video *ngIf="currentSlide === 0" autoplay loop muted playsinline class="video-slide">
-        <source src="/assets/images/video-1.mp4" type="video/mp4">
-      </video>
-      <div class="slide-info">
-        <h1 class="hero-title">Keşfet</h1>
-        <p class="hero-subtitle">Spor modasında iz bırakmış markaların sneaker, giyim ve aksesuar seçenekleri.</p>
-        <button class="hero-btn">KOLEKSİYONU GÖR</button>
+        <div class="hero-media-wrapper">
+          @if (slide.type === 'video') {
+          <video autoplay loop muted playsinline class="hero-main-media">
+            <source [src]="slide.src" type="video/mp4">
+          </video>
+          } @else {
+          <img [src]="slide.src" [alt]="slide.tag" class="hero-main-media">
+          }
+        </div>
+
+        @if (slide.type === 'video') {
+        <div class="hero-content-block">
+          <span class="hero-tag">{{ slide.tag }}</span>
+          <h1 class="hero-title" [innerHTML]="slide.title"></h1>
+          <p class="hero-desc">{{ slide.desc }}</p>
+          <div class="hero-actions">
+            <a [routerLink]="slide.link" class="btn-black-primary">Keşfet</a>
+          </div>
+        </div>
+        }
       </div>
+      }
     </div>
 
-    <div class="slide-item" [class.active]="currentSlide === 1">
-      <img src="/assets/images/ana-banner-2.jpg" alt="Bahar Fırsatları">
-      <div class="slide-info">
-        <h1 class="hero-title">Bahar Esintisi</h1>
-        <p class="hero-subtitle">Seçili ürünlerde %40'a varan indirimler.</p>
-        <button class="hero-btn">İNDİRİMİ YAKALA</button>
-      </div>
-    </div>
-
-    <div class="slide-item" [class.active]="currentSlide === 2">
-      <video *ngIf="currentSlide === 2" autoplay loop muted playsinline class="video-slide">
-        <source src="/assets/images/video-3.mp4" type="video/mp4">
-      </video>
-      <div class="slide-info">
-        <h1 class="hero-title">Limited Edition</h1>
-        <p class="hero-subtitle">Sadece sana özel, sınırlı sayıda üretim.</p>
-        <button class="hero-btn">SERİYİ İNCELE</button>
-      </div>
-    </div>
-
-    <button class="nav-arrow prev" (click)="prevSlide()">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <button class="nav-arrow next" (click)="nextSlide()">
-      <i class="fas fa-chevron-right"></i>
-    </button>
+    <button class="slider-nav prev" (click)="prevSlide()">❮</button>
+    <button class="slider-nav next" (click)="nextSlide()">❯</button>
 
     <div class="slider-dots">
-      <span class="dot" [class.active]="currentSlide === 0" (click)="setSlide(0)"></span>
-      <span class="dot" [class.active]="currentSlide === 1" (click)="setSlide(1)"></span>
-      <span class="dot" [class.active]="currentSlide === 2" (click)="setSlide(2)"></span>
+      @for (slide of slides; track $index) {
+      <span class="dot" [class.active]="currentSlide === $index" (click)="setSlide($index)"></span>
+      }
     </div>
-
   </section>
 
-  <section class="categories-section">
-    <h2 class="section-title">Kategorileri Keşfet</h2>
-
-    <div class="category-grid">
-      <div class="category-card">
-        <img src="/assets/images/kadin.jpg" alt="Kadın Modası">
-        <div class="card-label">
-          <span>Kadın</span>
-          <i class="fas fa-arrow-right"></i>
+  <section class="category-section">
+    <div class="container">
+      <h2 class="section-title">Kategoriler</h2>
+      <div class="category-grid">
+        <div class="cat-card">
+          <img src="assets/images/cat-woman.jpg" alt="Kadın Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/kadin" class="cat-btn">→ KADIN KOLEKSİYONU</a>
+          </div>
         </div>
-      </div>
-
-      <div class="category-card">
-        <img src="/assets/images/erkek.jpg" alt="Erkek Modası">
-        <div class="card-label">
-          <span>Erkek</span>
-          <i class="fas fa-arrow-right"></i>
+        <div class="cat-card">
+          <img src="assets/images/cat-man.jpg" alt="Erkek Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/erkek" class="cat-btn">→ ERKEK KOLEKSİYONU</a>
+          </div>
         </div>
-      </div>
-
-      <div class="category-card">
-        <img src="/assets/images/cocuk.jpg" alt="Çocuk Modası">
-        <div class="card-label">
-          <span>Çocuk</span>
-          <i class="fas fa-arrow-right"></i>
+        <div class="cat-card">
+          <img src="assets/images/cat-child.jpg" alt="Çocuk Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/cocuk" class="cat-btn">→ ÇOCUK KOLEKSİYONU</a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-</div>
+  <section class="style-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Markalar</h2>
+        <a routerLink="/all" class="explore-link">→ Ürünleri Gör</a>
+      </div>
+      <div class="style-grid">
+        <div class="style-card">
+          <span class="style-label">ADİDAS</span>
+          <img src="assets/images/adidas.jpg" alt="Adidas">
+        </div>
+        <div class="style-card">
+          <span class="style-label">CONVERSE</span>
+          <img src="assets/images/converse.jpg" alt="Converse">
+        </div>
+        <div class="style-card">
+          <span class="style-label">NEW BALANCE</span>
+          <img src="assets/images/new-balance.jpg" alt="New Balance">
+        </div>
+        <div class="style-card">
+          <span class="style-label">NIKE</span>
+          <img src="assets/images/nike.jpg" alt="Nike">
+        </div>
+        <div class="style-card">
+          <span class="style-label">PUMA</span>
+          <img src="assets/images/puma.jpg" alt="Puma">
+        </div>
+        <div class="style-card">
+          <span class="style-label">VANS</span>
+          <img src="assets/images/vans.jpg" alt="Vans">
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>

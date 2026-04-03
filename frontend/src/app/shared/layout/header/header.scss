@@ -1,155 +1,201 @@
+@use "../../../../styles/variables" as v;
+
 .site-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: var(--color-bg-surface);
+  background: var(--color-white);
   border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
 }
 
-// ── Top bar ───────────────────────────────────
+// ── Üst İnce Bar (Top Bar) ─────────────────────
 .top-bar {
+  background: var(--color-black);
+  height: var(--ann-height);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 6px 40px;
-  background: var(--color-primary-soft);
-  font-size: 11.5px;
-  color: var(--color-dark-mid);
-  border-bottom: 1px solid var(--color-border);
+  justify-content: space-between;
+  padding: 0 40px;
 
-  .top-links {
+  &__left {
+    flex: 1;
+  }
+
+  &__text {
+    flex: 2;
+    text-align: center;
+    font-family: var(--font-topbar);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--color-white);
+    text-transform: uppercase;
+  }
+
+  &__right {
+    flex: 1;
     display: flex;
-    gap: 20px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+  }
 
-    a {
-      color: var(--color-dark-mid);
-      font-weight: 500;
-      transition: color var(--transition-fast);
-      &:hover { color: var(--color-primary); }
+  &__link {
+    font-family: var(--font-topbar);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-white);
+    text-decoration: none;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__divider {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 10px;
+  }
+
+  &__icon {
+    font-size: 18px;
+    color: var(--color-white);
+    font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz: 20';
+    margin-left: 4px;
+    cursor: pointer;
+  }
+}
+
+// ── Ana Bar (Main Bar) ─────────────────────────
+.main-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding: 0 32px;
+  position: relative;
+}
+
+// ── Logo: whoopsy & GÖZLER ──────────────────────
+.logo {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-logo);
+  font-size: 30px;
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  color: var(--color-black);
+  transition: opacity 150ms ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  .logo-oopsy {
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+  }
+
+  .eye-o {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+
+    // Göz Bebekleri
+    &::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #000;
+      border-radius: 50%;
+      top: 50%;
+      left: 35%;
+      transform: translate(-50%, -50%);
+      animation: eyeMove 3s infinite ease-in-out;
+    }
+  }
+
+  .logo-w,
+  .logo-y {
+    color: var(--color-black);
+  }
+}
+
+// ── Navbar: Tam Sayfa Ortası ────
+.navbar-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+// ── Sağ İkonlar ───────────────────────────────
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 20;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px; // Kutu boyutu sabit
+  height: 42px; // Kutu boyutu sabit
+  color: var(--color-black);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  cursor: pointer;
+
+  /* --- Google Material Symbols Ayarları --- */
+  .material-symbols-sharp {
+    font-size: 24px; // İkonun genel boyutu
+    font-variation-settings:
+      'FILL' 0,
+      /* İçi boş, ince çizgili */
+      'wght' 200,
+      /* EN İNCE ÇİZGİ AĞIRLIĞI */
+      'GRAD' 0,
+      'opsz' 24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  &:hover {
+    color: var(--color-primary); // Hover'da kırmızı
+    transform: scale(1.05);
+
+    .material-symbols-sharp {
+      font-variation-settings: 'wght' 300; // Hover'da çizgiyi çok hafif kalınlaştır
     }
   }
 }
 
-// ── Ana satır ─────────────────────────────────
-.header-main {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 0 40px;
-  height: var(--header-height);
-}
+// ── Animasyonlar ──────────────────────────────
+@keyframes eyeMove {
 
-// ── Logo ──────────────────────────────────────
-.logo {
-  font-family: var(--font-display);
-  font-size: 34px;
-  font-style: italic;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  flex-shrink: 0;
-  text-decoration: none;
-
-  // Soldan sağa leylak → gül geçişi
-  .l-v { color: #ddb8f0; }
-  .l-e { color: #c99ee0; }
-  .l-l { color: #b888d0; }
-  .l-u { color: #b06ab3; }
-  .l-r { color: #a0508a; }
-  .l-a { color: #6b2d7a; }
-
-  &:hover { opacity: 0.85; transition: opacity var(--transition-fast); }
-}
-
-// ── Arama ─────────────────────────────────────
-.search-wrapper {
-  flex: 1;
-  max-width: 560px;
-  position: relative;
-}
-
-.search-input {
-  width: 100%;
-  height: 44px;
-  border: 1.5px solid var(--color-border-strong);
-  border-radius: var(--radius-full);
-  padding: 0 52px 0 22px;
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--color-text-primary);
-  background: var(--color-bg);
-  outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-
-  &::placeholder { color: var(--color-text-light); }
-
-  &:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(224, 120, 64, 0.12);
+  0%,
+  100% {
+    transform: translate(-50%, -50%);
   }
-}
 
-.search-btn {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 34px;
-  height: 34px;
-  border: none;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background var(--transition-fast);
-
-  &:hover { background: var(--color-dark-mid); }
-}
-
-// ── Aksiyonlar ────────────────────────────────
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-}
-
-.action-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 8px 12px;
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  border-radius: var(--radius-md);
-  font-size: 11px;
-  font-weight: 500;
-  transition: background var(--transition-fast), color var(--transition-fast);
-
-  &:hover {
-    background: var(--color-primary-soft);
-    color: var(--color-primary);
+  25% {
+    transform: translate(-20%, -60%);
   }
-}
 
-.cart-wrap { position: relative; display: flex; }
+  50% {
+    transform: translate(-70%, -40%);
+  }
 
-.cart-badge {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  min-width: 17px;
-  height: 17px;
-  background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-full);
-  font-size: 9px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
+  75% {
+    transform: translate(-20%, -40%);
+  }
 }

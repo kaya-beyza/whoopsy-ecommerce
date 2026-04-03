@@ -1,0 +1,131 @@
+<div class="shop-container" [class.filter-open]="isFilterVisible()">
+    <!-- Header: Centered Aesthetic -->
+    <header class="shop-header">
+        <div class="breadcrumb">Anasayfa / Kadın / Ayakkabı / <span class="active">Tüm Ayakkabılar</span></div>
+        <h1 class="category-name">KADIN AYAKKABI</h1>
+    </header>
+
+    <!-- Controls Bar: Spacious and Professional -->
+    <div class="controls-bar">
+        <div class="filter-section">
+            <button class="filter-trigger" (click)="toggleFilter()">
+                <span class="material-symbols-sharp">tune</span>
+                <span class="filter-label">Filtrele</span>
+            </button>
+            <div class="divider"></div>
+            <span class="product-count" *ngIf="!isLoading()">{{ products().length }} Ürün</span>
+        </div>
+
+        <div class="sort-section" (click)="$event.stopPropagation()">
+            <div class="custom-sort" [class.open]="isSortOpen()">
+                <div class="sort-trigger" (click)="toggleSort()">
+                    <span class="sort-label">Sırala:</span>
+                    <span class="selected-value">{{ selectedSort().label }}</span>
+                    <span class="material-symbols-sharp sort-icon">expand_more</span>
+                </div>
+                
+                <ul class="sort-dropdown" *ngIf="isSortOpen()">
+                    <li *ngFor="let option of sortOptions" 
+                        [class.active]="selectedSort().value === option.value"
+                        (click)="selectSort(option)">
+                        {{ option.label }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <main class="products-layout">
+        <!-- Sidebar Filter Drawer -->
+        <aside class="filter-drawer" [class.active]="isFilterVisible()">
+            <div class="drawer-header">
+                <h3>FİLTRELER</h3>
+                <button class="close-btn" (click)="toggleFilter()">
+                    <span class="material-symbols-sharp">close</span>
+                </button>
+            </div>
+
+            <div class="filter-content">
+                <div class="filter-group" *ngFor="let group of filterGroups()">
+                    <div class="group-header" (click)="toggleFilterGroup(group)">
+                        <span>{{ group.name }}</span>
+                        <span class="material-symbols-sharp">{{ group.isExpanded ? 'remove' : 'add' }}</span>
+                    </div>
+                    <div class="group-options" [class.expanded]="group.isExpanded">
+                        <label class="option-item" *ngFor="let opt of group.options">
+                            <input type="checkbox">
+                            <span class="custom-checkbox"></span>
+                            <span class="option-text">{{ opt }}</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drawer-footer">
+                <button class="text-link-btn clear-all">TEMİZLE</button>
+                <button class="apply-filter-btn" (click)="toggleFilter()">SONUÇLARI GÖR</button>
+            </div>
+        </aside>
+
+        <!-- Overlay for Drawer -->
+        <div class="drawer-overlay" (click)="toggleFilter()" *ngIf="isFilterVisible()"></div>
+
+        <!-- Products Grid -->
+        <section class="products-grid">
+            <!-- Loading Skeletons -->
+            <ng-container *ngIf="isLoading()">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text short"></div>
+                    <div class="skeleton-text long"></div>
+                </div>
+            </ng-container>
+
+            <!-- Actual Product Cards -->
+            <ng-container *ngIf="!isLoading()">
+                <div class="product-card" *ngFor="let product of products()" 
+                     (mouseleave)="setQuickAddProduct(null)">
+                    
+                    <div class="card-image-wrapper">
+                        <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
+                        <span class="badge new" *ngIf="product.isNew">YENİ</span>
+                        <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel }}</span>
+
+                        <button class="wishlist-btn">
+                            <span class="material-symbols-sharp">favorite</span>
+                        </button>
+
+                        <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
+                        <img [src]="product.hoverImageUrl || product.imageUrl" [alt]="product.name" class="hover-img" *ngIf="product.hoverImageUrl">
+                        
+                        <!-- Quick Add Button (+) -->
+                        <button class="btn-plus-add" (click)="setQuickAddProduct(product.id)" *ngIf="quickAddProductId() !== product.id">
+                            <span class="material-symbols-sharp">add</span>
+                        </button>
+
+                        <!-- Size Selector Overlay -->
+                        <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id">
+                            <p class="quick-add-title">HIZLI EKLE</p>
+                            <div class="sizes-grid">
+                                <button *ngFor="let size of product.sizes" 
+                                        (click)="addToCart(product, size)"
+                                        class="size-btn">
+                                    {{ size }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-info">
+                        <p class="brand-name">{{ product.brand }}</p>
+                        <h3 class="product-title">{{ product.name }}</h3>
+                        <div class="price-row">
+                            <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice | number:'1.0-0' }} TL</span>
+                            <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price | number:'1.0-0' }} TL</span>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </section>
+    </main>
+</div>

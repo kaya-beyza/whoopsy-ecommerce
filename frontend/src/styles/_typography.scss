@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap');
+
+:root {
+    --font-logo: 'Anton', sans-serif;
+    --font-topbar: 'Inter', sans-serif;
+    --font-nav: 'Barlow Condensed', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-primary, #000000);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    background: none;
+}
