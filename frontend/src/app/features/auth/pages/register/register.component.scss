@@ -1,0 +1,328 @@
+@use "../../../../../styles/variables" as v;
+
+.login-viewport {
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  position: fixed; // Fixed branding baseline
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  background: #ffffff;
+  font-family: var(--font-body);
+  z-index: 100;
+}
+
+/* --- LOGO (Shared Styles) --- */
+.logo-main,
+.logo-light {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-logo);
+  font-size: 42px;
+  letter-spacing: -1px;
+  text-decoration: none;
+  color: #000;
+  margin-bottom: 25px; // Sıkılaştırılmış boşluk
+
+  .logo-oopsy {
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+  }
+
+  .eye-o {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+
+    &::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #000;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(calc(-50% + var(--eye-x, 0px)), calc(-50% + var(--eye-y, 0px)));
+      transition: transform 0.1s ease-out;
+    }
+  }
+
+  .logo-w,
+  .logo-h,
+  .logo-y {
+    color: #000;
+    text-transform: lowercase;
+  }
+}
+
+.logo-light {
+  font-size: 64px;
+  color: #000;
+  .logo-w, .logo-h, .logo-y { color: #000; }
+}
+
+/* --- Left Panel: Dynamic Visual --- */
+.brand-panel {
+  flex: 0 0 60%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+
+  .asset-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 40%);
+    z-index: 2;
+  }
+
+  .brand-asset {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    filter: brightness(0.85) grayscale(0.2);
+  }
+
+  .brand-tagline {
+    position: absolute;
+    bottom: 80px;
+    left: 80px;
+    z-index: 3;
+    color: #fff;
+    width: 400px;
+    height: 160px; // Absolute bucket height
+
+    .logo-light {
+      position: absolute !important;
+      bottom: 50px; // Fixed distance
+      left: 0;
+      margin: 0;
+    }
+
+    p {
+      position: absolute !important;
+      bottom: 0;
+      left: 0;
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 8px;
+      font-weight: 200;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+  }
+}
+
+/* --- Right Panel: Minimalist Form --- */
+.form-panel {
+  flex: 0 0 40%; // Locked split ratio
+  display: flex;
+  flex-direction: column; 
+  height: 100vh;
+  background: #ffffff;
+  overflow-y: auto; 
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  .login-container {
+    width: 100%;
+    max-width: 460px;
+    margin: auto; // Smart centering: fits? center. overflows? start.
+    padding: 60px 80px; 
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 35px; // Unified
+
+    .logo-main {
+      justify-content: center;
+      margin-bottom: 35px; // Unified
+    }
+
+    .welcome-title {
+      font-size: 32px; // Slightly smaller for 4-field fit
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #777;
+      font-weight: 300;
+    }
+  }
+}
+
+/* --- Form Elements --- */
+.login-form {
+  .form-group {
+    margin-bottom: 14px; // Compressed for sync
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 800;
+      color: #000;
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .input-icon {
+        position: absolute;
+        left: 20px;
+        font-size: 18px;
+        color: #ccc;
+      }
+
+      input {
+        width: 100%;
+        padding: 16px 20px 16px 55px; // Thinner inputs
+        font-size: 14px;
+        border: 1px solid #f0f0f0;
+        background: #fcfcfc;
+        border-radius: 15px;
+        outline: none;
+        transition: all 0.3s ease;
+
+        &:focus {
+          border-color: var(--color-primary);
+          background: #fff;
+          box-shadow: 0 5px 20px rgba(181, 0, 0, 0.05);
+          .input-icon { color: var(--color-primary); }
+        }
+      }
+    }
+  }
+
+  .primary-btn {
+    width: 100%;
+    background: #000;
+    color: #fff;
+    padding: 18px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      background: #222;
+      transform: translateY(-3px);
+    }
+  }
+}
+
+.social-divider {
+  text-align: center;
+  margin: 25px 0 20px;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+    z-index: 1;
+  }
+  span {
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    padding: 0 20px;
+    font-size: 11px;
+    color: #bbb;
+    text-transform: uppercase;
+  }
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  button {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #f0f0f0;
+    background: #fff;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: #444;
+    transition: all 0.2s;
+    &:hover { background: #fbfbfb; }
+    img { width: 18px; }
+  }
+}
+
+.form-footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+  .signup-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 800;
+    margin-left: 10px;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.error-msg {
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fff5f5;
+  color: var(--color-primary);
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDown 0.3s ease-out;
+  .material-symbols-sharp { font-size: 18px; }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1024px) {
+  .brand-panel { flex: 1; }
+  .form-panel { flex: 1; padding: 40px; }
+}
+
+@media (max-width: 768px) {
+  .brand-panel { display: none; }
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -7,62 +7,41 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './home.html',
-  styleUrl: './home.scss'
+  styleUrls: ['./home.scss']
 })
-export class Home implements OnInit, OnDestroy {
+export class Home {
   currentSlide = 0;
-  totalSlides = 3;
-  slideInterval: any;
 
-  ngOnInit() {
-    this.startTimer();
-  }
+  slides = [
+    {
+      id: 1,
+      type: 'video',
+      src: 'assets/images/video-1.mp4',
+      tag: 'OOPS!',
+      title: 'whOOPSy<br>ile',
+      desc: 'sokak ruhunu ayağına taşı.',
+      link: '/shop'
+    },
+    {
+      id: 2,
+      type: 'image',
+      src: 'assets/images/hero-1.jpg',
+      tag: '',
+      title: '',
+      desc: '',
+      link: '/explore'
+    }
+  ];
 
-  ngOnDestroy() {
-    this.stopTimer();
-  }
-
-  // Sadece ileri gitme fonksiyonu (Sonsuz Döngü)
   nextSlide() {
-    if (this.currentSlide < this.totalSlides - 1) {
-      this.currentSlide++;
-    } else {
-      this.currentSlide = 0; // 3 bittiyse 1'e dön
-    }
-    this.resetTimer();
+    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
   }
 
-  // Sadece geri gitme fonksiyonu
   prevSlide() {
-    if (this.currentSlide > 0) {
-      this.currentSlide--;
-    } else {
-      this.currentSlide = this.totalSlides - 1; // 1'deyken geri basınca 3'e git
-    }
-    this.resetTimer();
+    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
   }
 
-  // Noktalar için
   setSlide(index: number) {
     this.currentSlide = index;
-    this.resetTimer();
-  }
-
-  // --- ZAMANLAYICI YÖNETİMİ ---
-  startTimer() {
-    this.slideInterval = setInterval(() => {
-      this.nextSlide();
-    }, 5000);
-  }
-
-  stopTimer() {
-    if (this.slideInterval) {
-      clearInterval(this.slideInterval);
-    }
-  }
-
-  resetTimer() {
-    this.stopTimer();
-    this.startTimer();
   }
 }

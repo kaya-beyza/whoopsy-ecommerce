@@ -1,0 +1,30 @@
+<mat-sidenav-container class="layout-container">
+
+    <mat-sidenav #sidenav mode="over" class="side-menu">
+        <div class="side-menu__header">
+            <span class="side-menu__title">MENÜ</span>
+            <button mat-icon-button (click)="sidenav.close()">
+                <span class="material-symbols-sharp">close</span>
+            </button>
+        </div>
+
+        <mat-nav-list>
+            <a mat-list-item routerLink="/" (click)="sidenav.close()">Ana Sayfa</a>
+            <a mat-list-item routerLink="/shop" (click)="sidenav.close()">Yeni Gelenler</a>
+            <a mat-list-item routerLink="/orders" (click)="sidenav.close()">Siparişlerim</a>
+            <a mat-list-item routerLink="/users" (click)="sidenav.close()">Profilim</a>
+        </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+
+        <app-header (menuClick)="sidenav.toggle()"></app-header>
+
+        <main class="content-wrapper">
+            <router-outlet></router-outlet>
+        </main>
+
+        <app-footer></app-footer>
+
+    </mat-sidenav-content>
+</mat-sidenav-container>
