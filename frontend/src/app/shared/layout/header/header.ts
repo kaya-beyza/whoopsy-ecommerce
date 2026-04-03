@@ -10,10 +10,5 @@ import { Navbar }            from '../navbar/navbar';
   styleUrl: './header.scss'
 })
 export class Header {
-  cartCount = signal(3);
-
-  onSearch(event: Event): void {
-    const query = (event.target as HTMLInputElement).value;
-    console.log('Arama:', query);
-  }
+  cartCount = signal(0);
 }

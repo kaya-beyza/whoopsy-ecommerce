@@ -3,27 +3,25 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
-import { TokenService } from '../../../../core/services/token.service';
-import { LoginRequest } from '../../../../core/models/auth.model';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.scss'
 })
-export class LoginComponent {
-
+export class RegisterComponent {
+  fullName: string = '';
   email: string = '';
   password: string = '';
+  confirmPassword: string = '';
   errorMessage: string = '';
   isLoading: boolean = false;
 
   constructor(
-    private authService: AuthService,
-    private tokenService: TokenService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) { }
 
   @HostListener('document:mousemove', ['$event'])
@@ -31,7 +29,7 @@ export class LoginComponent {
     const x = (e.clientX / window.innerWidth) * 100;
     const y = (e.clientY / window.innerHeight) * 100;
 
-    // Eyeball move logic (max +/- 4px)
+    // Eyeball move logic (max +/- 4px) - Consistent with Login Page
     const moveX = (x - 50) / 12.5;
     const moveY = (y - 50) / 12.5;
 
@@ -39,35 +37,34 @@ export class LoginComponent {
     document.documentElement.style.setProperty('--eye-y', `${moveY}px`);
   }
 
-  onLogin(): void {
-    if (!this.email || !this.password) {
-      this.errorMessage = 'Email ve şifre alanları zorunludur.';
+  onRegister(): void {
+    if (!this.fullName || !this.email || !this.password || !this.confirmPassword) {
+      this.errorMessage = 'Lütfen tüm alanları doldurun.';
       return;
     }
 
-    // ───── TEST LOGIN ─────
-    if (this.email === 'admin@admin.com' && this.password === 'admin123') {
-      this.tokenService.setTokens('fake-test-token', 'fake-refresh-token');
-      this.router.navigate(['/']);
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Şifreler eşleşmiyor.';
       return;
     }
-    // ───── TEST LOGIN END ─────
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    const request: LoginRequest = {
+    this.authService.register({
+      fullName: this.fullName,
       email: this.email,
       password: this.password
-    };
-
-    this.authService.login(request).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
+    }).subscribe({
+      next: (response) => {
+        console.log('Kayıt başarılı:', response);
+        this.isLoading = false;
+        // Kayıt sonrası login sayfasına yönlendiriyoruz
+        this.router.navigate(['/login']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.Message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.';
+        this.errorMessage = err.error?.message || 'Kayıt sırasında bir hata oluştu.';
       }
     });
   }
