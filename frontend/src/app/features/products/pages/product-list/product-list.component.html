@@ -23,10 +23,9 @@
                     <span class="selected-value">{{ selectedSort().label }}</span>
                     <span class="material-symbols-sharp sort-icon">expand_more</span>
                 </div>
-                
+
                 <ul class="sort-dropdown" *ngIf="isSortOpen()">
-                    <li *ngFor="let option of sortOptions" 
-                        [class.active]="selectedSort().value === option.value"
+                    <li *ngFor="let option of sortOptions" [class.active]="selectedSort().value === option.value"
                         (click)="selectSort(option)">
                         {{ option.label }}
                     </li>
@@ -83,9 +82,8 @@
 
             <!-- Actual Product Cards -->
             <ng-container *ngIf="!isLoading()">
-                <div class="product-card" *ngFor="let product of products()" 
-                     (mouseleave)="setQuickAddProduct(null)">
-                    
+                <div class="product-card" *ngFor="let product of products()" (mouseleave)="setQuickAddProduct(null)">
+
                     <div class="card-image-wrapper">
                         <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
                         <span class="badge new" *ngIf="product.isNew">YENİ</span>
@@ -96,10 +94,12 @@
                         </button>
 
                         <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                        <img [src]="product.hoverImageUrl || product.imageUrl" [alt]="product.name" class="hover-img" *ngIf="product.hoverImageUrl">
-                        
+                        <img [src]="product.hoverImageUrl || product.imageUrl" [alt]="product.name" class="hover-img"
+                            *ngIf="product.hoverImageUrl">
+
                         <!-- Quick Add Button (+) -->
-                        <button class="btn-plus-add" (click)="setQuickAddProduct(product.id)" *ngIf="quickAddProductId() !== product.id">
+                        <button class="btn-plus-add" (click)="setQuickAddProduct(product.id)"
+                            *ngIf="quickAddProductId() !== product.id">
                             <span class="material-symbols-sharp">add</span>
                         </button>
 
@@ -107,9 +107,8 @@
                         <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id">
                             <p class="quick-add-title">HIZLI EKLE</p>
                             <div class="sizes-grid">
-                                <button *ngFor="let size of product.sizes" 
-                                        (click)="addToCart(product, size)"
-                                        class="size-btn">
+                                <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
+                                    class="size-btn">
                                     {{ size }}
                                 </button>
                             </div>
@@ -120,8 +119,10 @@
                         <p class="brand-name">{{ product.brand }}</p>
                         <h3 class="product-title">{{ product.name }}</h3>
                         <div class="price-row">
-                            <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice | number:'1.0-0' }} TL</span>
-                            <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price | number:'1.0-0' }} TL</span>
+                            <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice |
+                                number:'1.0-0' }} TL</span>
+                            <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price |
+                                number:'1.0-0' }} TL</span>
                         </div>
                     </div>
                 </div>

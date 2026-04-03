@@ -73,7 +73,9 @@
           font-family: var(--font-body);
         }
 
-        &:hover { opacity: 0.6; }
+        &:hover {
+          opacity: 0.6;
+        }
       }
 
       .divider {
@@ -140,7 +142,7 @@
         min-width: 180px;
         background: #fff;
         border: 1px solid #f0f0f0;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         z-index: 100;
         list-style: none;
         padding: 12px 0;
@@ -172,8 +174,15 @@
     }
 
     @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   }
 
@@ -189,7 +198,7 @@
     display: flex;
     flex-direction: column;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 10px 0 30px rgba(0,0,0,0.05);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
 
     &.active {
       transform: translateX(420px);
@@ -217,7 +226,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #aaa; /* Yumuşatılmış X ikonu */
+        color: #aaa;
+        /* Yumuşatılmış X ikonu */
         transition: color 0.2s, transform 0.2s;
 
         &:hover {
@@ -254,7 +264,8 @@
 
           .material-symbols-sharp {
             font-size: 20px;
-            color: #ddd; /* Daha da yumuşatılmış ikonlar */
+            color: #ddd;
+            /* Daha da yumuşatılmış ikonlar */
             transition: color 0.2s;
           }
 
@@ -284,8 +295,11 @@
             color: #555;
             cursor: pointer;
             transition: color 0.2s;
-            &:hover { color: #000; }
-            
+
+            &:hover {
+              color: #000;
+            }
+
             input[type="checkbox"] {
               width: 16px;
               height: 16px;
@@ -336,12 +350,12 @@
         cursor: pointer;
         letter-spacing: 1.5px;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
         &:hover {
           background: #333;
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
       }
     }
@@ -384,8 +398,13 @@
     }
 
     &:hover {
-      .main-img { transform: scale(1.04); }
-      .hover-img { opacity: 1; }
+      .main-img {
+        transform: scale(1.04);
+      }
+
+      .hover-img {
+        opacity: 1;
+      }
     }
 
     .btn-plus-add {
@@ -404,7 +423,7 @@
       cursor: pointer;
       z-index: 5;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 
       &:hover {
         background: #000;
@@ -412,7 +431,10 @@
         border-color: #000;
         transform: scale(1.05);
       }
-      .material-symbols-sharp { font-size: 20px; }
+
+      .material-symbols-sharp {
+        font-size: 20px;
+      }
     }
 
     .quick-size-selector {
@@ -427,7 +449,9 @@
       z-index: 10;
       text-align: center;
 
-      &.active { transform: translateY(0); }
+      &.active {
+        transform: translateY(0);
+      }
 
       .quick-add-title {
         font-family: var(--font-nav);
@@ -450,7 +474,12 @@
           font-weight: 600;
           cursor: pointer;
           transition: 0.2s;
-          &:hover { background: #000; color: #fff; border-color: #000; }
+
+          &:hover {
+            background: #000;
+            color: #fff;
+            border-color: #000;
+          }
         }
       }
     }
@@ -483,7 +512,10 @@
         .current-price {
           font-weight: 700;
           font-size: 15px;
-          &.discounted { color: #e8000d; }
+
+          &.discounted {
+            color: #e8000d;
+          }
         }
 
         .original-price {
@@ -504,8 +536,16 @@
     font-size: 10px;
     font-weight: 700;
     z-index: 5;
-    &.bestseller { background: #000; color: #fff; }
-    &.new { background: #e8000d; color: #fff; }
+
+    &.bestseller {
+      background: #000;
+      color: #fff;
+    }
+
+    &.new {
+      background: #e8000d;
+      color: #fff;
+    }
   }
 
   .wishlist-btn {
@@ -518,7 +558,11 @@
     z-index: 5;
     font-size: 22px;
     transition: 0.2s;
-    &:hover { color: #e8000d; transform: scale(1.1); }
+
+    &:hover {
+      color: #e8000d;
+      transform: scale(1.1);
+    }
   }
 }
 
@@ -543,8 +587,13 @@
 }
 
 @keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .drawer-overlay {
@@ -553,7 +602,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 999;
   backdrop-filter: blur(2px);
 }
