@@ -42,4 +42,10 @@ public class ProductRepository : IProductRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
+    public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken)
+    {   
+    return await _context.Products
+        .Where(p => p.CategoryId == categoryId)
+        .ToListAsync(cancellationToken);
+    }
 }

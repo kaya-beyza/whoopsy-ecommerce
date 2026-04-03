@@ -1,7 +1,6 @@
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
-using MiniETicaret.Domain.Entities;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductById;
 
