@@ -58,9 +58,7 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: '',
-    pathMatch: 'full'
-    
-    path: 'orders', // www. jadaksd/orders
+    pathMatch: 'full',
     // canActivate: [authGuard],
     loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
   },
@@ -74,10 +72,10 @@ export const routes: Routes = [
   },
 
   // VARSAYILAN YÖNLENDİRME (En altta kalmalı)
-  { 
-    path: '', 
-    redirectTo: 'login', 
-    pathMatch: 'full' 
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
 
   }
 ];
