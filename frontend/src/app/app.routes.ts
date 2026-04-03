@@ -11,6 +11,10 @@ export const routes: Routes = [
     path: 'login',
     component: LoginComponent
   },
+
+
+
+  // 2. KULLANICILAR SAYFASI
   {
     path: 'register',
     component: RegisterComponent
@@ -18,6 +22,7 @@ export const routes: Routes = [
 
   // 2. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
   {
+
     path: '',
     component: MainLayoutComponent, // 💡 Çatı burada kuruluyor
     children: [
@@ -54,5 +59,25 @@ export const routes: Routes = [
     path: '**',
     redirectTo: '',
     pathMatch: 'full'
+    
+    path: 'orders', // www. jadaksd/orders
+    // canActivate: [authGuard],
+    loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
+  },
+
+  // 4. YENİ EKLENEN: ÜRÜN EKLEME SAYFASI
+  {
+    path: 'products/create',
+    // İleride giriş yapmayanların ürün eklemesini engellemek için burayı da açabilirsin:
+    // canActivate: [authGuard], 
+    loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
+  },
+
+  // VARSAYILAN YÖNLENDİRME (En altta kalmalı)
+  { 
+    path: '', 
+    redirectTo: 'login', 
+    pathMatch: 'full' 
+
   }
 ];
