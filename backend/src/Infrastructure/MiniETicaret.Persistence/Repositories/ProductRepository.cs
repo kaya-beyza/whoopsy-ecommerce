@@ -18,7 +18,7 @@ public class ProductRepository : IProductRepository
     {
         return await _context.Products.ToListAsync(cancellationToken);
     }
-           
+
     public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _context.Products.FindAsync(new object[] { id }, cancellationToken);
@@ -27,13 +27,13 @@ public class ProductRepository : IProductRepository
     {
         await _context.Products.AddAsync(product, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-    }     
+    }
     public async Task UpdateAsync(Product product, CancellationToken cancellationToken)
     {
         _context.Products.Update(product);
         await _context.SaveChangesAsync(cancellationToken);
-    }      
-     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    }
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         var product = await GetByIdAsync(id, cancellationToken);
         if (product != null)
@@ -43,9 +43,14 @@ public class ProductRepository : IProductRepository
         }
     }
     public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken)
-    {   
-    return await _context.Products
-        .Where(p => p.CategoryId == categoryId)
-        .ToListAsync(cancellationToken);
+    {
+        return await _context.Products
+            .Where(p => p.CategoryId == categoryId)
+            .ToListAsync(cancellationToken);
     }
 }
+// ödeme ekranı firebasein sandbox 
+//  bdeva storage sağlayan azure storeageoları oraya yüklenecek linkler gelicek 
+// ürünler kaggle veri seti kaggledan veriler çekilecek.
+// register adres, telefon numaras eklenecek 
+//ödeme ekranı yapılacak 
