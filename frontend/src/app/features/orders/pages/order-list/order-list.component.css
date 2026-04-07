@@ -1,0 +1,83 @@
+/* GENEL AYARLAR VE TİPOGRAFİ */
+.page-container { padding: 32px 40px; background-color: #f8fafc; min-height: 100vh; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+.page-header { margin-bottom: 24px; }
+.page-header h2 { color: #0f172a; font-size: 24px; font-weight: 700; margin: 0 0 4px 0; }
+.subtitle { color: #64748b; font-size: 14px; margin: 0; }
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; color: #1e293b; }
+.text-muted { color: #64748b; font-size: 13.5px; }
+.mt-3 { margin-top: 16px; }
+
+/* FİLTRE BÖLÜMÜ */
+.filter-section { display: flex; gap: 16px; align-items: flex-end; background: #ffffff; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+.filter-group label { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.filter-group select, .filter-group input { padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: 8px; color: #334155; background-color: #ffffff; outline: none; transition: all 0.2s; font-size: 14px; min-width: 160px; }
+.filter-group select:focus, .filter-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+.filter-actions { display: flex; gap: 12px; margin-left: auto; }
+
+/* BUTONLAR */
+.btn-primary { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37, 99, 235, 0.3); }
+.btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+.btn-secondary { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btn-secondary:hover { background: #f8fafc; border-color: #94a3b8; }
+.btn-text { background: transparent; color: #64748b; border: none; font-weight: 500; font-size: 14px; cursor: pointer; padding: 10px 16px; transition: 0.2s; }
+.btn-text:hover { color: #0f172a; background: #f1f5f9; border-radius: 8px; }
+.btn-icon { background: #f1f5f9; color: #3b82f6; border: none; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+.btn-icon:hover { background: #e0e7ff; color: #4f46e5; }
+
+/* TOPLU İŞLEM ÇUBUĞU (BULK ACTIONS) */
+.bulk-action-bar { background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; animation: slideDown 0.3s ease; color: #1e3a8a; font-size: 14px; }
+.bulk-buttons { display: flex; gap: 12px; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* MODERN TABLO VE STICKY HEADER */
+.table-responsive { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; overflow: auto; max-height: calc(100vh - 280px); /* Kaydırma çubuğu için max boy */ }
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.data-table th { background-color: #f8fafc; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; padding: 16px 20px; text-align: left; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; /* Aşağı kaydırırken başlık üstte yapışık kalır */ box-shadow: 0 1px 0 #e2e8f0; }
+.data-table td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; transition: background 0.2s; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background-color: #f8fafc; }
+.selected-row td { background-color: #f0fdf4 !important; } /* Seçili satırı hafif yeşil yap */
+.order-id { font-family: monospace; font-size: 14px; font-weight: 600; color: #3b82f6; }
+
+/* CHECKBOX TASARIMI */
+.checkbox-cell { width: 40px; text-align: center; }
+input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #2563eb; }
+
+/* TABLO İÇİ DURUM AÇILIR MENÜSÜ */
+.status-dropdown { padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid transparent; cursor: pointer; outline: none; appearance: none; background-color: #f1f5f9; color: #475569; transition: 0.2s; }
+.status-dropdown:hover { background-color: #e2e8f0; }
+.status-dropdown:focus { box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3); }
+
+/* SKELETON (HAYALET) YÜKLEME EFEKTİ */
+.skeleton-box { background: #e2e8f0; height: 16px; border-radius: 4px; overflow: hidden; position: relative; }
+.skeleton-box::after { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); animation: shimmer 1.5s infinite; }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.skeleton-box.short { width: 40%; }
+.skeleton-box.medium { width: 70%; }
+.skeleton-box.checkbox-skel { width: 16px; height: 16px; border-radius: 4px; }
+.skeleton-box.dropdown-skel { width: 120px; height: 30px; border-radius: 20px; }
+.skeleton-box.button-skel { width: 80px; height: 30px; border-radius: 6px; }
+
+/* BOŞ DURUM (EMPTY STATE) İLLÜSTRASYONU */
+.empty-state { padding: 60px 20px; text-align: center; background: white; }
+.empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.8; filter: grayscale(1); }
+.empty-state h3 { color: #1e293b; font-size: 18px; margin-bottom: 8px; }
+.empty-state p { color: #64748b; font-size: 14px; max-width: 400px; margin: 0 auto; line-height: 1.5; }
+
+/* SAYFALAMA */
+.pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+.page-info { color: #64748b; font-size: 14px; }
+.page-info strong { color: #0f172a; }
+.page-buttons { display: flex; gap: 8px; }
+.page-buttons button { padding: 8px 16px; border: 1px solid #e2e8f0; background: white; color: #334155; font-weight: 500; font-size: 13px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+.page-buttons button:not(:disabled):hover { background: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+.page-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* TOAST BİLDİRİMLERİ (SAĞ ÜST KÖŞE) */
+.toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { background: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; font-weight: 500; font-size: 14px; color: #1e293b; animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-left: 4px solid transparent; }
+.toast.success { border-left-color: #22c55e; }
+.toast.error { border-left-color: #ef4444; }
+@keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }

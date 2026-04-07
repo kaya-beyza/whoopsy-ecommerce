@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/MiniETicaret.Application/MiniETicaret.Application.csproj" />
+    <Project Path="src/Core/MiniETicaret.Domain/MiniETicaret.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="src/Infrastructure/MiniETicaret.Infrastructure/MiniETicaret.Infrastructure.csproj" />
+    <Project Path="src/Infrastructure/MiniETicaret.Persistence/MiniETicaret.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/src/Presentation/">
+    <Project Path="src/Presentation/MiniETicaret.API/MiniETicaret.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MiniETicaret.IntegrationTests/MiniETicaret.IntegrationTests.csproj" />
+    <Project Path="tests/MiniETicaret.UnitTests/MiniETicaret.UnitTests.csproj" />
+  </Folder>
+</Solution>

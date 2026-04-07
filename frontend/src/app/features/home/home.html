@@ -1,0 +1,103 @@
+<main class="home-wrapper">
+
+  <section class="hero-slider">
+    <div class="slides-container">
+      @for (slide of slides; track $index) {
+      <div class="slide" [class.active]="currentSlide === $index" [class.is-video]="slide.type === 'video'">
+
+        <div class="hero-media-wrapper">
+          @if (slide.type === 'video') {
+          <video autoplay loop muted playsinline class="hero-main-media">
+            <source [src]="slide.src" type="video/mp4">
+          </video>
+          } @else {
+          <img [src]="slide.src" [alt]="slide.tag" class="hero-main-media">
+          }
+        </div>
+
+        @if (slide.type === 'video') {
+        <div class="hero-content-block">
+          <span class="hero-tag">{{ slide.tag }}</span>
+          <h1 class="hero-title" [innerHTML]="slide.title"></h1>
+          <p class="hero-desc">{{ slide.desc }}</p>
+          <div class="hero-actions">
+            <a [routerLink]="slide.link" class="btn-black-primary">Keşfet</a>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <button class="slider-nav prev" (click)="prevSlide()">❮</button>
+    <button class="slider-nav next" (click)="nextSlide()">❯</button>
+
+    <div class="slider-dots">
+      @for (slide of slides; track $index) {
+      <span class="dot" [class.active]="currentSlide === $index" (click)="setSlide($index)"></span>
+      }
+    </div>
+  </section>
+
+  <section class="category-section">
+    <div class="container">
+      <h2 class="section-title">Kategoriler</h2>
+      <div class="category-grid">
+        <div class="cat-card">
+          <img src="assets/images/cat-woman.jpg" alt="Kadın Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/kadin" class="cat-btn">→ KADIN KOLEKSİYONU</a>
+          </div>
+        </div>
+        <div class="cat-card">
+          <img src="assets/images/cat-man.jpg" alt="Erkek Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/erkek" class="cat-btn">→ ERKEK KOLEKSİYONU</a>
+          </div>
+        </div>
+        <div class="cat-card">
+          <img src="assets/images/cat-child.jpg" alt="Çocuk Koleksiyonu">
+          <div class="cat-info">
+            <a routerLink="/cocuk" class="cat-btn">→ ÇOCUK KOLEKSİYONU</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="style-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Markalar</h2>
+        <a routerLink="/all" class="explore-link">→ Ürünleri Gör</a>
+      </div>
+      <div class="style-grid">
+        <div class="style-card">
+          <span class="style-label">ADİDAS</span>
+          <img src="assets/images/adidas.jpg" alt="Adidas">
+        </div>
+        <div class="style-card">
+          <span class="style-label">CONVERSE</span>
+          <img src="assets/images/converse.jpg" alt="Converse">
+        </div>
+        <div class="style-card">
+          <span class="style-label">NEW BALANCE</span>
+          <img src="assets/images/new-balance.jpg" alt="New Balance">
+        </div>
+        <div class="style-card">
+          <span class="style-label">NIKE</span>
+          <img src="assets/images/nike.jpg" alt="Nike">
+        </div>
+        <div class="style-card">
+          <span class="style-label">PUMA</span>
+          <img src="assets/images/puma.jpg" alt="Puma">
+        </div>
+        <div class="style-card">
+          <span class="style-label">VANS</span>
+          <img src="assets/images/vans.jpg" alt="Vans">
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>

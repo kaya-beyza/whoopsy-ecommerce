@@ -1,0 +1,40 @@
+name: Backend CI
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+        # 1. Kodu çek — repo dosyalarını sunucuya indir
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        # 2. .NET SDK'yı kur
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v4
+          with:
+            dotnet-version: '10.0.x'
+
+        # 3. NuGet paketlerini indir (bağımlılıklar)
+        - name: Restore dependencies
+          run: dotnet restore
+          working-directory: backend
+
+        # 4. Projeyi build et — derleme hatası var mı?
+        # --no-restore → zaten 3. adımda restore ettik, tekrar yapma
+        - name: Build
+          run: dotnet build --no-restore --configuration Release
+          working-directory: backend
+
+        # 5. Testleri çalıştır — birim testler geçiyor mu?
+        # --no-build → zaten 4. adımda build ettik
+        - name: Test
+          run: dotnet test --no-build --configuration Release --verbosity normal
+          working-directory: backend

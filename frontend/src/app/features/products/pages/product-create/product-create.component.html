@@ -1,0 +1,80 @@
+<div class="container mt-4">
+  <h2>Yeni Ürün Ekle</h2>
+  <hr>
+
+  <form (ngSubmit)="onSubmit(productForm)" #productForm="ngForm">
+    
+    <div class="mb-3">
+      <label class="form-label">Ürün Adı <span class="text-danger">*</span></label>
+      <input 
+        type="text" 
+        class="form-control" 
+        name="name" 
+        [(ngModel)]="productData.name" 
+        required 
+        placeholder="Örn: Kablosuz Kulaklık"
+        #nameField="ngModel"
+      >
+      <div *ngIf="nameField.invalid && nameField.touched" class="text-danger small mt-1">
+        Ürün adı zorunludur.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Açıklama <span class="text-danger">*</span></label>
+      <textarea 
+        class="form-control" 
+        name="description" 
+        [(ngModel)]="productData.description" 
+        required 
+        rows="3"
+        placeholder="Ürün detaylarını buraya girin...">
+      </textarea>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Fiyat (TL) <span class="text-danger">*</span></label>
+        <input 
+          type="number" 
+          class="form-control" 
+          name="price" 
+          [(ngModel)]="productData.price" 
+          required 
+          min="1"
+        >
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Stok Miktarı <span class="text-danger">*</span></label>
+        <input 
+          type="number" 
+          class="form-control" 
+          name="stockQuantity" 
+          [(ngModel)]="productData.stockQuantity" 
+          required 
+          min="0"
+        >
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3">
+      <button 
+        type="submit" 
+        class="btn btn-primary px-4" 
+        [disabled]="productForm.invalid || isSubmitting">
+        <span *ngIf="isSubmitting">Kaydediliyor...</span>
+        <span *ngIf="!isSubmitting">Kaydet</span>
+      </button>
+    </div>
+
+  </form>
+
+  <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    <div *ngFor="let toast of toasts" 
+         class="alert mb-2" 
+         [ngClass]="toast.type === 'success' ? 'alert-success' : 'alert-danger'">
+      {{ toast.message }}
+    </div>
+  </div>
+</div>

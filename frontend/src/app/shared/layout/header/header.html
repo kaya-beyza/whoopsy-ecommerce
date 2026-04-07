@@ -1,0 +1,55 @@
+<header class="site-header">
+
+  <div class="top-bar">
+    <div class="top-bar__left"></div>
+
+    <span class="top-bar__text">
+      Ücretsiz Kargo · 3.000₺ ve Üzeri Siparişlerde!
+    </span>
+
+    <div class="top-bar__right">
+      <a routerLink="/login" class="top-bar__link">Giriş Yap</a>
+      <span class="top-bar__divider">|</span>
+      <a routerLink="/register" class="top-bar__link">Kaydol</a>
+
+      <span class="material-symbols-sharp top-bar__icon">person</span>
+    </div>
+  </div>
+
+  <div class="main-bar">
+
+    <a class="logo" routerLink="/">
+      <span class="logo-w">w</span>
+      <span class="logo-h">h</span>
+      <span class="logo-oopsy">
+        <span class="eye-o">O</span>
+        <span class="eye-o">O</span>
+        <span class="logo-ps">PS</span>
+      </span>
+      <span class="logo-y">y</span>
+    </a>
+
+    <div class="navbar-wrapper">
+      <app-navbar />
+    </div>
+
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Ara">
+        <span class="material-symbols-sharp">search</span>
+      </button>
+
+      <a class="icon-btn" routerLink="/favorites" aria-label="Favoriler">
+        <span class="material-symbols-sharp">favorite</span>
+      </a>
+
+      <a class="icon-btn cart-icon" routerLink="/cart" aria-label="Sepetim">
+        @if (cartCount() > 0) {
+        <span class="cart-badge">{{ cartCount() }}</span>
+        }
+        <span class="material-symbols-sharp">local_mall</span>
+      </a>
+    </div>
+
+  </div>
+
+</header>

@@ -1,0 +1,21 @@
+:root {
+    /* --- Renk Değişkenleri --- */
+    --color-primary: #e8000d;
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-border: #e8e8e8;
+    --color-text-primary: #000000;
+
+    /* --- Yükseklik Değişkenleri--- */
+    --header-height: 50px; // Beyaz Ana Header Yüksekliği
+    --ann-height: 50px; // Siyah Top-Bar Yüksekliği
+
+    /* --- Font Değişkenleri (Typography'den beslenir) --- */
+    --font-logo: var(--font-logo);
+    --font-nav: var(--font-nav);
+    --font-topbar: var(--font-topbar);
+
+    --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06);
+    --radius-full: 9999px;
+    --transition-fast: 150ms ease;
+}

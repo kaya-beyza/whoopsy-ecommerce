@@ -1,0 +1,56 @@
+  services:
+
+    # ──────── VERİTABANI ────────
+    db:
+      image: postgres:17-alpine
+      container_name: mini-eticaret-db
+      environment:
+        # Bu değerler backend'in appsettings.json'daki connection string ile eşleşmeli
+        POSTGRES_DB: MiniETicaretDb
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres123
+      ports:
+        # Sol: senin bilgisayarındaki port → Sağ: container içindeki port
+        # localhost:5432 ile veritabanına bağlanabilirsin
+        - "5432:5432"
+      volumes:
+        # Volume = kalıcı depolama
+        # Container silinse bile veriler kaybolmaz
+        - postgres_data:/var/lib/postgresql/data
+
+    # ──────── BACKEND ────────
+    # .NET API — iş mantığı burada çalışır
+    backend:
+      build:
+        context: ./backend
+        dockerfile: Dockerfile
+      container_name: mini-eticaret-api
+      ports:
+        - "5079:5079"
+      environment:
+        # "db" → üstteki servisin adı. Docker Compose bu ismi IP adresine çevirir
+        # Yani backend "db" dediğinde Docker otomatik olarak PostgreSQL container'ını bulur
+        ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=MiniETicaretDb;Username=postgres;Password=postgres123"
+        ASPNETCORE_URLS: "http://+:5079"
+      depends_on:
+        # "Önce db başlasın, sonra ben başlayayım"
+        # Çünkü backend veritabanına bağlanmaya çalışacak — db hazır olmalı
+        - db
+
+    # ──────── FRONTEND ────────
+    # Angular uygulaması — Nginx ile servis ediliyor
+    frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      container_name: mini-eticaret-ui
+      ports:
+        # Tarayıcıdan localhost:4200 ile erişeceksin
+        - "4200:80"
+      depends_on:
+        # "Önce backend başlasın, sonra ben başlayayım"
+        - backend
+
+  # Volume tanımı — PostgreSQL verilerinin kalıcı saklanacağı yer
+  volumes:
+    postgres_data:
