@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:mobile/features/products/presentation/category_products_page.dart';
+import 'package:mobile/features/categories/presentation/category_products_page.dart';
 
 // Resim ve başlığı bir arada tutmak için basit bir model
 class SliderItem {
@@ -27,7 +27,7 @@ class _HomeSliderState extends State<HomeSlider> {
     SliderItem(
       imageUrl:
           "https://i.pinimg.com/1200x/e3/c4/b7/e3c4b70ec6fb29a8e8d2c94abf7ece21.jpg",
-      title: "ÇANTA-AKSESUAR",
+      title: "Çanta",
     ),
     SliderItem(
       imageUrl:
