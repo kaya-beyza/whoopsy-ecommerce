@@ -6,9 +6,10 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
-  providers: [ //"Bu uygulamada şu servisler kullanılacak" listesi.
-    provideBrowserGlobalErrorListeners(),   // Angular'ın varsayılan hata yakalayıcısı
-    provideRouter(routes),                   // Routing sistemi (URL → Component eşleşmesi)
+  providers: [ 
+    provideBrowserGlobalErrorListeners(),  
+    provideRouter(routes),             
+    provideHttpClient(),      
     provideHttpClient(withInterceptors([authInterceptor]))  
   ]
 };
