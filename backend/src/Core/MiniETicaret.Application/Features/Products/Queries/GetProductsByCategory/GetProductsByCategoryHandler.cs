@@ -1,7 +1,6 @@
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
-using MiniETicaret.Domain.Entities;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByCategory;
 
@@ -26,7 +25,8 @@ public class GetProductsByCategoryQueryHandler : IRequestHandler<GetProductsByCa
         Price = p.Price,
         StockQuantity = p.StockQuantity,
         CategoryId = p.CategoryId,
-        CategoryName = p.Category?.Name ?? ""
+        CategoryName = p.Category?.Name ?? "",
+        Gender = p.Gender,
     }).ToList();
    }
 }

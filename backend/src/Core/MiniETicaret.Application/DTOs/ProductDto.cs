@@ -1,3 +1,4 @@
+using MiniETicaret.Domain.Enums;
 namespace MiniETicaret.Application.Features.Products.DTOs;
 
 public class ProductDto
@@ -9,4 +10,7 @@ public class ProductDto
     public int StockQuantity {get;set;}
     public Guid CategoryId {get;set;}
     public string CategoryName {get;set;} = "";
+    public Gender Gender {get;set;}
+    public string? MainImageUrl { get; set; }
+    public List<string> ImageUrls { get; set; } = new();
 }

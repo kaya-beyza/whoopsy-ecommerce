@@ -1,6 +1,5 @@
 using MediatR;
 using MiniETicaret.Application.Interfaces;
-using MiniETicaret.Domain.Entities;
 
 namespace MiniETicaret.Application.Features.Products.Commands.DeleteProduct;
 
