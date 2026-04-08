@@ -48,9 +48,63 @@ public class ProductRepository : IProductRepository
             .Where(p => p.CategoryId == categoryId)
             .ToListAsync(cancellationToken);
     }
+    public async Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken)
+    {
+        image.ProductId = productId;
+        image.CreatedDate = DateTime.UtcNow.AddHours(3);
+
+        await _context.ProductImages.AddAsync(image, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return image;
+    }
+
+    public async Task<bool> DeleteImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
+    {
+        var image = await _context.ProductImages
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.ProductId == productId, cancellationToken);
+
+        if (image == null)
+            return false;
+
+        _context.ProductImages.Remove(image);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return true;
+    }
+
+    public async Task<List<ProductImage>> GetImagesByProductIdAsync(Guid productId, CancellationToken cancellationToken)
+    {
+        return await _context.ProductImages
+            .Where(i => i.ProductId == productId)
+            .OrderBy(i => i.DisplayOrder)
+            .ToListAsync(cancellationToken);
+    }
+    public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
+    {
+        var images = await _context.ProductImages
+            .Where(i => i.ProductId == productId)
+            .ToListAsync(cancellationToken);
+
+        var targetImage = images.FirstOrDefault(i => i.Id == imageId);
+        if (targetImage == null)
+            return false;
+
+        // Tüm görsellerin IsMain'ini false yap
+        foreach (var img in images)
+        {
+            img.IsMain = false;
+        }
+
+        // Seçilen görseli ana görsel yap
+        targetImage.IsMain = true;
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
+    }
 }
 // ödeme ekranı firebasein sandbox 
-//  bdeva storage sağlayan azure storeageoları oraya yüklenecek linkler gelicek 
+//  bedeva storage sağlayan azure storeageoları oraya yüklenecek linkler gelicek 
 // ürünler kaggle veri seti kaggledan veriler çekilecek.
 // register adres, telefon numaras eklenecek 
 //ödeme ekranı yapılacak 

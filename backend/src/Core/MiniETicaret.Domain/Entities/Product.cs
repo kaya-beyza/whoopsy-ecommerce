@@ -13,6 +13,6 @@ public class Product : BaseEntity
     public Guid CategoryId {get;set;}
     public bool IsActive {get;set;} = true;
     public Gender Gender {get;set;}
-    public Category Category {get;set;} = null!;   
-    
+    public Category Category {get;set;} = null!;
+    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
 }
