@@ -1,6 +1,7 @@
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductById;
 
@@ -27,7 +28,8 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             Price = product.Price,
             StockQuantity = product.StockQuantity,
             CategoryId = product.CategoryId,
-            CategoryName = product.Category?.Name ?? ""
+            CategoryName = product.Category?.Name ?? "",
+            Gender = product.Gender
         };
     }
 }

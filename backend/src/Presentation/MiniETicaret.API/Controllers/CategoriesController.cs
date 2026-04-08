@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MiniETicaret.Application.Features.Categories.Commands.CreateCategory;
 using MiniETicaret.Application.Features.Categories.Commands.UpdateCategory;
 using MiniETicaret.Application.Features.Categories.Queries.GetCategories;
+using MiniETicaret.Application.Features.Categories.Commands.DeleteCategory;
 
 namespace MiniETicaret.API.Controllers;
 
@@ -35,6 +36,15 @@ public class CategoriesController : ControllerBase
     public async Task<IActionResult> Update(Guid id,UpdateCategoryCommand command)
     {
         var result = await _mediator.Send(command with {Id = id});
+        if(result == false)
+            return NotFound();
+
+        return Ok(result);    
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        var result = await _mediator.Send(new DeleteCategoryCommand(id));
         if(result == false)
             return NotFound();
 

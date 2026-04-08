@@ -23,6 +23,9 @@ public class CreateProductCommandValidator : AbstractValidator<CreateProductComm
         RuleFor(x => x.CategoryId)
             .NotEmpty().WithMessage("Kategori Id boş olamaz!");
 
+        RuleFor(x => x.Gender)
+            .IsInEnum().WithMessage("Lütfen geçerli bir cinsiyet seçin!");    
+
            
     }
 }

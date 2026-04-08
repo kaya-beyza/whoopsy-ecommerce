@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using MiniETicaret.Domain.Common;
+using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Domain.Entities;
 
@@ -11,6 +12,7 @@ public class Product : BaseEntity
     public int StockQuantity {get;set;}
     public Guid CategoryId {get;set;}
     public bool IsActive {get;set;} = true;
+    public Gender Gender {get;set;}
     public Category Category {get;set;} = null!;   
     
 }

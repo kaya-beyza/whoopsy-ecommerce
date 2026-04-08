@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
@@ -25,7 +26,9 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<Pr
             Price = p.Price,
             StockQuantity = p.StockQuantity,
             CategoryId = p.CategoryId,
-            CategoryName = p.Category?.Name ?? "" //kontrol edeceğim tekrar
+            CategoryName = p.Category?.Name ?? "",
+            Gender = p.Gender,
+             //kontrol edeceğim tekrar
         }).ToList();
     }
 }
