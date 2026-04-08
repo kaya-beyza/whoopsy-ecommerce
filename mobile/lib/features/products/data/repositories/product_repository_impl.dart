@@ -10,9 +10,7 @@ class ProductRepositoryImpl implements IProductRepository {
 
   @override
   Future<List<Product>> getProductsByCategoryId(String id) async {
-    final List<dynamic> jsonList =
-        await remoteDataSource.getProductsByCategoryId(id);
-    // Gelen JSON listesini tek tek Product nesnesine çeviriyoruz
+    final jsonList = await remoteDataSource.getProductsByCategoryId(id);
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 }

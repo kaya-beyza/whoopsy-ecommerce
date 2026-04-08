@@ -2,18 +2,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ProductRemoteDataSource {
-  // Buraya backend ekibinden aldığın IP adresini yazmalısın
   final String baseUrl = "http://localhost:5277/api";
 
   Future<List<dynamic>> getProductsByCategoryId(String categoryId) async {
-    // Backend'deki [HttpGet("by-category/{categoryId}")] ucuna istek atıyoruz
-    final response =
-        await http.get(Uri.parse("$baseUrl/Products/by-category/$categoryId"));
+    final url = "$baseUrl/Products/by-category/$categoryId";
+    print("PRODUCT REQUEST: $url");
+
+    final response = await http.get(Uri.parse(url));
+
+    print("PRODUCT STATUS: ${response.statusCode}");
+    print("PRODUCT BODY: ${response.body}");
 
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception("Backend ürünleri gönderemedi: ${response.statusCode}");
+      throw Exception("Ürünler alınamadı");
     }
   }
 }

@@ -4,17 +4,21 @@ class ProductModel extends Product {
   ProductModel({
     required super.id,
     required super.name,
+    required super.description,
     required super.price,
+    required super.stockQuantity,
+    required super.categoryId,
     super.image,
   });
 
-  // Backend'den gelen JSON'ı okuyan kısım
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      // C#'tan gelen decimal/double farkını önlemek için num kullanıyoruz
+      description: json['description'] ?? '',
       price: (json['price'] as num).toDouble(),
+      stockQuantity: json['stockQuantity'] ?? 0,
+      categoryId: json['categoryId'] ?? '',
       image: json['image'],
     );
   }

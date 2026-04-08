@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart'; // firstWhereOrNull için gerekli (pubspec'e ekle)
+import 'package:collection/collection.dart';
+import 'package:mobile/features/products/presentation/product_detail_page.dart';
 
 import '../../categories/data/datasources/category_remote_data_source.dart';
 import '../../categories/data/repositories/category_repository_impl.dart';
@@ -7,6 +8,7 @@ import '../../categories/domain/usecases/get_categories_usecase.dart';
 import '../../products/data/datasources/product_remote_data_source.dart';
 import '../../products/data/repositories/product_repository_impl.dart';
 import '../../products/domain/usecases/get_products_by_category_usecase.dart';
+import '../../products/domain/entities/product.dart';
 
 class CategoryProductsPage extends StatefulWidget {
   final String categoryName;
@@ -20,71 +22,65 @@ class CategoryProductsPage extends StatefulWidget {
 class _CategoryProductsPageState extends State<CategoryProductsPage> {
   bool _isLoading = true;
   String? _errorMessage;
-  List<dynamic> _products = [];
+  List<Product> _products = [];
 
-  // UseCase tanımlamaları
   late final GetCategoriesUseCase _getCategoriesUseCase;
-  late final GetProductsByCategoryUseCase _getProductsByCategoryUseCase;
+  late final GetProductsByCategoryUseCase _getProductsUseCase;
 
   @override
   void initState() {
     super.initState();
-    _setupDependencies(); // Katmanları birbirine bağlıyoruz
+    _setupDependencies();
     _fetchProductsByMatchingName();
   }
 
   void _setupDependencies() {
-    // 1. Kategori katmanlarını bağla
     final categoryDataSource = CategoryRemoteDataSource();
     final categoryRepo = CategoryRepositoryImpl(categoryDataSource);
     _getCategoriesUseCase = GetCategoriesUseCase(categoryRepo);
 
-    // 2. Ürün katmanlarını bağla
     final productDataSource = ProductRemoteDataSource();
     final productRepo = ProductRepositoryImpl(productDataSource);
-    _getProductsByCategoryUseCase = GetProductsByCategoryUseCase(productRepo);
+    _getProductsUseCase = GetProductsByCategoryUseCase(productRepo);
   }
 
   Future<void> _fetchProductsByMatchingName() async {
     try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
+      print("START");
 
-      // ADIM 1: Backend'den tüm kategorileri çek
       final categories = await _getCategoriesUseCase.execute();
+      print("CATEGORIES: $categories");
 
-      // ADIM 2: İsim eşleşmesi yap (Çanta-Aksesuar vs Çanta)
-      // firstWhereOrNull hata fırlatmaz, bulamazsa null döner
       final matchedCategory = categories.firstWhereOrNull((cat) =>
-          cat.name
-              .toLowerCase()
-              .contains(widget.categoryName.toLowerCase().trim()) ||
-          widget.categoryName
-              .toLowerCase()
-              .contains(cat.name.toLowerCase().trim()));
+          cat.name.toLowerCase().contains(widget.categoryName.toLowerCase()));
 
-      if (matchedCategory != null) {
-        // ADIM 3: Bulunan ID ile ürünleri çek
-        final products =
-            await _getProductsByCategoryUseCase.execute(matchedCategory.id);
+      print("MATCHED: $matchedCategory");
+
+      if (matchedCategory == null) {
+        print("CATEGORY BULUNAMADI");
 
         setState(() {
-          _products = products;
+          _errorMessage = "Kategori bulunamadı";
           _isLoading = false;
         });
-      } else {
-        setState(() {
-          _errorMessage =
-              "'${widget.categoryName}' kategorisi veritabanında bulunamadı.";
-          _isLoading = false;
-        });
+        return;
       }
-    } catch (e) {
+
+      print("PRODUCT API ÇAĞRILIYOR");
+
+      final allProducts = await _getProductsUseCase.execute(matchedCategory.id);
+
+      print("PRODUCTS: $allProducts");
+
       setState(() {
-        _errorMessage =
-            "Bağlantı hatası: Backend'e ulaşılamadı.\n${e.toString()}";
+        _products = allProducts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("HATA: $e");
+
+      setState(() {
+        _errorMessage = e.toString();
         _isLoading = false;
       });
     }
@@ -93,7 +89,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.categoryName.toUpperCase(),
             style: const TextStyle(
@@ -103,51 +99,96 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: _buildBody(),
+      body: Column(
+        children: [
+          _buildTopBar(),
+          Expanded(child: _buildBody()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.search, size: 18),
+                  SizedBox(width: 8),
+                  Text("Ara", style: TextStyle(color: Colors.grey)),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child:
+                const Text("Filtreler", style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return GridView.builder(
+        itemCount: 6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.72,
+        ),
+        itemBuilder: (_, __) => Container(
+          margin: const EdgeInsets.all(8),
+          color: Colors.grey[300],
+        ),
+      );
     }
 
     if (_errorMessage != null) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.cloud_off, size: 60, color: Colors.grey),
-              const SizedBox(height: 16),
-              Text(_errorMessage!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: Colors.red)),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _fetchProductsByMatchingName,
-                child: const Text("Tekrar Dene"),
-              )
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cloud_off, size: 60, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _fetchProductsByMatchingName,
+              child: const Text("Tekrar Dene"),
+            )
+          ],
         ),
       );
     }
 
     if (_products.isEmpty) {
-      return const Center(
-          child: Text("Bu kategoride henüz ürün bulunmuyor.",
-              style: TextStyle(fontSize: 16, color: Colors.grey)));
+      return const Center(child: Text("Ürün bulunamadı"));
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.68,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: 0.58,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 16,
       ),
       itemCount: _products.length,
       itemBuilder: (context, index) {
@@ -158,62 +199,71 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
 }
 
 class _ProductCard extends StatelessWidget {
-  final dynamic product;
+  final Product product;
+
   const _ProductCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ProductDetailPage(product: product),
+          ),
+        );
+      },
+      child: Container(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.network(
-                product.image ?? "https://via.placeholder.com/150",
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (context, error, stackTrace) =>
-                    const Center(child: Icon(Icons.image_not_supported)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Image.network(
+                        (product.image != null && product.image!.isNotEmpty)
+                            ? product.image!
+                            : "https://i.pinimg.com/736x/64/1f/70/641f70be1b77ce5f433819372de8cbed.jpg",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.favorite_border, size: 18),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 14),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  "${product.price} TL",
-                  style: TextStyle(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 16),
-                ),
-              ],
+            const SizedBox(height: 8),
+            Text(
+              product.name,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              "${product.price.toStringAsFixed(0)} TL",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }
