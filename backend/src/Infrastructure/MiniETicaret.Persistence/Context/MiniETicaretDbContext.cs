@@ -15,6 +15,7 @@ public class MiniETicaretDbContext : DbContext
     public DbSet<Product> Products {get;set;}
     public DbSet<Category> Categories {get;set;}
     public DbSet<ProductImage> ProductImages { get; set; }
+    public DbSet<Payment> Payments { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
