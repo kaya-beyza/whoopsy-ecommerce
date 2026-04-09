@@ -51,6 +51,7 @@ public class ProductRepository : IProductRepository
     {
         return await _context.Products
             .Where(p => p.CategoryId == categoryId)
+            .Include(p => p.Images)
             .ToListAsync(cancellationToken);
     }
     public async Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken)
@@ -91,11 +92,15 @@ public class ProductRepository : IProductRepository
 
     if (gender.HasValue)
         query = query.Where(p => p.Gender == gender.Value);
+        
 
     if (categoryId.HasValue)
         query = query.Where(p => p.CategoryId == categoryId.Value);
 
-    return await query.ToListAsync(cancellationToken);
+    return await query
+                    .Include(p => p.Images)
+                    .ToListAsync(cancellationToken);
+                      
     } 
     public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
     {
