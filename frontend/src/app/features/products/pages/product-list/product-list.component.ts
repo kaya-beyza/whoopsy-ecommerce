@@ -91,6 +91,9 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
+    if (this.isFilterVisible()) {
+      document.body.style.overflow = 'hidden';
+    }
   }
 
   loadProducts(): void {

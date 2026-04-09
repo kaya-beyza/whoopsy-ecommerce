@@ -33,7 +33,7 @@
                     </span>
                     <span class="logo-y">y</span>
                 </a>
-                
+
                 <div class="header-titles">
                     <h1 class="welcome-title">Hesap Oluştur</h1>
                     <p class="subtitle">Whoopsy dünyasına ilk adımını at.</p>
@@ -96,8 +96,8 @@
                         <label for="confirmPassword">ŞİFRE TEKRAR*</label>
                         <div class="input-wrapper">
                             <span class="material-symbols-sharp input-icon">lock</span>
-                            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
-                                placeholder="••••••••" />
+                            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword"
+                                name="confirmPassword" required placeholder="••••••••" />
                         </div>
                     </div>
                 </div>
@@ -138,7 +138,7 @@
                     <label for="address">ADRES</label>
                     <div class="input-wrapper">
                         <span class="material-symbols-sharp input-icon">location_on</span>
-                        <textarea id="address" [(ngModel)]="address" name="address" rows="3" 
+                        <textarea id="address" [(ngModel)]="address" name="address" rows="3"
                             placeholder="Teslimat adresi detayları..."></textarea>
                     </div>
                 </div>
@@ -150,7 +150,7 @@
 
                 <button type="submit" [disabled]="isLoading" class="primary-btn">
                     <span *ngIf="!isLoading">HESAP OLUŞTUR</span>
-                    <span *ngIf="isLoading" class="loading-spinner">Mühürleniyor...</span>
+                    <span *ngIf="isLoading" class="loading-spinner">Kayıt tamamlanıyor...</span>
                 </button>
 
                 <div class="social-divider">

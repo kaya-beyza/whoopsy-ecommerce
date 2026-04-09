@@ -13,21 +13,16 @@ import { environment } from '../../../../../environments/environment';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
-  // main'den gelen cdnUrl'i ekliyoruz
   cdnUrl = environment.cdnUrl;
 
-  // layout'daki ayrılmış isim yapılarını koruyoruz
   firstName: string = '';
   lastName: string = '';
-
-  // Eğer main branch'i başka bir yerde fullName'e ihtiyaç duyuyorsa bunu da tutabilirsin:
   fullName: string = '';
-
   email: string = '';
   phone: string = '';
   password: string = '';
   confirmPassword: string = '';
-  gender: string = 'Erkek'; // Default as seen in screenshot
+  gender: string = 'Erkek';
   birthDate: string = '';
   address: string = '';
   errorMessage: string = '';
@@ -43,7 +38,6 @@ export class RegisterComponent {
     const x = (e.clientX / window.innerWidth) * 100;
     const y = (e.clientY / window.innerHeight) * 100;
 
-    // Eyeball move logic (max +/- 4px) - Consistent with Login Page
     const moveX = (x - 50) / 12.5;
     const moveY = (y - 50) / 12.5;
 
