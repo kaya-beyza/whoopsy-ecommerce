@@ -22,7 +22,6 @@ export class RegisterComponent {
   phone: string = '';
   password: string = '';
   confirmPassword: string = '';
-
   gender: number | null = null;
   birthDate: string = '';
   address: string = '';
