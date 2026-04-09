@@ -22,9 +22,11 @@ export class RegisterComponent {
   phone: string = '';
   password: string = '';
   confirmPassword: string = '';
-  gender: string = 'Erkek';
+
+  gender: number | null = null;
   birthDate: string = '';
   address: string = '';
+
   errorMessage: string = '';
   isLoading: boolean = false;
 
