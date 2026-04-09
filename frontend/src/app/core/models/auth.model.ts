@@ -8,7 +8,11 @@
   export interface RegisterRequest {
     fullName: string;
     email: string;
-    password: string;  
+    password: string;
+   /* phoneNumber?: string;    
+    address?: string;     
+    gender?: number;      
+    birthDate?: string;  */
   }
 
   // Backend'den dönen token yanıtı — Backend'deki TokenDto'nun frontend karşılığı
