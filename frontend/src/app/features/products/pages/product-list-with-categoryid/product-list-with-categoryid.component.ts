@@ -1,17 +1,18 @@
 import { Component, OnInit, signal, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product, FilterGroup } from '../../models/product.model';
+import { switchMap } from 'rxjs';
 
 @Component({
-  selector: 'app-product-list',
+  selector: 'app-product-list-with-categoryid',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './product-list.component.html',
-  styleUrl: './product-list.component.scss'
+  imports: [CommonModule, RouterModule],
+  templateUrl: './product-list-with-categoryid.component.html',
+  styleUrl: './product-list-with-categoryid.component.scss'
 })
-export class ProductListComponent implements OnInit {
+export class ProductListWithCategoryidComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
 
@@ -20,9 +21,10 @@ export class ProductListComponent implements OnInit {
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
 
-  // Dinamik Başlık ve Breadcrumb
-  pageTitle = signal('TÜM ÜRÜNLER');
-  breadcrumbItems = signal(['Anasayfa', 'Kadın', 'Ayakkabı', 'Tüm Ayakkabılar']);
+  // Breadcrumb
+  baseCategoryName = signal('AYAKKABI');
+  pageTitle = signal('TÜM AYAKKABILAR');
+  breadcrumbItems = signal(['Anasayfa', 'Koleksiyon', 'Ayakkabı']);
 
   // Filtreleme (Grup: Seçenek formatı için)
   selectedFilters = signal<{ group: string, option: string }[]>([]);
@@ -48,13 +50,12 @@ export class ProductListComponent implements OnInit {
 
   updateHeader(): void {
     const genderFilters = this.selectedFilters().filter(f => f.group === 'Cinsiyet');
+    const baseName = this.baseCategoryName().toUpperCase();
 
-    if (genderFilters.length === 1) {
-      this.pageTitle.set(genderFilters[0].option.toUpperCase());
-    } else if (genderFilters.length > 1) {
-      this.pageTitle.set('FİLTRELENMİŞ ÜRÜNLER');
+    if (genderFilters.length === 1 && genderFilters[0].option.toUpperCase() !== baseName) {
+      this.pageTitle.set(`${genderFilters[0].option.toUpperCase()} ${baseName}`);
     } else {
-      this.pageTitle.set('TÜM ÜRÜNLER');
+      this.pageTitle.set(baseName);
     }
   }
 
@@ -87,24 +88,43 @@ export class ProductListComponent implements OnInit {
     { name: 'Fiyat', key: 'price', options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL'], isExpanded: false }
   ]);
 
-  constructor() { }
-
   ngOnInit(): void {
-    this.loadProducts();
-    if (this.isFilterVisible()) {
-      document.body.style.overflow = 'hidden';
-    }
-  }
+    this.route.params.pipe(
+      switchMap(params => {
+        const id = params['id'];
+        this.isLoading.set(true);
 
-  loadProducts(): void {
-    this.isLoading.set(true);
-    this.productService.getProducts().subscribe({
+        let label = 'AYAKKABI';
+        let displayLabel = '';
+
+        if (id === '019d433e-9c19-771a-aee0-08812c0b5562') {
+          label = 'KADIN';
+          displayLabel = 'Kadın';
+        } else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') {
+          label = 'ERKEK';
+          displayLabel = 'Erkek';
+        } else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') {
+          label = 'ÇOCUK';
+          displayLabel = 'Çocuk';
+        }
+
+        this.baseCategoryName.set(label);
+        this.breadcrumbItems.set(['Anasayfa', 'Koleksiyon', displayLabel || 'Ayakkabı']);
+
+        if (displayLabel) {
+          this.selectedFilters.set([{ group: 'Cinsiyet', option: displayLabel }]);
+        }
+
+        this.updateHeader();
+        return this.productService.getProductsByCategoryId(id);
+      })
+    ).subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Ürünler yüklenirken hata oluştu:', err);
+        console.error('Kategori ürünleri yüklenirken hata:', err);
         this.isLoading.set(false);
       }
     });
@@ -112,11 +132,6 @@ export class ProductListComponent implements OnInit {
 
   toggleFilter(): void {
     this.isFilterVisible.set(!this.isFilterVisible());
-    if (this.isFilterVisible()) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
   }
 
   toggleFilterGroup(group: FilterGroup): void {
@@ -135,7 +150,6 @@ export class ProductListComponent implements OnInit {
     this.quickAddProductId.set(null);
   }
 
-  // Sıralama Fonksiyonları
   @HostListener('window:click')
   closeSort(): void {
     this.isSortOpen.set(false);
@@ -148,7 +162,6 @@ export class ProductListComponent implements OnInit {
   selectSort(option: any): void {
     this.selectedSort.set(option);
     this.isSortOpen.set(false);
-    console.log('Sıralama değişti:', option.value);
   }
 
   getColorHex(color: string): string {

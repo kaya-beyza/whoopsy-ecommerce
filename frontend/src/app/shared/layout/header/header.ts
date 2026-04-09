@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
-import { RouterModule }      from '@angular/router';
-import { Navbar }            from '../navbar/navbar';
+import { RouterModule } from '@angular/router';
+import { Navbar } from '../navbar/navbar';
 
 @Component({
   selector: 'app-header',

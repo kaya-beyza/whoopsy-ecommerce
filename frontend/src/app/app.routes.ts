@@ -21,13 +21,13 @@ export const routes: Routes = [
   // 3. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
   {
     path: '',
-    component: MainLayoutComponent, // 💡 Çatı burada kuruluyor
+    component: MainLayoutComponent,
     children: [
       // ── ANA SAYFA ──
       {
         path: '',
         component: Home,
-        pathMatch: 'full' 
+        pathMatch: 'full'
       },
 
       // ── KULLANICILAR ──

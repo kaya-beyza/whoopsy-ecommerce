@@ -34,6 +34,7 @@
             font-weight: 700;
             color: #000;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
     }
 
@@ -234,16 +235,8 @@
             width: 250px;
             flex-shrink: 0;
             border-right: 1px solid #f2f2f2;
-            overflow-y: auto;
-            max-height: calc(100vh - 200px);
-            position: sticky;
-            top: 100px;
-
-            /* Custom subtle scrollbar mirroring the brand twin */
-            &::-webkit-scrollbar { width: 4px; }
-            &::-webkit-scrollbar-track { background: transparent; }
-            &::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
-            &:hover::-webkit-scrollbar-thumb { background: #ddd; }
+            transition: inherit;
+            overflow: hidden;
 
             .filter-content {
                 padding-right: 20px;

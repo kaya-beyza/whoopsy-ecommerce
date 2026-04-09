@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Domain.Entities;
 using MiniETicaret.Persistence.Context;
+using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Persistence.Repositories;
 
@@ -16,12 +17,16 @@ public class ProductRepository : IProductRepository
 
     public async Task<List<Product>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _context.Products.ToListAsync(cancellationToken);
+        return await _context.Products
+          .Include(p => p.Images)
+          .ToListAsync(cancellationToken);
     }
 
     public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Products.FindAsync(new object[] { id }, cancellationToken);
+        return await _context.Products
+          .Include(p => p.Images)
+          .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
     public async Task AddAsync(Product product, CancellationToken cancellationToken)
     {
@@ -46,6 +51,7 @@ public class ProductRepository : IProductRepository
     {
         return await _context.Products
             .Where(p => p.CategoryId == categoryId)
+            .Include(p => p.Images)
             .ToListAsync(cancellationToken);
     }
     public async Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken)
@@ -80,6 +86,22 @@ public class ProductRepository : IProductRepository
             .OrderBy(i => i.DisplayOrder)
             .ToListAsync(cancellationToken);
     }
+    public async Task<List<Product>> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken)
+    {
+    var query = _context.Products.AsQueryable();
+
+    if (gender.HasValue)
+        query = query.Where(p => p.Gender == gender.Value);
+        
+
+    if (categoryId.HasValue)
+        query = query.Where(p => p.CategoryId == categoryId.Value);
+
+    return await query
+                    .Include(p => p.Images)
+                    .ToListAsync(cancellationToken);
+                      
+    } 
     public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
     {
         var images = await _context.ProductImages

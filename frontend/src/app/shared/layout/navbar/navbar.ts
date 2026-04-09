@@ -1,12 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MegaMenu } from '../mega-menu/mega-menu';
-
-export interface NavCategory {
-  id: string;
-  label: string;
-  highlight: boolean;
-}
+import { CategoryService, NavCategory } from '../../../core/services/category.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,17 +10,17 @@ export interface NavCategory {
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
-export class Navbar {
+export class Navbar implements OnInit {
   activeCategory = signal<string | null>(null);
+  categories: NavCategory[] = [];
 
-  categories: NavCategory[] = [
-    { id: 'yeni', label: 'Yeni Gelenler', highlight: false },
-    { id: 'kadin', label: 'Kadın', highlight: false },
-    { id: 'erkek', label: 'Erkek', highlight: false },
-    { id: 'cocuk', label: 'Çocuk', highlight: false },
-    { id: 'koleksiyon', label: 'Koleksiyon', highlight: false },
-    { id: 'indirim', label: 'İndirim', highlight: true },
-  ];
+  constructor(private categoryService: CategoryService) { }
+
+  ngOnInit(): void {
+    this.categoryService.getCategories().subscribe(cats => {
+      this.categories = cats;
+    });
+  }
 
   onEnter(id: string): void { this.activeCategory.set(id); }
   onLeave(): void { this.activeCategory.set(null); }
