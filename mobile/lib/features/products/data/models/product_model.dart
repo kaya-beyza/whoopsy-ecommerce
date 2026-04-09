@@ -8,7 +8,8 @@ class ProductModel extends Product {
     required super.price,
     required super.stockQuantity,
     required super.categoryId,
-    super.image,
+    super.mainImageUrl,
+    super.imageUrls,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -19,7 +20,10 @@ class ProductModel extends Product {
       price: (json['price'] as num).toDouble(),
       stockQuantity: json['stockQuantity'] ?? 0,
       categoryId: json['categoryId'] ?? '',
-      image: json['image'],
+
+      // 🔥 BACKEND MAPPING
+      mainImageUrl: json['mainImageUrl'],
+      imageUrls: List<String>.from(json['imageUrls'] ?? []),
     );
   }
 }

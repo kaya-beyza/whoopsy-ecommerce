@@ -27,12 +27,12 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   void initState() {
     super.initState();
 
-    productImages = [
-      if (widget.product.image != null && widget.product.image!.isNotEmpty)
-        widget.product.image!,
-      "https://i.pinimg.com/736x/64/1f/70/641f70be1b77ce5f433819372de8cbed.jpg",
-      "https://i.pinimg.com/1200x/14/13/43/14134369a1480f7b460a8987482e0d1b.jpg",
-    ];
+    productImages = widget.product.imageUrls.isNotEmpty
+        ? widget.product.imageUrls
+        : [
+            if (widget.product.mainImageUrl != null)
+              widget.product.mainImageUrl!,
+          ];
   }
 
   @override

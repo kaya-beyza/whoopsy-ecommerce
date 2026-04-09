@@ -5,7 +5,8 @@ class Product {
   final double price;
   final int stockQuantity;
   final String categoryId;
-  final String? image;
+  final String? mainImageUrl;
+  final List<String> imageUrls;
 
   Product({
     required this.id,
@@ -14,6 +15,7 @@ class Product {
     required this.price,
     required this.stockQuantity,
     required this.categoryId,
-    this.image,
+    this.mainImageUrl,
+    this.imageUrls = const [],
   });
 }

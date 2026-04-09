@@ -227,12 +227,27 @@ class _ProductCard extends StatelessWidget {
                     child: SizedBox(
                       width: double.infinity,
                       height: double.infinity,
-                      child: Image.network(
-                        (product.image != null && product.image!.isNotEmpty)
-                            ? product.image!
-                            : "https://i.pinimg.com/736x/64/1f/70/641f70be1b77ce5f433819372de8cbed.jpg",
-                        fit: BoxFit.cover,
-                      ),
+                      child: product.mainImageUrl?.isNotEmpty == true
+                          ? Image.network(
+                              product.mainImageUrl!,
+                              fit: BoxFit.cover,
+
+                              // 🔥 DEBUG
+                              errorBuilder: (context, error, stackTrace) {
+                                print(
+                                    "IMAGE LOAD ERROR: ${product.mainImageUrl}");
+                                return Container(
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(Icons.broken_image),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Colors.grey.shade200,
+                              child: const Center(
+                                child: Icon(Icons.image_not_supported_outlined),
+                              ),
+                            ),
                     ),
                   ),
                   Positioned(
