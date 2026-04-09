@@ -17,12 +17,16 @@ public class ProductRepository : IProductRepository
 
     public async Task<List<Product>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return await _context.Products.ToListAsync(cancellationToken);
+        return await _context.Products
+          .Include(p => p.Images)
+          .ToListAsync(cancellationToken);
     }
 
     public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Products.FindAsync(new object[] { id }, cancellationToken);
+        return await _context.Products
+          .Include(p => p.Images)
+          .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
     public async Task AddAsync(Product product, CancellationToken cancellationToken)
     {
