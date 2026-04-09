@@ -37,12 +37,24 @@ public class UploadProductImageCommandHandler : IRequestHandler<UploadProductIma
         var existingImages = await _productRepository.GetImagesByProductIdAsync(
             request.ProductId, cancellationToken);
 
-        // 4. ProductImage entity oluştur
+        // 4. Bu görsel ana görsel mi olacak?
+        var shouldBeMain = request.IsMain || existingImages.Count == 0;
+
+        // 4a. Eğer ana görsel olacaksa, mevcut ana görselleri kaldır
+        if (shouldBeMain && existingImages.Count > 0)
+        {
+            foreach (var img in existingImages.Where(i => i.IsMain))
+            {
+                img.IsMain = false;
+            }
+        }
+
+        // 4b. ProductImage entity oluştur
         var image = new ProductImage
         {
             PublicId = uploadResult.PublicId,
             Url = uploadResult.Url,
-            IsMain = request.IsMain || existingImages.Count == 0,
+            IsMain = shouldBeMain,
             DisplayOrder = existingImages.Count
         };
 
