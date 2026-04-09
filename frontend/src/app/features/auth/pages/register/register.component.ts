@@ -18,6 +18,10 @@ export class RegisterComponent {
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
+        /*phoneNumber: string = '';
+        address: string = '';
+        gender: number | null = null;
+        birthDate: string = '';*/
   errorMessage: string = '';
   isLoading: boolean = false;
 
