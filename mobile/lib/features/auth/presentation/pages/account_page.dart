@@ -18,7 +18,7 @@ class AccountPage extends StatelessWidget {
 
             /// 👤 HEADER
             Text(
-              "MERHABA, ${auth.name ?? "KULLANICI"}!",
+              "MERHABA, ${auth.name ?? "KULLANICI"}",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
@@ -44,7 +44,10 @@ class AccountPage extends StatelessWidget {
                 onPressed: () {
                   context.read<AuthProvider>().logout();
                 },
-                child: const Text("OTURUMU KAPAT"),
+                child: const Text(
+                  "OTURUMU KAPAT",
+                  style: TextStyle(color: Color.fromARGB(255, 40, 40, 40)),
+                ),
               ),
             ),
 

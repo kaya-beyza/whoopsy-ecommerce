@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile/core/navigation/main_screen.dart';
 import 'package:mobile/core/widgets/whoopsy_logo.dart';
+import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +16,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.microtask(() async {
+      await AuthLocalDataSource().tryAutoLogin(context);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const MainScreen()),
