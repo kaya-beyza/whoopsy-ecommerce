@@ -27,6 +27,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.CategoryId = request.CategoryId;
         product.Gender = request.Gender;
         product.IsActive = request.IsActive;
+        product.UpdatedDate = DateTime.UtcNow.AddHours(3);
 
         await _productRepository.UpdateAsync(product, cancellationToken);
         return true;
