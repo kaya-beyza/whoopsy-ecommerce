@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MiniETicaret.Domain.Enums;
 using MiniETicaret.Application.Features.Products.Commands.CreateProduct;
 using MiniETicaret.Application.Features.Products.Commands.DeleteProduct;
 using MiniETicaret.Application.Features.Products.Commands.UpdateProduct;
@@ -9,6 +10,7 @@ using MiniETicaret.Application.Features.Products.Queries.GetProductsByCategory;
 using MiniETicaret.Application.Features.Products.Commands.UploadProductImage;
 using MiniETicaret.Application.Features.Products.Commands.SetMainProductImage;
 using MiniETicaret.Application.Features.Products.Commands.DeleteProductImage;
+using MiniETicaret.Application.Features.Products.Queries.GetProductsByGender;
 
 namespace MiniETicaret.API.Controllers;
 
@@ -71,6 +73,13 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
+    [HttpGet("by-gender")]
+    public async Task<IActionResult> GetByGender([FromQuery] Gender? gender, [FromQuery] Guid? categoryId)
+    {
+    var result = await _mediator.Send(new GetProductsByGenderQuery(gender, categoryId));
+    return Ok(result);
+    }   
+
     [HttpPost("{productId}/images")]
     public async Task<IActionResult> UploadImage(Guid productId, IFormFile file, [FromQuery] bool isMain = false)
     {

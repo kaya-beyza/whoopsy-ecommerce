@@ -26,6 +26,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
         category.Name = request.Name;
         category.Description = request.Description;
         category.IsActive = request.IsActive;
+        category.UpdatedDate = DateTime.UtcNow.AddHours(3);
 
 
         await _categoryRepository.UpdateAsync(category, cancellationToken);

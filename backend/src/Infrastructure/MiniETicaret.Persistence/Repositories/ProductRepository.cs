@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Domain.Entities;
 using MiniETicaret.Persistence.Context;
+using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Persistence.Repositories;
 
@@ -80,6 +81,18 @@ public class ProductRepository : IProductRepository
             .OrderBy(i => i.DisplayOrder)
             .ToListAsync(cancellationToken);
     }
+    public async Task<List<Product>> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken)
+    {
+    var query = _context.Products.AsQueryable();
+
+    if (gender.HasValue)
+        query = query.Where(p => p.Gender == gender.Value);
+
+    if (categoryId.HasValue)
+        query = query.Where(p => p.CategoryId == categoryId.Value);
+
+    return await query.ToListAsync(cancellationToken);
+    } 
     public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
     {
         var images = await _context.ProductImages
