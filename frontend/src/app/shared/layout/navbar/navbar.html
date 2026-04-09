@@ -3,7 +3,7 @@
     @for (cat of categories; track cat.id) {
     <li class="nav-item" [class.highlight]="cat.highlight" [class.active]="activeCategory() === cat.id"
       (mouseenter)="onEnter(cat.id)">
-      <a class="nav-link" [routerLink]="['/kategori', cat.id]">
+      <a class="nav-link" [routerLink]="['/urunler/kategori', cat.id]">
         {{ cat.label }}
       </a>
 

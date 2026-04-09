@@ -19,22 +19,22 @@ export class MegaMenu implements OnInit {
     yeni: [
       {
         title: 'Kadın', items: [
-          { label: 'Ayakkabı', link: '/yeni/kadin-ayakkabi', hot: true },
-          { label: 'Giyim', link: '/yeni/kadin-giyim' },
-          { label: 'Aksesuar', link: '/yeni/kadin-aksesuar' },
+          { label: 'Ayakkabı', link: '/yeni-gelenler/kadin-ayakkabi', hot: true },
+          { label: 'Giyim', link: '/yeni-gelenler/kadin-giyim' },
+          { label: 'Aksesuar', link: '/yeni-gelenler/kadin-aksesuar' },
         ]
       },
       {
         title: 'Erkek', items: [
-          { label: 'Ayakkabı', link: '/yeni/erkek-ayakkabi', hot: true },
-          { label: 'Giyim', link: '/yeni/erkek-giyim' },
-          { label: 'Aksesuar', link: '/yeni/erkek-aksesuar' },
+          { label: 'Ayakkabı', link: '/yeni-gelenler/erkek-ayakkabi', hot: true },
+          { label: 'Giyim', link: '/yeni-gelenler/erkek-giyim' },
+          { label: 'Aksesuar', link: '/yeni-gelenler/erkek-aksesuar' },
         ]
       },
       {
         title: 'Çocuk', items: [
-          { label: 'Ayakkabı', link: '/yeni/cocuk-ayakkabi', hot: true },
-          { label: 'Giyim', link: '/yeni/cocuk-giyim' },
+          { label: 'Ayakkabı', link: '/yeni-gelenler/cocuk-ayakkabi', hot: true },
+          { label: 'Giyim', link: '/yeni-gelenler/cocuk-giyim' },
         ]
       },
     ],
@@ -42,27 +42,27 @@ export class MegaMenu implements OnInit {
       {
         title: 'Ayakkabı', items: [
           { label: 'Tüm Ayakkabılar', link: '/kadin/ayakkabi', hot: true },
-          { label: 'Spor Ayakkabı', link: '/kadin/spor' },
-          { label: 'Koşu', link: '/kadin/kosu' },
-          { label: 'Outdoor', link: '/kadin/outdoor' },
-          { label: 'Terlik & Sandalet', link: '/kadin/terlik' },
+          { label: 'Spor Ayakkabı', link: '/kadin/ayakkabi/spor' },
+          { label: 'Koşu', link: '/kadin/ayakkabi/kosu' },
+          { label: 'Outdoor', link: '/kadin/ayakkabi/outdoor' },
+          { label: 'Terlik & Sandalet', link: '/kadin/ayakkabi/terlik-sandalet' },
         ]
       },
       {
         title: 'Giyim', items: [
           { label: 'Tüm Giyim', link: '/kadin/giyim' },
-          { label: 'Sweatshirt & Hoodie', link: '/kadin/sweatshirt', hot: true },
-          { label: 'T-Shirt', link: '/kadin/tisort' },
-          { label: 'Tayt & Şort', link: '/kadin/tayt' },
-          { label: 'Ceket & Mont', link: '/kadin/ceket' },
+          { label: 'Sweatshirt & Hoodie', link: '/kadin/giyim/sweatshirt', hot: true },
+          { label: 'T-Shirt', link: '/kadin/giyim/t-shirt' },
+          { label: 'Tayt & Şort', link: '/kadin/giyim/tayt-sort' },
+          { label: 'Ceket & Mont', link: '/kadin/giyim/ceket-mont' },
         ]
       },
       {
         title: 'Aksesuar & Öne Çıkanlar', items: [
-          { label: 'Çanta', link: '/kadin/canta' },
-          { label: 'Şapka & Bere', link: '/kadin/sapka' },
-          { label: 'Çorap', link: '/kadin/corap' },
-          { label: 'Çok Satanlar', link: '/kadin/best', hot: true },
+          { label: 'Çanta', link: '/kadin/aksesuar/canta' },
+          { label: 'Şapka & Bere', link: '/kadin/aksesuar/sapka-bere' },
+          { label: 'Çorap', link: '/kadin/aksesuar/corap' },
+          { label: 'Çok Satanlar', link: '/kadin/one-cikanlar/cok-satanlar', hot: true },
         ]
       },
     ],
@@ -70,27 +70,27 @@ export class MegaMenu implements OnInit {
       {
         title: 'Ayakkabı', items: [
           { label: 'Tüm Ayakkabılar', link: '/erkek/ayakkabi', hot: true },
-          { label: 'Spor Ayakkabı', link: '/erkek/spor' },
-          { label: 'Koşu', link: '/erkek/kosu' },
-          { label: 'Basketbol', link: '/erkek/basketbol' },
-          { label: 'Outdoor', link: '/erkek/outdoor' },
+          { label: 'Spor Ayakkabı', link: '/erkek/ayakkabi/spor' },
+          { label: 'Koşu', link: '/erkek/ayakkabi/kosu' },
+          { label: 'Basketbol', link: '/erkek/ayakkabi/basketbol' },
+          { label: 'Outdoor', link: '/erkek/ayakkabi/outdoor' },
         ]
       },
       {
         title: 'Giyim', items: [
           { label: 'Tüm Giyim', link: '/erkek/giyim' },
-          { label: 'Sweatshirt & Hoodie', link: '/erkek/sweatshirt', hot: true },
-          { label: 'T-Shirt', link: '/erkek/tisort' },
-          { label: 'Eşofman', link: '/erkek/esofman' },
-          { label: 'Şort & Pantolon', link: '/erkek/sort' },
+          { label: 'Sweatshirt & Hoodie', link: '/erkek/giyim/sweatshirt', hot: true },
+          { label: 'T-Shirt', link: '/erkek/giyim/t-shirt' },
+          { label: 'Eşofman', link: '/erkek/giyim/esofman' },
+          { label: 'Şort & Pantolon', link: '/erkek/giyim/sort-pantolon' },
         ]
       },
       {
         title: 'Aksesuar & Öne Çıkanlar', items: [
-          { label: 'Çanta', link: '/erkek/canta' },
-          { label: 'Şapka & Bere', link: '/erkek/sapka' },
-          { label: 'Çorap', link: '/erkek/corap' },
-          { label: 'Çok Satanlar', link: '/erkek/best', hot: true },
+          { label: 'Çanta', link: '/erkek/aksesuar/canta' },
+          { label: 'Şapka & Bere', link: '/erkek/aksesuar/sapka-bere' },
+          { label: 'Çorap', link: '/erkek/aksesuar/corap' },
+          { label: 'Çok Satanlar', link: '/erkek/one-cikanlar/cok-satanlar', hot: true },
         ]
       },
     ],
@@ -98,58 +98,58 @@ export class MegaMenu implements OnInit {
       {
         title: 'Ayakkabı', items: [
           { label: 'Tüm Ayakkabılar', link: '/cocuk/ayakkabi', hot: true },
-          { label: 'Bebek (0–4 Yaş)', link: '/cocuk/bebek' },
-          { label: 'Çocuk (4–8 Yaş)', link: '/cocuk/cocuk' },
-          { label: 'Genç (8–12 Yaş)', link: '/cocuk/genc' },
+          { label: 'Bebek (0–4 Yaş)', link: '/cocuk/ayakkabi/bebek' },
+          { label: 'Çocuk (4–8 Yaş)', link: '/cocuk/ayakkabi/cocuk' },
+          { label: 'Genç (8–12 Yaş)', link: '/cocuk/ayakkabi/genc' },
         ]
       },
       {
         title: 'Giyim & Aksesuar', items: [
-          { label: 'T-Shirt', link: '/cocuk/tisort' },
-          { label: 'Eşofman', link: '/cocuk/esofman' },
+          { label: 'T-Shirt', link: '/cocuk/giyim/t-shirt' },
+          { label: 'Eşofman', link: '/cocuk/giyim/esofman' },
           { label: 'Çorap & Aksesuar', link: '/cocuk/aksesuar' },
         ]
       },
       {
         title: 'Öne Çıkanlar', items: [
-          { label: 'Yeni Gelenler', link: '/cocuk/yeni', hot: true },
-          { label: 'Çok Satanlar', link: '/cocuk/best' },
-          { label: 'Kolay Giyilen', link: '/cocuk/kolay' },
+          { label: 'Yeni Gelenler', link: '/cocuk/one-cikanlar/yeni-gelenler', hot: true },
+          { label: 'Çok Satanlar', link: '/cocuk/one-cikanlar/cok-satanlar' },
+          { label: 'Kolay Giyilen', link: '/cocuk/one-cikanlar/kolay-giyilen' },
         ]
       },
     ],
     koleksiyon: [
       {
         title: 'Klasikler', items: [
-          { label: 'Tüm Koleksiyon', link: '/koleksiyon/tumu', hot: true },
-          { label: 'Signature Serisi', link: '/koleksiyon/signature' },
-          { label: 'Limited Edition', link: '/koleksiyon/limited' },
-          { label: 'Kolaborasyonlar', link: '/koleksiyon/kolaborasyon' },
+          { label: 'Tüm Koleksiyon', link: '/koleksiyonlar', hot: true },
+          { label: 'Signature Serisi', link: '/koleksiyonlar/signature' },
+          { label: 'Limited Edition', link: '/koleksiyonlar/limited' },
+          { label: 'Kolaborasyonlar', link: '/koleksiyonlar/kolab' },
         ]
       },
       {
         title: 'Tarzına Göre', items: [
-          { label: 'Siyah & Beyaz', link: '/koleksiyon/siyah-beyaz' },
-          { label: 'Renkli Modeller', link: '/koleksiyon/renkli', hot: true },
-          { label: 'Retro', link: '/koleksiyon/retro' },
-          { label: 'Minimalist', link: '/koleksiyon/minimalist' },
+          { label: 'Siyah & Beyaz', link: '/tarz/siyah-beyaz' },
+          { label: 'Renkli Modeller', link: '/tarz/renkli', hot: true },
+          { label: 'Retro', link: '/tarz/retro' },
+          { label: 'Minimalist', link: '/tarz/minimalist' },
         ]
       },
     ],
     indirim: [
       {
         title: 'Kategoriye Göre', items: [
-          { label: 'Tüm İndirimler', link: '/indirim/tumu', hot: true },
-          { label: 'Kadın İndirim', link: '/indirim/kadin' },
-          { label: 'Erkek İndirim', link: '/indirim/erkek' },
-          { label: 'Çocuk İndirim', link: '/indirim/cocuk' },
+          { label: 'Tüm İndirimler', link: '/indirimler', hot: true },
+          { label: 'Kadın İndirim', link: '/indirimler/kadin' },
+          { label: 'Erkek İndirim', link: '/indirimler/erkek' },
+          { label: 'Çocuk İndirim', link: '/indirimler/cocuk' },
         ]
       },
       {
         title: 'Fırsatlar', items: [
-          { label: '%20 ve Üzeri', link: '/indirim/yirmi', hot: true },
-          { label: '%30 ve Üzeri', link: '/indirim/otuz' },
-          { label: 'Son Bedenler', link: '/indirim/son-beden' },
+          { label: '%20 ve Üzeri', link: '/indirimler/firsat-20', hot: true },
+          { label: '%30 ve Üzeri', link: '/indirimler/firsat-30' },
+          { label: 'Son Bedenler', link: '/indirimler/son-bedenler' },
         ]
       },
     ],
