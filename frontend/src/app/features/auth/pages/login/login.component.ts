@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TokenService } from '../../../../core/services/token.service';
 import { LoginRequest } from '../../../../core/models/auth.model';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -14,7 +15,7 @@ import { LoginRequest } from '../../../../core/models/auth.model';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-
+  cdnUrl =environment.cdnUrl;
   email: string = '';
   password: string = '';
   errorMessage: string = '';

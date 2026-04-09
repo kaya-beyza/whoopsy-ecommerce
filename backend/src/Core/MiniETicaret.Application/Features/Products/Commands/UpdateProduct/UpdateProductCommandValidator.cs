@@ -26,6 +26,9 @@ public class UpdateProductCommandValidator : AbstractValidator<UpdateProductComm
         RuleFor(x => x.CategoryId)
             .NotEmpty().WithMessage("Kategori seçilmek zorunadır!");   
 
+        RuleFor(x => x.Gender)
+            .IsInEnum().WithMessage("Lütfen geçerli bir cinsiyet seçin!");    
+
 
 
     }

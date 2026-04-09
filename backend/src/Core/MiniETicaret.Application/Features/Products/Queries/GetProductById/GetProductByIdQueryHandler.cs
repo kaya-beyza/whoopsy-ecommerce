@@ -1,7 +1,7 @@
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
-using MiniETicaret.Domain.Entities;
+using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductById;
 
@@ -17,7 +17,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
     {
         var product = await _productRepository.GetByIdAsync(request.Id, cancellationToken);
 
-        if(product == null)
+        if (product == null)
             return null!;
 
         return new ProductDto
@@ -28,7 +28,10 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             Price = product.Price,
             StockQuantity = product.StockQuantity,
             CategoryId = product.CategoryId,
-            CategoryName = product.Category?.Name ?? ""
+            CategoryName = product.Category?.Name ?? "",
+            Gender = product.Gender,
+            MainImageUrl = product.Images?.FirstOrDefault(i => i.IsMain)?.Url,
+            ImageUrls = product.Images?.Select(i => i.Url).ToList() ?? new()
         };
     }
 }

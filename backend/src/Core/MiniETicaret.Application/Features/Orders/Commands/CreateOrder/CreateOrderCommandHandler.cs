@@ -23,7 +23,8 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
         {
             ProductId = item.ProductId,
             Quantity = item.Quantity,
-            UnitPrice = item.UnitPrice
+            UnitPrice = item.UnitPrice,
+            CreatedDate = DateTime.UtcNow.AddHours(3)
         }).ToList();
 
         // 2) TotalAmount'u sunucu tarafında hesapla (güvenlik için)

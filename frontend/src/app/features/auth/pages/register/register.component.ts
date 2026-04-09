@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -12,8 +13,16 @@ import { AuthService } from '../../../../core/services/auth.service';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
+  // main'den gelen cdnUrl'i ekliyoruz
+  cdnUrl = environment.cdnUrl;
+
+  // layout'daki ayrılmış isim yapılarını koruyoruz
   firstName: string = '';
   lastName: string = '';
+
+  // Eğer main branch'i başka bir yerde fullName'e ihtiyaç duyuyorsa bunu da tutabilirsin:
+  fullName: string = '';
+
   email: string = '';
   phone: string = '';
   password: string = '';
