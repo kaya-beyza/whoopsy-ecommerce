@@ -1,0 +1,29 @@
+.layout-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrapper {
+    min-height: calc(100vh - 120px);
+    background-color: #fff;
+    position: relative;
+}
+
+.side-menu {
+    width: 280px;
+    background: #fff;
+
+    &__header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    &__title {
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+}

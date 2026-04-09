@@ -1,0 +1,112 @@
+<div class="login-viewport">
+    <!-- Left Panel: Premium Lifestyle Asset (Consistent Brand Branding) -->
+    <div class="brand-panel">
+        <div class="asset-overlay"></div>
+        <img [src]="cdnUrl + '/f_auto,q_auto/log-in.jpg'" alt="Whoopsy Brand Image" class="brand-asset">
+        <div class="brand-tagline">
+            <a class="logo-light" routerLink="/">
+                <span class="logo-w">w</span>
+                <span class="logo-h">h</span>
+                <span class="logo-oopsy">
+                    <span class="eye-o">O</span>
+                    <span class="eye-o">O</span>
+                    <span class="logo-ps">PS</span>
+                </span>
+                <span class="logo-y">y</span>
+            </a>
+            <p>Urban. Authentic. Premium.</p>
+        </div>
+    </div>
+
+    <!-- Right Panel: Expansive Form Panel -->
+    <div class="form-panel">
+        <div class="login-container">
+            <header class="form-header">
+                <!-- Main Animated Logo -->
+                <a class="logo-main" routerLink="/">
+                    <span class="logo-w">w</span>
+                    <span class="logo-h">h</span>
+                    <span class="logo-oopsy">
+                        <span class="eye-o">O</span>
+                        <span class="eye-o">O</span>
+                        <span class="logo-ps">PS</span>
+                    </span>
+                    <span class="logo-y">y</span>
+                </a>
+                
+                <div class="header-titles">
+                    <h1 class="welcome-title">Hesap Oluştur</h1>
+                    <p class="subtitle">Whoopsy dünyasına ilk adımını at.</p>
+                </div>
+            </header>
+
+            <form (ngSubmit)="onRegister()" class="login-form">
+                <div class="form-group">
+                    <label for="fullName">AD SOYAD</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">person</span>
+                        <input id="fullName" type="text" [(ngModel)]="fullName" name="fullName" required autocomplete="name"
+                            placeholder="Adınız ve Soyadınız" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-POSTA</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">mail</span>
+                        <input id="email" type="email" [(ngModel)]="email" name="email" required autocomplete="email"
+                            placeholder="E-posta adresiniz" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">ŞİFRE</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">lock</span>
+                        <input id="password" type="password" [(ngModel)]="password" name="password" required
+                            autocomplete="new-password" placeholder="••••••••" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">ŞİFRE TEKRAR</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">lock</span>
+                        <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
+                            autocomplete="new-password" placeholder="••••••••" />
+                    </div>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-sharp">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <button type="submit" [disabled]="isLoading" class="primary-btn">
+                    <span *ngIf="!isLoading">KAYDOL</span>
+                    <span *ngIf="isLoading" class="loading-spinner">Hesap oluşturuluyor...</span>
+                </button>
+
+                <div class="social-divider">
+                    <span>veya</span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="google-btn">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google Logo">
+                        Google ile Kaydol
+                    </button>
+                    <button type="button" class="apple-btn">
+                        <span class="material-icons">apple</span>
+                        Apple ile Kaydol
+                    </button>
+                </div>
+            </form>
+
+            <footer class="form-footer">
+                <span>Zaten hesabınız var mı?</span>
+                <a routerLink="/login" class="signup-link">GİRİŞ YAP</a>
+            </footer>
+        </div>
+    </div>
+</div>

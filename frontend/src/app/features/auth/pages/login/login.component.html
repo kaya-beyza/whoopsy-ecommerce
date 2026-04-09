@@ -1,54 +1,102 @@
- <div class="login-shell">
-    <div class="login-card">
-      <div class="card-header">
-        <div class="brand-mark"></div>
-        <h1>Yönetim Paneli</h1>
-        <p>Devam etmek için giriş yapın</p>
-      </div>
-
-      <form (ngSubmit)="onLogin()" class="login-form">
-        <div class="field">
-          <label for="email">E-posta</label>
-          <input
-            id="email"
-            type="email"
-            [(ngModel)]="email"
-            name="email"
-            required
-            autocomplete="email"
-            placeholder="ornek@firma.com"
-          />
+<div class="login-viewport">
+    <!-- Left Panel: Premium Lifestyle Asset -->
+    <div class="brand-panel">
+        <div class="asset-overlay"></div>
+        <img [src]="cdnUrl + '/f_auto,q_auto/log-in.jpg'" alt="Whoopsy Brand Image" class="brand-asset">
+        <div class="brand-tagline">
+            <a class="logo-light" routerLink="/">
+                <span class="logo-w">w</span>
+                <span class="logo-h">h</span>
+                <span class="logo-oopsy">
+                    <span class="eye-o">O</span>
+                    <span class="eye-o">O</span>
+                    <span class="logo-ps">PS</span>
+                </span>
+                <span class="logo-y">y</span>
+            </a>
+            <p>Urban. Authentic. Premium.</p>
         </div>
-
-        <div class="field">
-          <label for="password">Şifre</label>
-          <input
-            id="password"
-            type="password"
-            [(ngModel)]="password"
-            name="password"
-            required
-            autocomplete="current-password"
-            placeholder="••••••••"
-          />
-        </div>
-
-        <div class="error-banner" *ngIf="errorMessage">
-          <span class="error-icon">!</span>
-          {{ errorMessage }}
-        </div>
-
-        <button type="submit" [disabled]="isLoading" class="login-btn">
-          <span *ngIf="!isLoading">Giriş Yap</span>
-          <span *ngIf="isLoading" class="loading-state">
-            <span class="spinner"></span>
-            Giriş Yapılıyor...
-          </span>
-        </button>
-      </form>
-
-      <div class="card-footer">
-        <span>Mini E-Ticaret &copy; 2026</span>
-      </div>
     </div>
-  </div>
+
+    <!-- Right Panel: Minimalist Login Form -->
+    <div class="form-panel">
+        <div class="login-container">
+            <header class="form-header">
+                <!-- Main Animated Logo -->
+                <a class="logo-main" routerLink="/">
+                    <span class="logo-w">w</span>
+                    <span class="logo-h">h</span>
+                    <span class="logo-oopsy">
+                        <span class="eye-o">O</span>
+                        <span class="eye-o">O</span>
+                        <span class="logo-ps">PS</span>
+                    </span>
+                    <span class="logo-y">y</span>
+                </a>
+                
+                <div class="header-titles">
+                    <h1 class="welcome-title">Hoş Geldiniz</h1>
+                    <p class="subtitle">Lütfen hesabınıza giriş yapın.</p>
+                </div>
+            </header>
+
+            <form (ngSubmit)="onLogin()" class="login-form">
+                <div class="form-group">
+                    <label for="email">E-POSTA</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">mail</span>
+                        <input id="email" type="email" [(ngModel)]="email" name="email" required autocomplete="email"
+                            placeholder="E-posta adresiniz" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">ŞİFRE</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">lock</span>
+                        <input id="password" type="password" [(ngModel)]="password" name="password" required
+                            autocomplete="current-password" placeholder="••••••••" />
+                    </div>
+                    <div class="form-actions-sub">
+                        <a href="javascript:void(0)" class="forgot-link">Şifremi Unuttum</a>
+                    </div>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-sharp">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <button type="submit" [disabled]="isLoading" class="primary-btn">
+                    <span *ngIf="!isLoading">GİRİŞ YAP</span>
+                    <span *ngIf="isLoading" class="loading-spinner">Giriş Yapılıyor...</span>
+                </button>
+
+                <div class="social-divider">
+                    <span>veya</span>
+                </div>
+
+                <div class="social-login">
+                    <button type="button" class="google-btn">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google Logo">
+                        Google ile Devam Et
+                    </button>
+                    <button type="button" class="apple-btn">
+                        <span class="material-icons">apple</span>
+                        Apple ile Devam Et
+                    </button>
+                </div>
+            </form>
+
+            <footer class="form-footer">
+                <span>Henüz hesabınız yok mu?</span>
+                <a routerLink="/register" class="signup-link">KAYIT OL</a>
+            </footer>
+
+            <div class="dev-hint">
+                <span class="material-symbols-sharp">info</span>
+                Test: admin@admin.com / admin123
+            </div>
+        </div>
+    </div>
+</div>

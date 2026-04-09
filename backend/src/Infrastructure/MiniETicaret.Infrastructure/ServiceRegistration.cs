@@ -8,8 +8,9 @@ public static class ServiceRegistration
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services)
     {   // "Birisi ITokenService isterse, ona TokenService ver."
-        services.AddScoped<ITokenService,TokenService>();
-
+        services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IFileService, FileService>();
+        services.AddScoped<IPaymentService, IyzicoPaymentService>();
         return services;
     }
 }

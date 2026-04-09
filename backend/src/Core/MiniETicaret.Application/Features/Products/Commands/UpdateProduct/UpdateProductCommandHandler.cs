@@ -25,6 +25,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.Price = request.Price;
         product.StockQuantity = request.StockQuantity;
         product.CategoryId = request.CategoryId;
+        product.Gender = request.Gender;
         product.IsActive = request.IsActive;
 
         await _productRepository.UpdateAsync(product, cancellationToken);

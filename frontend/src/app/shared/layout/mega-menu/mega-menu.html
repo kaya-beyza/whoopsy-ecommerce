@@ -1,32 +1,40 @@
 @if (groups.length > 0) {
-  <div class="mega-menu">
-    <div class="mega-inner">
+<div class="mega-menu-full-width">
+  <div class="mega-container">
 
+    <div class="mega-columns">
       @for (group of groups; track group.title) {
-        <div class="menu-group">
-          <h4 class="group-title">{{ group.title }}</h4>
-          <ul class="group-list">
-            @for (item of group.items; track item.label) {
-              <li>
-                <a class="group-link" [routerLink]="item.link">
-                  {{ item.label }}
-                  @if (item.hot) {
-                    <span class="hot-badge">Trend</span>
-                  }
-                </a>
-              </li>
-            }
-          </ul>
-        </div>
-      }
-
-      <div class="menu-promo">
-        <div class="promo-tag">Özel Teklif</div>
-        <div class="promo-title">Bu Haftanın Yıldızları</div>
-        <div class="promo-sub">Seçili ürünlerde %40'a varan indirim</div>
-        <a class="promo-btn" routerLink="/kampanya">Keşfet</a>
+      <div class="mega-col">
+        <h4 class="col-title">{{ group.title }}</h4>
+        <ul class="col-links">
+          @for (item of group.items; track item.label) {
+          <li>
+            <a class="mega-item-link" [routerLink]="item.link">
+              {{ item.label }}
+              @if (item.hot) {
+              <span class="hot-badge">YENİ</span>
+              }
+            </a>
+          </li>
+          }
+        </ul>
       </div>
-
+      }
     </div>
+
+    <div class="mega-promo">
+      <div class="promo-box">
+        <img src="assets/images/mega-menu-promo.jpg" alt="Yeni Koleksiyon" class="promo-img">
+
+        <div class="promo-overlay">
+          <span class="promo-tag">BU SEZON</span>
+          <h3 class="promo-title">YENİ KOLEKSİYON</h3>
+          <p class="promo-sub">İlk senin olsun</p>
+          <a class="promo-btn" routerLink="/yeni">KEŞFET</a>
+        </div>
+      </div>
+    </div>
+
   </div>
+</div>
 }

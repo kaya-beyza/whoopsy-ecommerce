@@ -1,46 +1,75 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/pages/login/login.component';
+import { RegisterComponent } from './features/auth/pages/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
+import { Home } from './features/home/home';
+import { MainLayoutComponent } from './core/layout/main-layout/main-layout';
 
 export const routes: Routes = [
-  // 1. GİRİŞ SAYFASI
-  { 
-    path: 'login', 
-    component: LoginComponent 
-  },
-
-  // 2. KULLANICILAR SAYFASI
+  // 1. GİRİŞ SAYFASI (Layout Dışında - Sade Sayfa)
   {
-    path: 'users',
-    canActivate: [authGuard],
-    loadChildren: () => import('./features/users/users.routes').then(m => m.userRoutes)
+    path: 'login',
+    component: LoginComponent
   },
 
-  // 3. SİPARİŞLER SAYFASI 
+  // 2. KAYIT SAYFASI (Layout Dışında - Sade Sayfa)
   {
-    path: 'orders',
-    // canActivate: [authGuard],
-    loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
+    path: 'register',
+    component: RegisterComponent
   },
 
-  // 4. ÜRÜN EKLEME SAYFASI
+  // 3. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
   {
-    path: 'products/create',
-    // canActivate: [authGuard], 
-    loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
+    path: '',
+    component: MainLayoutComponent, // 💡 Çatı burada kuruluyor
+    children: [
+      // ── ANA SAYFA ──
+      {
+        path: '',
+        component: Home,
+        pathMatch: 'full' 
+      },
+
+      // ── KULLANICILAR ──
+      {
+        path: 'users',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/users/users.routes').then(m => m.userRoutes)
+      },
+
+      // ── SİPARİŞLER ──
+      {
+        path: 'orders',
+        // canActivate: [authGuard],
+        loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
+      },
+
+      // ── ÜRÜNLER LİSTESİ ──
+      {
+        path: 'urunler',
+        loadChildren: () => import('./features/products/products.routes').then(m => m.routes)
+      },
+
+      // ── ÜRÜN EKLEME SAYFASI (Senin dalından geldi) ──
+      {
+        path: 'products/create',
+        // canActivate: [authGuard], 
+        loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
+      },
+
+      // ── SEPET SAYFASI (Senin dalından geldi) ──
+      {
+        path: 'cart',
+        // canActivate: [authGuard], 
+        loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
+      }
+    ]
   },
 
-  // 5. SEPET SAYFASI (Lazy Loading ile)
+  // 4. HATALI ROTA KONTROLÜ (Bilinmeyen bir URL girilirse anasayfaya atar)
   {
-    path: 'cart',
-    // canActivate: [authGuard], // İleride girişi zorunlu yapmak istersen açarsın
-    loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
-  },
-
-  // VARSAYILAN YÖNLENDİRME 
-  { 
-    path: '', 
-    redirectTo: 'login', 
-    pathMatch: 'full' 
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full'
   }
 ];
