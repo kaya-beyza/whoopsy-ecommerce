@@ -15,7 +15,7 @@ import { environment } from '../../../../../environments/environment';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  cdnUrl =environment.cdnUrl;
+  cdnUrl = environment.cdnUrl;
   email: string = '';
   password: string = '';
   errorMessage: string = '';
