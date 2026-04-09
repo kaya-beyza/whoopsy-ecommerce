@@ -137,8 +137,22 @@
   height: 100vh;
   background: #ffffff;
   overflow-y: auto; 
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
+  
+  /* --- Elite Scrollbar (Whoopsy Standard) --- */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+  }
 
   .login-container {
     width: 100%;

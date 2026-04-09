@@ -24,13 +24,13 @@ export const routes: Routes = [
   {
 
     path: '',
-    component: MainLayoutComponent, // 💡 Çatı burada kuruluyor
+    component: MainLayoutComponent,
     children: [
       // ── ANA SAYFA ──
       {
         path: '',
         component: Home,
-        pathMatch: 'full' // 👈 Bunu ekliyoruz ki diğer rotaları bozmasın
+        pathMatch: 'full'
       },
 
       // ── KULLANICILAR ──

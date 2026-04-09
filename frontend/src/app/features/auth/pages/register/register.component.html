@@ -41,17 +41,29 @@
             </header>
 
             <form (ngSubmit)="onRegister()" class="login-form">
-                <div class="form-group">
-                    <label for="fullName">AD SOYAD</label>
-                    <div class="input-wrapper">
-                        <span class="material-symbols-sharp input-icon">person</span>
-                        <input id="fullName" type="text" [(ngModel)]="fullName" name="fullName" required autocomplete="name"
-                            placeholder="Adınız ve Soyadınız" />
+                <!-- Row 1: Name & Surname -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">İSİM*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">person</span>
+                            <input id="firstName" type="text" [(ngModel)]="firstName" name="firstName" required
+                                placeholder="Adınız" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">SOYİSİM*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">person</span>
+                            <input id="lastName" type="text" [(ngModel)]="lastName" name="lastName" required
+                                placeholder="Soyadınız" />
+                        </div>
                     </div>
                 </div>
 
+                <!-- Row 2: Email -->
                 <div class="form-group">
-                    <label for="email">E-POSTA</label>
+                    <label for="email">E-POSTA*</label>
                     <div class="input-wrapper">
                         <span class="material-symbols-sharp input-icon">mail</span>
                         <input id="email" type="email" [(ngModel)]="email" name="email" required autocomplete="email"
@@ -59,21 +71,75 @@
                     </div>
                 </div>
 
+                <!-- Row 3: Phone -->
                 <div class="form-group">
-                    <label for="password">ŞİFRE</label>
+                    <label for="phone">TELEFON*</label>
                     <div class="input-wrapper">
-                        <span class="material-symbols-sharp input-icon">lock</span>
-                        <input id="password" type="password" [(ngModel)]="password" name="password" required
-                            autocomplete="new-password" placeholder="••••••••" />
+                        <span class="material-symbols-sharp input-icon">call</span>
+                        <input id="phone" type="tel" [(ngModel)]="phone" name="phone" required
+                            placeholder="05xx xxx xx xx" />
                     </div>
                 </div>
 
+                <!-- Row 4: Password -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">ŞİFRE*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">lock</span>
+                            <input id="password" type="password" [(ngModel)]="password" name="password" required
+                                placeholder="••••••••" />
+                        </div>
+                        <p class="input-hint">En az 6 karakter</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">ŞİFRE TEKRAR*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">lock</span>
+                            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
+                                placeholder="••••••••" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 5: Gender Selection -->
                 <div class="form-group">
-                    <label for="confirmPassword">ŞİFRE TEKRAR</label>
+                    <label>CİNSİYET</label>
+                    <div class="gender-selection">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" value="Erkek">
+                            <span class="radio-custom"></span>
+                            Erkek
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" value="Kadın">
+                            <span class="radio-custom"></span>
+                            Kadın
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" value="Belirtmek istemiyorum">
+                            <span class="radio-custom"></span>
+                            Belirtmek istemiyorum
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Row 6: Date of Birth -->
+                <div class="form-group">
+                    <label for="birthDate">DOĞUM TARİHİ*</label>
                     <div class="input-wrapper">
-                        <span class="material-symbols-sharp input-icon">lock</span>
-                        <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
-                            autocomplete="new-password" placeholder="••••••••" />
+                        <span class="material-symbols-sharp input-icon">calendar_month</span>
+                        <input id="birthDate" type="date" [(ngModel)]="birthDate" name="birthDate" required />
+                    </div>
+                </div>
+
+                <!-- Row 7: Address (Requested) -->
+                <div class="form-group">
+                    <label for="address">ADRES</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">location_on</span>
+                        <textarea id="address" [(ngModel)]="address" name="address" rows="3" 
+                            placeholder="Teslimat adresi detayları..."></textarea>
                     </div>
                 </div>
 
@@ -83,8 +149,8 @@
                 </div>
 
                 <button type="submit" [disabled]="isLoading" class="primary-btn">
-                    <span *ngIf="!isLoading">KAYDOL</span>
-                    <span *ngIf="isLoading" class="loading-spinner">Hesap oluşturuluyor...</span>
+                    <span *ngIf="!isLoading">HESAP OLUŞTUR</span>
+                    <span *ngIf="isLoading" class="loading-spinner">Mühürleniyor...</span>
                 </button>
 
                 <div class="social-divider">
@@ -94,11 +160,11 @@
                 <div class="social-login">
                     <button type="button" class="google-btn">
                         <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google Logo">
-                        Google ile Kaydol
+                        Google ile Devam Et
                     </button>
                     <button type="button" class="apple-btn">
                         <span class="material-icons">apple</span>
-                        Apple ile Kaydol
+                        Apple ile Devam Et
                     </button>
                 </div>
             </form>
