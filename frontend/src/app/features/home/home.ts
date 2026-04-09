@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ProductService } from '../products/services/product.service';
+import { Product } from '../products/models/product.model';
 
 @Component({
   selector: 'app-home',
@@ -9,8 +11,23 @@ import { RouterModule } from '@angular/router';
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
-export class Home {
+export class Home implements OnInit {
+  private productService = inject(ProductService);
+  
   currentSlide = 0;
+  featuredProducts = signal<Product[]>([]);
+  isLoading = signal(true);
+
+  ngOnInit(): void {
+    this.productService.getProducts().subscribe({
+      next: (products) => {
+        // En öncelikli 8 ürünü vitrine çıkartıyoruz
+        this.featuredProducts.set(products.slice(0, 8));
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
 
   slides = [
     {
@@ -20,7 +37,7 @@ export class Home {
       tag: 'OOPS!',
       title: 'whOOPSy<br>ile',
       desc: 'sokak ruhunu ayağına taşı.',
-      link: '/shop'
+      link: '/urunler'
     },
     {
       id: 2,
@@ -29,7 +46,7 @@ export class Home {
       tag: '',
       title: '',
       desc: '',
-      link: '/explore'
+      link: '/urunler'
     }
   ];
 

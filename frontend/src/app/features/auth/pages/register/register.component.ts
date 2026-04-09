@@ -14,14 +14,18 @@ import { environment } from '../../../../../environments/environment';
 })
 export class RegisterComponent {
   cdnUrl = environment.cdnUrl;
+
+  firstName: string = '';
+  lastName: string = '';
   fullName: string = '';
   email: string = '';
+  phone: string = '';
   password: string = '';
   confirmPassword: string = '';
-        /*phoneNumber: string = '';
-        address: string = '';
-        gender: number | null = null;
-        birthDate: string = '';*/
+  gender: number | null = null;
+  birthDate: string = '';
+  address: string = '';
+
   errorMessage: string = '';
   isLoading: boolean = false;
 
@@ -35,7 +39,6 @@ export class RegisterComponent {
     const x = (e.clientX / window.innerWidth) * 100;
     const y = (e.clientY / window.innerHeight) * 100;
 
-    // Eyeball move logic (max +/- 4px) - Consistent with Login Page
     const moveX = (x - 50) / 12.5;
     const moveY = (y - 50) / 12.5;
 
@@ -44,8 +47,8 @@ export class RegisterComponent {
   }
 
   onRegister(): void {
-    if (!this.fullName || !this.email || !this.password || !this.confirmPassword) {
-      this.errorMessage = 'Lütfen tüm alanları doldurun.';
+    if (!this.firstName || !this.lastName || !this.email || !this.password || !this.confirmPassword || !this.phone) {
+      this.errorMessage = 'Lütfen zorunlu alanları doldurun.';
       return;
     }
 
@@ -57,15 +60,24 @@ export class RegisterComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.register({
-      fullName: this.fullName,
+    const registerData = {
+      fullName: `${this.firstName} ${this.lastName}`,
+      firstName: this.firstName,
+      lastName: this.lastName,
       email: this.email,
-      password: this.password
-    }).subscribe({
+      phone: this.phone,
+      password: this.password,
+      gender: this.gender,
+      birthDate: this.birthDate,
+      address: this.address
+    };
+
+    console.log('Whoopsy Kayıt Verisi:', registerData);
+
+    this.authService.register(registerData).subscribe({
       next: (response) => {
         console.log('Kayıt başarılı:', response);
         this.isLoading = false;
-        // Kayıt sonrası login sayfasına yönlendiriyoruz
         this.router.navigate(['/login']);
       },
       error: (err) => {

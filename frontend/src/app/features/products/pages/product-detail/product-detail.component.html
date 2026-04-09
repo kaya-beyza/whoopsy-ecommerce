@@ -1,0 +1,157 @@
+<div class="detail-viewport">
+  <!-- ── ERROR STATE (Boutique Silence) ── -->
+  <div class="container" *ngIf="!isLoading() && hasError()">
+    <div class="error-container simplified">
+      <div class="error-brand-eyes-minimal">
+        <span class="eye-o">O</span>
+        <span class="eye-o">O</span>
+      </div>
+      <p class="boutique-message">Whoopsy Arşivleri bu eseri henüz mühürlememiş olabilir veya eser kısa bir süreliğine kilitli olabilir.</p>
+      <a routerLink="/" class="btn-clean-link">Koleksiyona Dön</a>
+    </div>
+  </div>
+
+  <!-- ── LOADING STATE ── -->
+  <div class="container loading-state" *ngIf="isLoading()">
+    <div class="loading-overlay">
+      <div class="shimmer-card">
+        <div class="shimmer-media"></div>
+        <div class="shimmer-text"></div>
+      </div>
+      <p>Yükleniyor...</p>
+    </div>
+  </div>
+
+  <!-- ── SUCCESS STATE ── -->
+  <div class="container" *ngIf="!isLoading() && product() as p">
+    <!-- ── BREADCRUMBS ── -->
+    <nav class="breadcrumbs">
+      <div class="bc-inner">
+        <a routerLink="/">Anasayfa</a>
+        <span class="sep">/</span>
+        <a routerLink="/urunler">Tüm Ürünler</a>
+        <span class="sep">/</span>
+        <a [routerLink]="['/urunler/kategori', p.categoryId]">{{ p.category }}</a>
+        <span class="sep">/</span>
+        <span class="current">{{ p.name }}</span>
+      </div>
+    </nav>
+
+    <div class="detail-layout">
+      <!-- ── LEFT: GALLERY ── -->
+      <div class="gallery-section">
+        <div class="gal-sticky-wrapper">
+          <div class="thumbnail-sidebar">
+            <div class="thumb" [class.active]="selectedImage() === p.imageUrl" (click)="selectImage(p.imageUrl)">
+              <img [src]="p.imageUrl" alt="Thumbnail">
+            </div>
+            <div class="thumb" *ngIf="p.hoverImageUrl" [class.active]="selectedImage() === p.hoverImageUrl" (click)="selectImage(p.hoverImageUrl)">
+              <img [src]="p.hoverImageUrl" alt="Thumbnail Hover">
+            </div>
+            <div class="thumb"><img [src]="p.imageUrl" style="filter: grayscale(100%); opacity: 0.5;"></div>
+            <div class="thumb" style="border: 1px dashed #ddd; display: flex; align-items: center; justify-content: center; background: #fafafa;">
+              <span class="material-symbols-sharp" style="font-size: 20px; color: #ccc;">play_circle</span>
+            </div>
+          </div>
+
+          <div class="main-display">
+            <div class="badge-wrapper">
+              <span class="badge new" *ngIf="p.isNew">YENİ</span>
+              <span class="badge best" *ngIf="p.isBestseller">POPÜLER</span>
+            </div>
+            <img [src]="selectedImage()" [alt]="p.name" class="hero-image">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── RIGHT: INFO PANEL ── -->
+      <div class="info-section">
+        <div class="sticky-panel">
+          <header class="product-header">
+            <div class="header-top">
+              <span class="brand-name">{{ p.brand }}</span>
+              <div class="rating-row">
+                <span class="material-symbols-sharp">star</span>
+                <span class="rate">{{ p.rating }}</span>
+              </div>
+            </div>
+            <h1 class="product-name">{{ p.name }}</h1>
+            <p class="product-subtitle">Modern Şehir Koleksiyonu</p>
+          </header>
+
+          <div class="price-block">
+            <span class="current-price">{{ p.price | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+            <span class="original-price" *ngIf="p.originalPrice">{{ p.originalPrice | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+            <span class="installment-info" *ngIf="p.price > 1000">Vade farksız 3 taksit</span>
+          </div>
+
+          <!-- Variants / Colors -->
+          <div class="options-group">
+            <div class="group-header">
+              <label>RENK: <span class="val">Orijinal Renk</span></label>
+            </div>
+            <div class="color-dots">
+              <span class="dot active" style="background: #000;"></span>
+              <span class="dot" style="background: #fff; border: 1px solid #ddd;"></span>
+              <span class="dot" style="background: #bebebe;"></span>
+            </div>
+          </div>
+
+          <!-- Size Selector -->
+          <div class="options-group">
+            <div class="group-header">
+              <label>BEDEN SEÇİN</label>
+              <button class="size-guide-btn">Beden Rehberi</button>
+            </div>
+            <div class="size-grid">
+              <button *ngFor="let s of p.sizes" 
+                class="size-btn" 
+                [class.selected]="selectedSize() === s"
+                (click)="selectSize(s)">
+                {{ s }}
+              </button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="add-to-cart-btn" (click)="addToCart()" [disabled]="!selectedSize()">
+              <span class="material-symbols-sharp">shopping_bag</span>
+              <span>SEPETE EKLE</span>
+            </button>
+            <button class="fav-btn">
+              <span class="material-symbols-sharp">favorite</span>
+            </button>
+          </div>
+
+          <div class="trust-badges">
+            <div class="badge-item">
+              <span class="material-symbols-sharp">local_shipping</span>
+              <span>ÜCRETSİZ KARGO (4.000 TL Üzeri)</span>
+            </div>
+            <div class="badge-item">
+              <span class="material-symbols-sharp">history</span>
+              <span>30 GÜN İÇİNDE ÜCRETSİZ İADE</span>
+            </div>
+          </div>
+
+          <div class="product-details-accordion">
+            <details open>
+              <summary>
+                <span>Ürün Bilgisi</span>
+                <span class="material-symbols-sharp arrow">expand_more</span>
+              </summary>
+              <div class="content">
+                <p>{{ p.description }}</p>
+                <ul class="attr-list">
+                  <li><strong>Kategori:</strong> {{ p.category }}</li>
+                  <li><strong>Marka:</strong> {{ p.brand }}</li>
+                  <li><strong>Stil:</strong> Sokak Modası</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

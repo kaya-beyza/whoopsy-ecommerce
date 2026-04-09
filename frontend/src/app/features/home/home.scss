@@ -215,7 +215,7 @@
 
 // ── KATEGORİ VE STİLLER ──
 .category-section {
-  padding: 100px 0;
+  padding: 80px 0;
 
   .category-grid {
     display: grid;
@@ -227,18 +227,20 @@
     position: relative;
     height: 600px;
     overflow: hidden;
+    border-radius: 4px;
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 0.8s ease;
+      transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     .cat-info {
       position: absolute;
       bottom: 40px;
       left: 40px;
+      z-index: 2;
 
       .cat-btn {
         color: #fff;
@@ -246,11 +248,227 @@
         font-family: var(--font-nav);
         font-size: 18px;
         font-weight: 700;
+        letter-spacing: 1px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+
+        &:hover {
+          border-bottom-color: #fff;
+          padding-left: 10px;
+        }
       }
     }
 
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+    }
+
     &:hover img {
-      transform: scale(1.05);
+      transform: scale(1.08);
+    }
+  }
+}
+
+// ── ELITE+ VITRIN: HANDPICKED SECTION ───────────
+.handpicked-section {
+  padding: 60px 0 100px;
+  background: #fff;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 50px;
+
+    .section-title {
+      margin-bottom: 0;
+    }
+
+    .explore-link {
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 14px;
+      letter-spacing: 1px;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+      transition: all 0.3s;
+
+      &:hover {
+        color: var(--color-primary);
+        border-bottom-color: var(--color-primary);
+        padding-right: 10px;
+      }
+    }
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+}
+
+// ── ELITE PRODUCT CARD ───────────
+.elite-product-card {
+  cursor: pointer;
+  
+  .card-media {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: #f9f9f9;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 18px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s ease, transform 0.8s ease;
+    }
+
+    .hover-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      opacity: 0;
+    }
+
+    .card-badges {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 2;
+
+      span {
+        padding: 5px 12px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        border-radius: 2px;
+      }
+
+      .badge-new { background: #000; color: #fff; }
+      .badge-best { background: var(--color-primary); color: #fff; }
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #fff;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      z-index: 2;
+      transition: all 0.3s;
+
+      span { font-size: 20px; transition: color 0.3s; }
+      &:hover {
+        transform: scale(1.1);
+        span { color: var(--color-primary); font-variation-settings: 'FILL' 1; }
+      }
+    }
+
+    .quick-add-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
+      padding: 15px;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+      .add-btn {
+        width: 100%;
+        background: #000;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        font-weight: 700;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: 0.3s;
+
+        span:last-child { font-size: 18px; }
+        &:hover { background: var(--color-primary); }
+      }
+    }
+  }
+
+  .card-info {
+    .info-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+
+      .p-brand {
+        font-size: 11px;
+        font-weight: 800;
+        color: #888;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+      }
+
+      .p-rating {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #444;
+
+        span:first-child { color: #ffbc00; font-size: 16px; font-variation-settings: 'FILL' 1; }
+      }
+    }
+
+    .p-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #000;
+      margin-bottom: 8px;
+    }
+
+    .p-price-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .p-price { font-weight: 800; font-size: 17px; }
+      .p-original {
+        color: #999;
+        text-decoration: line-through;
+        font-size: 14px;
+      }
+    }
+  }
+
+  &:hover {
+    .card-media {
+      .main-image { opacity: 0; transform: scale(1.05); }
+      .hover-image { opacity: 1; transform: scale(1.05); }
+      .quick-add-overlay { transform: translateY(0); }
     }
   }
 }
@@ -280,10 +498,11 @@
 
   .style-card {
     position: relative;
-    height: 300px; // Kartın yüksekliği
+    height: 300px;
     overflow: hidden;
     cursor: pointer;
     padding: 0 !important;
+    border-radius: 4px;
 
     img {
       width: 100%;
