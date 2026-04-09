@@ -1,79 +1,114 @@
-<div class="container mt-4">
-  <h2>Yeni Ürün Ekle</h2>
-  <hr>
+<div class="dashboard-wrapper">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">Ürün Yönetimi</h1>
+        <p class="page-subtitle">Envanterinizi tek bir ekrandan profesyonelce yönetin.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-refresh" (click)="loadProducts()" [class.spinning]="isSubmitting">
+          <span class="btn-icon">↻</span> Listeyi Yenile
+        </button>
+      </div>
+    </div>
+  </header>
 
-  <form (ngSubmit)="onSubmit(productForm)" #productForm="ngForm">
+  <main class="dashboard-content grid-layout">
     
-    <div class="mb-3">
-      <label class="form-label">Ürün Adı <span class="text-danger">*</span></label>
-      <input 
-        type="text" 
-        class="form-control" 
-        name="name" 
-        [(ngModel)]="productData.name" 
-        required 
-        placeholder="Örn: Kablosuz Kulaklık"
-        #nameField="ngModel"
-      >
-      <div *ngIf="nameField.invalid && nameField.touched" class="text-danger small mt-1">
-        Ürün adı zorunludur.
+    <aside class="sidebar-form">
+      <div class="card form-card" [class.editing-mode]="editingProductId">
+        <div class="card-header">
+          <h2 class="card-subtitle">
+            {{ editingProductId ? '✏️ Ürünü Düzenle' : '➕ Yeni Ürün Tanımla' }}
+          </h2>
+        </div>
+        <form (ngSubmit)="onSubmit(productForm)" #productForm="ngForm" class="product-form">
+          <div class="form-group">
+            <label for="name">Ürün İsmi</label>
+            <input type="text" id="name" name="name" [(ngModel)]="productData.name" required placeholder="Örn: Kablosuz Mouse">
+          </div>
+          
+          <div class="form-group">
+            <label for="categoryId">Kategori</label>
+            <input type="text" id="categoryId" name="categoryId" [(ngModel)]="productData.categoryId" required placeholder="Kategori ID">
+          </div>
+
+          <div class="form-group">
+            <label for="description">Açıklama</label>
+            <textarea id="description" name="description" [(ngModel)]="productData.description" required rows="4" placeholder="Ürün detaylarını giriniz..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="price">Birim Fiyat (₺)</label>
+              <input type="number" id="price" name="price" [(ngModel)]="productData.price" required min="0">
+            </div>
+            <div class="form-group">
+              <label for="stockQuantity">Stok Miktarı</label>
+              <input type="number" id="stockQuantity" name="stockQuantity" [(ngModel)]="productData.stockQuantity" required min="0">
+            </div>
+          </div>
+
+          <div class="form-actions-inline">
+            @if(editingProductId) {
+              <button type="button" class="btn-secondary" (click)="cancelEdit(productForm)">Vazgeç</button>
+            }
+            <button type="submit" class="btn-primary" [disabled]="productForm.invalid || isSubmitting">
+              {{ isSubmitting ? 'İşleniyor...' : (editingProductId ? 'Değişiklikleri Kaydet' : 'Ürünü Kaydet') }}
+            </button>
+          </div>
+        </form>
       </div>
-    </div>
+    </aside>
 
-    <div class="mb-3">
-      <label class="form-label">Açıklama <span class="text-danger">*</span></label>
-      <textarea 
-        class="form-control" 
-        name="description" 
-        [(ngModel)]="productData.description" 
-        required 
-        rows="3"
-        placeholder="Ürün detaylarını buraya girin...">
-      </textarea>
-    </div>
+    <section class="main-list">
+      <div class="list-container">
+        <div class="list-header">
+          <h2 class="card-subtitle">Mevcut Ürünler</h2>
+          <span class="count-badge">{{ products.length }} Kayıt Bulundu</span>
+        </div>
 
-    <div class="row">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Fiyat (TL) <span class="text-danger">*</span></label>
-        <input 
-          type="number" 
-          class="form-control" 
-          name="price" 
-          [(ngModel)]="productData.price" 
-          required 
-          min="1"
-        >
+        <div class="product-vertical-list" *ngIf="products.length > 0; else noProducts">
+          <div class="product-row-item" *ngFor="let urun of products" [class.active-row]="urun.id === editingProductId">
+            <div class="row-main-content">
+              <div class="row-primary-info">
+                <h3 class="product-name">{{ urun.name }}</h3>
+                <span class="category-pill">{{ urun.categoryId | slice:0:8 }}</span>
+              </div>
+              <p class="product-row-desc">{{ urun.description | slice:0:150 }}...</p>
+            </div>
+            <div class="row-metrics">
+              <div class="metric-group">
+                <span class="m-label">Birim Fiyat</span>
+                <span class="m-value price">{{ urun.price | number:'1.2-2' }} ₺</span>
+              </div>
+              <div class="metric-group">
+                <span class="m-label">Stok Durumu</span>
+                <span class="m-value stock" [ngClass]="urun.stockQuantity > 10 ? 'st-ok' : 'st-low'">
+                  {{ urun.stockQuantity }} Adet
+                </span>
+              </div>
+            </div>
+            
+            <div class="row-actions">
+              <button class="btn-edit" (click)="onEditProduct(urun)">
+                Düzenle ✎
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noProducts>
+          <div class="empty-state">
+            <p>Sistemde herhangi bir ürün verisi bulunmuyor.</p>
+          </div>
+        </ng-template>
       </div>
+    </section>
+  </main>
 
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Stok Miktarı <span class="text-danger">*</span></label>
-        <input 
-          type="number" 
-          class="form-control" 
-          name="stockQuantity" 
-          [(ngModel)]="productData.stockQuantity" 
-          required 
-          min="0"
-        >
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-end mt-3">
-      <button 
-        type="submit" 
-        class="btn btn-primary px-4" 
-        [disabled]="productForm.invalid || isSubmitting">
-        <span *ngIf="isSubmitting">Kaydediliyor...</span>
-        <span *ngIf="!isSubmitting">Kaydet</span>
-      </button>
-    </div>
-
-  </form>
-
-  <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-    <div *ngFor="let toast of toasts" 
-         class="alert mb-2" 
-         [ngClass]="toast.type === 'success' ? 'alert-success' : 'alert-danger'">
+  <div class="toast-container">
+    <div *ngFor="let toast of toasts" class="toast" [ngClass]="toast.type">
       {{ toast.message }}
     </div>
   </div>

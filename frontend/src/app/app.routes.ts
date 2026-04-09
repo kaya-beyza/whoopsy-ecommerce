@@ -18,20 +18,26 @@ export const routes: Routes = [
 
   // 3. SİPARİŞLER SAYFASI 
   {
-    path: 'orders', // www. jadaksd/orders
+    path: 'orders',
     // canActivate: [authGuard],
     loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
   },
 
-  // 4. YENİ EKLENEN: ÜRÜN EKLEME SAYFASI
+  // 4. ÜRÜN EKLEME SAYFASI
   {
     path: 'products/create',
-    // İleride giriş yapmayanların ürün eklemesini engellemek için burayı da açabilirsin:
     // canActivate: [authGuard], 
     loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
   },
 
-  // VARSAYILAN YÖNLENDİRME (En altta kalmalı)
+  // 5. SEPET SAYFASI (Lazy Loading ile)
+  {
+    path: 'cart',
+    // canActivate: [authGuard], // İleride girişi zorunlu yapmak istersen açarsın
+    loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
+  },
+
+  // VARSAYILAN YÖNLENDİRME 
   { 
     path: '', 
     redirectTo: 'login', 

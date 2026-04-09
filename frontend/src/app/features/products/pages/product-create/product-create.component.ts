@@ -1,8 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ProductService } from '../../../../core/services/product.service';
-import { CreateProduct } from '../../../../core/models/product.model';
+import { CreateProduct, Product } from '../../../../core/models/product.model';
 
 @Component({
   selector: 'app-product-create',
@@ -11,29 +11,52 @@ import { CreateProduct } from '../../../../core/models/product.model';
   templateUrl: './product-create.component.html',
   styleUrls: ['./product-create.component.css']
 })
-export class ProductCreateComponent {
-  // Servisimizi modern inject yöntemiyle çağırıyoruz
+export class ProductCreateComponent implements OnInit {
   private productService = inject(ProductService);
 
-  // 1. Modelin Kalıbını Hazırlama (Başlangıç değerleri boş)
+  // Düzenleme modunda mıyız kontrolü için değişken (Null ise ekleme modundayız)
+  editingProductId: string | null = null;
+
   productData: CreateProduct = {
-    name: '',
-    description: '',
-    price: 0,
-    stockQuantity: 0,
-    // Backend Guid beklediği için şimdilik geçerli bir sahte Guid veriyoruz.
-    // İleride burayı bir açılır listeden (dropdown) seçilen kategori ID'si ile değiştirebilirsin.
-    categoryId: '3fa85f64-5717-4562-b3fc-2c963f66afa6' 
+    name: '', description: '', price: 0, stockQuantity: 0, categoryId: '' 
   };
 
-  // UI Durum Yönetimi
   isSubmitting = false;
+  products: Product[] = []; 
   toasts: { id: number, message: string, type: 'success' | 'error' }[] = [];
   private toastIdCounter = 0;
 
-  // 2 ve 3. Veriyi Toplama ve Kargoya Verme (Form Gönderildiğinde Çalışır)
+  ngOnInit() {
+    this.loadProducts(); 
+  }
+
+  // LİSTEDEN DÜZENLEYE BASILINCA ÇALIŞACAK METOT
+  onEditProduct(urun: Product) {
+    this.editingProductId = urun.id; // Düzenleme moduna geç
+    
+    // Sol taraftaki formu, seçilen ürünün bilgileriyle doldur
+    this.productData = {
+      name: urun.name,
+      description: urun.description,
+      price: urun.price,
+      stockQuantity: urun.stockQuantity,
+      categoryId: urun.categoryId
+    };
+    
+    // Kullanıcının dikkatini sola çekmek için sayfanın en üstüne kaydır
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.showToast('Ürün bilgileri forma yüklendi.', 'success');
+  }
+
+  // DÜZENLEMEDEN VAZGEÇİLDİĞİNDE ÇALIŞACAK METOT
+  cancelEdit(form: NgForm) {
+    this.editingProductId = null; // Ekleme moduna dön
+    form.resetForm();
+    this.productData.categoryId = '';
+  }
+
+  // FORM KAYDEDİLDİĞİNDE (EKLEME VEYA GÜNCELLEME) ÇALIŞACAK METOT
   onSubmit(form: NgForm) {
-    // Form geçersizse (örn: isim boşsa) işlemi durdur
     if (form.invalid) {
       this.showToast('Lütfen zorunlu alanları doldurun.', 'error');
       return;
@@ -41,30 +64,56 @@ export class ProductCreateComponent {
 
     this.isSubmitting = true;
 
-    // Servise veriyi yolla
-    this.productService.createProduct(this.productData).subscribe({
-      next: (yeniUrunId) => {
-        this.showToast('Ürün başarıyla eklendi!', 'success');
-        this.isSubmitting = false;
-        form.resetForm(); // İşlem bitince formu temizle
-        
-        // Form temizlendiğinde varsayılan değerleri geri yükle
-        this.productData.categoryId = '3fa85f64-5717-4562-b3fc-2c963f66afa6'; 
-      },
-      error: (hata) => {
-        console.error("Hata detayı:", hata);
-        this.showToast('Ürün eklenirken sunucuda bir hata oluştu.', 'error');
-        this.isSubmitting = false;
-      }
+    // EĞER DÜZENLEME MODUNDAYSAK (PUT İsteği)
+    if (this.editingProductId) {
+      const updatePayload = {
+        ...this.productData,
+        id: this.editingProductId,
+        isActive: true
+      };
+
+      this.productService.updateProduct(this.editingProductId, updatePayload).subscribe({
+        next: () => {
+          this.showToast('Ürün başarıyla GÜNCELLENDİ!', 'success');
+          this.isSubmitting = false;
+          this.cancelEdit(form); // Formu temizle ve normale dön
+          this.loadProducts();   // Listeyi yenile
+        },
+        error: (err) => {
+          console.error(err);
+          this.showToast('Güncelleme sırasında hata oluştu.', 'error');
+          this.isSubmitting = false;
+        }
+      });
+    } 
+    // EĞER EKLEME MODUNDAYSAK (POST İsteği)
+    else {
+      this.productService.createProduct(this.productData).subscribe({
+        next: () => {
+          this.showToast('Ürün başarıyla EKLENDİ!', 'success');
+          this.isSubmitting = false;
+          this.cancelEdit(form);
+          this.loadProducts();
+        },
+        error: (err) => {
+          console.error(err);
+          this.showToast('Ürün eklenirken hata oluştu.', 'error');
+          this.isSubmitting = false;
+        }
+      });
+    }
+  }
+
+  loadProducts() {
+    this.productService.getProducts().subscribe({
+      next: (gelenVeriler) => { this.products = gelenVeriler; },
+      error: () => { this.showToast('Ürünler çekilemedi.', 'error'); }
     });
   }
 
-  // Bildirim (Toast) Fonksiyonu
   showToast(message: string, type: 'success' | 'error') {
     const id = this.toastIdCounter++;
     this.toasts.push({ id, message, type });
-    setTimeout(() => {
-      this.toasts = this.toasts.filter(t => t.id !== id);
-    }, 3000);
+    setTimeout(() => { this.toasts = this.toasts.filter(t => t.id !== id); }, 3000);
   }
 }
