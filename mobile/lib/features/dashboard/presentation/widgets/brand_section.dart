@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/dashboard/data/models/brand.dart';
 import '../../data/datasources/brand_local_data.dart';
+import 'package:mobile/features/products/presentation/product_list_page.dart';
 
 class BrandSection extends StatelessWidget {
   const BrandSection({super.key});
@@ -31,11 +32,15 @@ class BrandSection extends StatelessWidget {
               // Sadece yazı şeklinde buton
               TextButton(
                 onPressed: () {
-                  // Tüm ürünlere veya markalar listesine yönlendirme
-                  print("Ürünleri gör tıklandı");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProductListPage(), // 🔥 TÜM ÜRÜNLER
+                    ),
+                  );
                 },
                 style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero, // Etrafındaki boşluğu sıfırla
+                  padding: EdgeInsets.zero,
                   minimumSize: const Size(50, 30),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
@@ -43,8 +48,7 @@ class BrandSection extends StatelessWidget {
                   "Ürünleri Gör →",
                   style: TextStyle(
                     fontSize: 12,
-                    color: const Color.fromARGB(
-                        255, 82, 83, 84), // Marka rengine göre değişebilir
+                    color: const Color.fromARGB(255, 82, 83, 84),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -89,7 +93,14 @@ class BrandSection extends StatelessWidget {
                                 child: InkWell(
                                   splashColor: Colors.black.withOpacity(0.05),
                                   onTap: () {
-                                    // Markaya göre filtreleme sayfasına git
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductListPage(
+                                          brandId: item.id, // 🔥 BURASI
+                                        ),
+                                      ),
+                                    );
                                   },
                                 ),
                               ),
