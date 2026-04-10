@@ -12,6 +12,8 @@ public interface IProductRepository
     Task DeleteAsync(Guid id, CancellationToken cancellationToken);
     Task<List<Product>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken);
     Task<List<Product>> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken);
+    Task<List<Product>> GetByBrandAsync(Brand brand, CancellationToken cancellationToken);
+    Task<List<Product>> GetByFilterAsync(Gender? gender, Brand? brand, Guid? categoryId, CancellationToken cancellationToken);
     // Image metodları
     Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken);
     Task<bool> DeleteImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken);
