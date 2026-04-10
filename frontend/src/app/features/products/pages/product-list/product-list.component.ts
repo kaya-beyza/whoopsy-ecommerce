@@ -37,12 +37,14 @@ export class ProductListComponent implements OnInit {
       this.selectedFilters.set(current.filter((_, i) => i !== index));
     }
 
+    this.updateDynamicSizes();
     this.updateHeader();
   }
 
   removeFilter(filter: { group: string, option: string }): void {
     const current = this.selectedFilters();
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
+    this.updateDynamicSizes();
     this.updateHeader();
   }
 
@@ -60,6 +62,7 @@ export class ProductListComponent implements OnInit {
 
   clearFilters(): void {
     this.selectedFilters.set([]);
+    this.updateDynamicSizes();
     this.updateHeader();
   }
 
@@ -78,13 +81,101 @@ export class ProductListComponent implements OnInit {
   ];
   selectedSort = signal(this.sortOptions[0]);
 
+  // Akıllı Beden Setleri
+  private readonly sizeSets = {
+    shoesAdult: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
+    shoesChild: ['18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35'],
+    clothingAdult: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    clothingChild: ['2-3 Yaş', '4-5 Yaş', '6-7 Yaş', '8-9 Yaş', '10-11 Yaş', '12-13 Yaş'],
+    accessory: ['Standart'],
+    default: ['36', '37', '38', '39', '40', '41', 'XS', 'S', 'M', 'L', 'XL', 'Standart']
+  };
+
+  updateDynamicSizes(): void {
+    const selected = this.selectedFilters();
+    const groups = selected.filter(f => f.group === 'Ürün Grubu').map(f => f.option);
+    const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.option);
+    
+    const isAdultSelected = genders.some(g => g === 'Kadın' || g === 'Erkek');
+    const isChildSelected = genders.some(g => g === 'Çocuk');
+
+    let newSizes: string[] = [];
+
+    if (groups.length === 0) {
+      newSizes = this.sizeSets.default;
+    } else {
+      if (groups.includes('Ayakkabı')) {
+        // Eğer hiçbir cinsiyet seçilmemişse varsayılan olarak yetişkin göster
+        if (!isAdultSelected && !isChildSelected) {
+          newSizes.push(...this.sizeSets.shoesAdult);
+        } else {
+          if (isAdultSelected) newSizes.push(...this.sizeSets.shoesAdult);
+          if (isChildSelected) newSizes.push(...this.sizeSets.shoesChild);
+        }
+      }
+      
+      if (groups.includes('Giyim')) {
+        if (!isAdultSelected && !isChildSelected) {
+          newSizes.push(...this.sizeSets.clothingAdult);
+        } else {
+          if (isAdultSelected) newSizes.push(...this.sizeSets.clothingAdult);
+          if (isChildSelected) newSizes.push(...this.sizeSets.clothingChild);
+        }
+      }
+      
+      if (groups.includes('Aksesuar')) {
+        newSizes.push(...this.sizeSets.accessory);
+      }
+    }
+
+    // Tekrar edenleri temizle ve filterGroups'u güncelle
+    const uniqueSizes = [...new Set(newSizes)];
+    
+    const updated = this.filterGroups().map(g => {
+      if (g.key === 'size') {
+        return { ...g, options: uniqueSizes };
+      }
+      return g;
+    });
+    
+    this.filterGroups.set(updated);
+  }
+
   filterGroups = signal<FilterGroup[]>([
-    { name: 'Cinsiyet', key: 'gender', options: ['Kadın', 'Erkek', 'Çocuk'], isExpanded: true },
-    { name: 'Kategori', key: 'category', options: ['Sneaker Ayakkabı', 'Outdoor Ayakkabı', 'Bot&Çizme', 'Terlik&Sandalet', 'Babet'], isExpanded: true },
-    { name: 'Marka', key: 'brand', options: ['adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans'], isExpanded: false },
-    { name: 'Beden', key: 'size', options: ['35', '36', '37', '38', '39', '40', '41', '42', '44'], isExpanded: false },
-    { name: 'Renk', key: 'color', options: ['Siyah', 'Kemik', 'Krem', 'Pembe', 'Lila', 'Kahve', 'Yeşil', 'Sarı', 'Mavi', 'Beyaz', 'Gri', 'Kırmızı', 'Lacivert', 'Bordo'], isExpanded: false },
-    { name: 'Fiyat', key: 'price', options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL'], isExpanded: false }
+    {
+      name: 'Ürün Grubu', key: 'group', isExpanded: true,
+      options: ['Ayakkabı', 'Giyim', 'Aksesuar']
+    },
+    {
+      name: 'Cinsiyet', key: 'gender', isExpanded: true,
+      options: ['Kadın', 'Erkek', 'Çocuk']
+    },
+    {
+      name: 'Kategori', key: 'category', isExpanded: true,
+      options: [
+        'Anahtarlık', 'Atkı', 'Bağcık', 'Bel Çantası', 'Bere', 'Bot', 'Bot & Çizme',
+        'Ceket', 'Çanta', 'Çorap', 'Eşofman Altı', 'Etek', 'Hoodie', 'Mont',
+        'Omuz Çantası', 'Pantolon', 'Rozet', 'Rüzgarlık', 'Sandalet',
+        'Sırt Çantası', 'Sneaker', 'Sweatshirt', 'Şapka', 'Tayt',
+        'Terlik', 'T-Shirt'
+      ]
+    },
+    {
+      name: 'Marka', key: 'brand', isExpanded: true,
+      options: ['adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
+    },
+    {
+      name: 'Beden', key: 'size', isExpanded: false,
+      options: ['35', '36', '37', '38', '39', '40', '41', '42', '44']
+    },
+    {
+      name: 'Renk', key: 'color', isExpanded: false,
+      options: ['Siyah', 'Beyaz', 'Mavi', 'Kırmızı', 'Yeşil', 'Gri', 'Kemik', 'Krem', 'Pembe', 'Lila', 'Kahve', 'Sarı', 'Lacivert', 'Bordo']
+    },
+    {
+      name: 'Fiyat', key: 'price', isExpanded: false,
+      options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL']
+    }
   ]);
 
   constructor() { }

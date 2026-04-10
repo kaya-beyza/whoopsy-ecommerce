@@ -54,6 +54,16 @@
             align-items: center;
             gap: 20px;
 
+            .option-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                font-size: 14px;
+                color: #555;
+                cursor: pointer;
+                &:hover { color: #000; }
+            }
+
             .filter-toggle-btn {
                 display: flex;
                 align-items: center;
@@ -277,8 +287,8 @@
                         transition: 0.3s ease-out;
 
                         &.expanded {
-                            max-height: 500px;
-                            padding-bottom: 20px;
+                            max-height: 2000px;
+                            padding-bottom: 30px;
                             display: flex;
                             flex-direction: column;
                             gap: 12px;
@@ -316,7 +326,7 @@
                             }
                         }
 
-                        .option-item {
+                          .option-item {
                             display: flex;
                             align-items: center;
                             gap: 12px;
@@ -358,7 +368,7 @@
                                 transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
                                 flex-shrink: 0;
                             }
-                        }
+                          }
                     }
                 }
             }
