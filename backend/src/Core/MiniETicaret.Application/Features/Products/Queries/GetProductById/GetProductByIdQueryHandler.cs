@@ -30,6 +30,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             CategoryId = product.CategoryId,
             CategoryName = product.Category?.Name ?? "",
             Gender = product.Gender,
+            Brand = product.Brand,
             MainImageUrl = product.Images?.FirstOrDefault(i => i.IsMain)?.Url,
             ImageUrls = product.Images?.Select(i => i.Url).ToList() ?? new()
         };

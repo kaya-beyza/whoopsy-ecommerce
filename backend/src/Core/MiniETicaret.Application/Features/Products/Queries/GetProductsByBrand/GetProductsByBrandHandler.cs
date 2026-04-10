@@ -2,20 +2,20 @@ using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
 
-namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByCategory;
+namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByBrand;
 
-public class GetProductsByCategoryQueryHandler : IRequestHandler<GetProductsByCategoryQuery, List<ProductDto>>
+public class GetProductsByBrandHandler : IRequestHandler<GetProductsByBrandQuery, List<ProductDto>>
 {
-    private readonly IProductRepository _producRepository;
+    private readonly IProductRepository _productRepository;
 
-    public GetProductsByCategoryQueryHandler(IProductRepository productRepository)
+    public GetProductsByBrandHandler(IProductRepository productRepository)
     {
-        _producRepository = productRepository;
+        _productRepository = productRepository;
     }
 
-    public async Task<List<ProductDto>> Handle(GetProductsByCategoryQuery request, CancellationToken cancellationToken)
+    public async Task<List<ProductDto>> Handle(GetProductsByBrandQuery request, CancellationToken cancellationToken)
     {
-        var products = await _producRepository.GetByCategoryIdAsync(request.CategoryId, cancellationToken);
+        var products = await _productRepository.GetByBrandAsync(request.Brand, cancellationToken);
 
         return products.Select(p => new ProductDto
         {
