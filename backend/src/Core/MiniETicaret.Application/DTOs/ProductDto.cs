@@ -11,6 +11,7 @@ public class ProductDto
     public Guid CategoryId {get;set;}
     public string CategoryName {get;set;} = "";
     public Gender Gender {get;set;}
+    public Brand Brand {get;set;}
     public string? MainImageUrl { get; set; }
     public List<string> ImageUrls { get; set; } = new();
 }

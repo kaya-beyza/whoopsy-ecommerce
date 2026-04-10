@@ -11,6 +11,8 @@ using MiniETicaret.Application.Features.Products.Commands.UploadProductImage;
 using MiniETicaret.Application.Features.Products.Commands.SetMainProductImage;
 using MiniETicaret.Application.Features.Products.Commands.DeleteProductImage;
 using MiniETicaret.Application.Features.Products.Queries.GetProductsByGender;
+using MiniETicaret.Application.Features.Products.Queries.GetProductsByBrand;
+using MiniETicaret.Application.Features.Products.Queries.GetProductsByFilter;
 
 namespace MiniETicaret.API.Controllers;
 
@@ -54,6 +56,12 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("filter")]
+    public async Task<IActionResult> GetByFilter([FromQuery] Gender? gender, [FromQuery] Brand? brand, [FromQuery] Guid? categoryId)
+    {
+        var result = await _mediator.Send(new GetProductsByFilterQuery(gender, brand, categoryId));
+        return Ok(result);
+    }
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(Guid id, UpdateProductCommand command)
     {
@@ -73,12 +81,20 @@ public class ProductsController : ControllerBase
 
         return Ok(result);
     }
+
     [HttpGet("by-gender")]
     public async Task<IActionResult> GetByGender([FromQuery] Gender? gender, [FromQuery] Guid? categoryId)
     {
     var result = await _mediator.Send(new GetProductsByGenderQuery(gender, categoryId));
     return Ok(result);
     }   
+    
+    [HttpGet("by-brand")]
+    public async Task<IActionResult> GetByBrand([FromQuery] Brand brand)
+    {
+        var result = await _mediator.Send(new GetProductsByBrandQuery(brand));
+        return Ok(result);
+    }
 
     [HttpPost("{productId}/images")]
     public async Task<IActionResult> UploadImage(Guid productId, IFormFile file, [FromQuery] bool isMain = false)
