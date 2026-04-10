@@ -1,21 +1,22 @@
 using MediatR;
-using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Application.Features.Products.DTOs;
+using MiniETicaret.Domain.Enums;
 
-namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByGender;
+namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByFilter;
 
-public class GetProductsByGenderHandler : IRequestHandler<GetProductsByGenderQuery, List<ProductDto>>
+public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilterQuery, List<ProductDto>>
 {
     private readonly IProductRepository _productRepository;
 
-    public GetProductsByGenderHandler(IProductRepository productRepository)
+    public GetProductsByFilterQueryHandler(IProductRepository productRepository)
     {
         _productRepository = productRepository;
     }
 
-    public async Task<List<ProductDto>> Handle(GetProductsByGenderQuery request, CancellationToken cancellationToken)
+    public async Task<List<ProductDto>> Handle(GetProductsByFilterQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetByGenderAsync(request.Gender, request.CategoryId, cancellationToken);
+        var products = await _productRepository.GetByFilterAsync(request.Gender, request.Brand, request.CategoryId, cancellationToken);
 
         return products.Select(p => new ProductDto
         {

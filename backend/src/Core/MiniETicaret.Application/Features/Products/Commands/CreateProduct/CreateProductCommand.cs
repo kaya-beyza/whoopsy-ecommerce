@@ -10,7 +10,8 @@ public record CreateProductCommand
     decimal Price,
     int StockQuantity,
     Guid CategoryId,
-    Gender Gender
+    Gender Gender,
+    Brand Brand
     //bool IsActive her zaman true başlayacağı için burada eklemek gereksiz olacağını düşündüm.
     // eğer ileride sorun olacaksa burayı değiştireceğiz. ayrıca true'yi handlerda set ettim.
 ): IRequest<Guid>;

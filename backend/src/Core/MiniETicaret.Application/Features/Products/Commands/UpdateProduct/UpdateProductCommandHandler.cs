@@ -26,6 +26,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.StockQuantity = request.StockQuantity;
         product.CategoryId = request.CategoryId;
         product.Gender = request.Gender;
+        product.Brand = request.Brand;
         product.IsActive = request.IsActive;
         product.UpdatedDate = DateTime.UtcNow.AddHours(3);
 
