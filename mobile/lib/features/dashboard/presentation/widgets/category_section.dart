@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/dashboard/data/models/category_model.dart';
+import 'package:mobile/features/products/presentation/product_list_page.dart';
 import '../../data/datasources/category_local_data.dart';
 // Gideceğin sayfanın importunu buraya ekle
 // import 'package:mobile/features/products/presentation/pages/category_detail_page.dart';
 
 class CategorySection extends StatelessWidget {
   const CategorySection({super.key});
+  int _mapTitleToGender(String title) {
+    switch (title.toLowerCase()) {
+      case "erkek":
+        return 1;
+      case "kadın":
+        return 2;
+      case "çocuk":
+        return 3;
+      default:
+        return 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +99,14 @@ class CategorySection extends StatelessWidget {
                                 Colors.white.withOpacity(0.3), // Tıklama rengi
                             highlightColor: Colors.white.withOpacity(0.1),
                             onTap: () {
-                              // Sayfa Yönlendirme
+                              final genderId = _mapTitleToGender(item.title);
+
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      CategoryDetailPage(category: item),
+                                  builder: (_) => ProductListPage(
+                                    genderId: genderId, // ✅ BURASI
+                                  ),
                                 ),
                               );
                             },

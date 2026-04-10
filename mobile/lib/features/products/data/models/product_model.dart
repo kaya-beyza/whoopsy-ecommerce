@@ -8,22 +8,34 @@ class ProductModel extends Product {
     required super.price,
     required super.stockQuantity,
     required super.categoryId,
+    required super.brand,
     super.mainImageUrl,
     super.imageUrls,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'] ?? '',
+      // ✅ ID her zaman string'e çevrilmeli (backend Guid olabilir)
+      id: json['id']?.toString() ?? '',
+
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      price: (json['price'] as num).toDouble(),
-      stockQuantity: json['stockQuantity'] ?? 0,
-      categoryId: json['categoryId'] ?? '',
 
-      // 🔥 BACKEND MAPPING
+      // ✅ NULL SAFE + TYPE SAFE
+      price: (json['price'] ?? 0).toDouble(),
+
+      stockQuantity: json['stockQuantity'] ?? 0,
+
+      // ✅ önemli: backend Guid/string olabilir
+      categoryId: json['categoryId']?.toString() ?? '',
+      brand: json['brand'] ?? 0,
+
+      // ✅ null gelebilir → güvenli bırak
       mainImageUrl: json['mainImageUrl'],
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
+
+      // ✅ liste null ise boş liste
+      imageUrls:
+          (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 }

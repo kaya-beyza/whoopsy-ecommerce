@@ -8,9 +8,29 @@ class ProductRepositoryImpl implements IProductRepository {
 
   ProductRepositoryImpl(this.remoteDataSource);
 
+  // ✅ TÜM ÜRÜNLER
+  @override
+  Future<List<Product>> getAllProducts() async {
+    final jsonList = await remoteDataSource.getAllProducts();
+
+    return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  // ✅ CATEGORY FILTER (hala lazım olabilir)
   @override
   Future<List<Product>> getProductsByCategoryId(String id) async {
     final jsonList = await remoteDataSource.getProductsByCategoryId(id);
+
+    return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  Future<List<Product>> getProductsByGender(int gender,
+      {String? categoryId}) async {
+    final jsonList = await remoteDataSource.getProductsByGender(
+      gender,
+      categoryId: categoryId,
+    );
+
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 }
