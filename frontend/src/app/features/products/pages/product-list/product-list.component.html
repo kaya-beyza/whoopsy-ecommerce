@@ -143,6 +143,14 @@
                     </div>
                 </ng-container>
             </div>
+
+            <!-- Whomopsy Elite Paging: Load More Button 🏛️ -->
+            <div class="load-more-container" *ngIf="hasMore() && !isLoading()">
+                <button class="load-more-btn" [class.loading]="isMoreLoading()" (click)="loadMore()" [disabled]="isMoreLoading()">
+                    <span class="btn-text">{{ isMoreLoading() ? 'YÜKLENİYOR...' : 'DAHA FAZLA KEŞFET' }}</span>
+                    <span class="btn-line"></span>
+                </button>
+            </div>
         </section>
     </main>
 </div>

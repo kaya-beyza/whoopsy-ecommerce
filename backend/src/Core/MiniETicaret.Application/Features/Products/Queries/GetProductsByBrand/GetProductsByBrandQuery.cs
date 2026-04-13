@@ -4,4 +4,4 @@ using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByBrand;
 
-public record GetProductsByBrandQuery(Brand Brand) : IRequest<List<ProductDto>>;
+public record GetProductsByBrandQuery(Brand Brand, int Page = 1, int PageSize = 20) : IRequest<List<ProductDto>>;

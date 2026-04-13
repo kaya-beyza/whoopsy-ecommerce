@@ -18,6 +18,7 @@ export interface Product {
     slug: string;
     sizes: (string | number)[];
     colors: string[];
+    images?: string[]; // 👈 Çoklu resim galerisi desteği
 }
 
 export interface FilterGroup {

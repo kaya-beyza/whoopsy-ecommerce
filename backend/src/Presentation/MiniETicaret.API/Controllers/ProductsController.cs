@@ -27,9 +27,9 @@ public class ProductsController : ControllerBase
         _mediator = mediator;
     }
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 21)
     {
-        var result = await _mediator.Send(new GetProductsQuery());
+        var result = await _mediator.Send(new GetProductsQuery(page, pageSize));
         return Ok(result);
     }
 
@@ -43,9 +43,9 @@ public class ProductsController : ControllerBase
         return Ok(result);
     }
     [HttpGet("by-category/{categoryId}")]
-    public async Task<IActionResult> GetByCategory(Guid categoryId)
+    public async Task<IActionResult> GetByCategory(Guid categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 21)
     {
-        var result = await _mediator.Send(new GetProductsByCategoryQuery(categoryId));
+        var result = await _mediator.Send(new GetProductsByCategoryQuery(categoryId, page, pageSize));
         return Ok(result);
     }
 
@@ -57,9 +57,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetByFilter([FromQuery] Gender? gender, [FromQuery] Brand? brand, [FromQuery] Guid? categoryId)
+    public async Task<IActionResult> GetByFilter([FromQuery] Gender? gender, [FromQuery] Brand? brand, [FromQuery] Guid? categoryId, [FromQuery] string? searchTerm, [FromQuery] int page = 1, [FromQuery] int pageSize = 21)
     {
-        var result = await _mediator.Send(new GetProductsByFilterQuery(gender, brand, categoryId));
+        var result = await _mediator.Send(new GetProductsByFilterQuery(gender, brand, categoryId, searchTerm, page, pageSize));
         return Ok(result);
     }
     [HttpPut("{id}")]
@@ -83,16 +83,16 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("by-gender")]
-    public async Task<IActionResult> GetByGender([FromQuery] Gender? gender, [FromQuery] Guid? categoryId)
+    public async Task<IActionResult> GetByGender([FromQuery] Gender? gender, [FromQuery] Guid? categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 21)
     {
-    var result = await _mediator.Send(new GetProductsByGenderQuery(gender, categoryId));
-    return Ok(result);
+        var result = await _mediator.Send(new GetProductsByGenderQuery(gender, categoryId, page, pageSize));
+        return Ok(result);
     }   
     
     [HttpGet("by-brand")]
-    public async Task<IActionResult> GetByBrand([FromQuery] Brand brand)
+    public async Task<IActionResult> GetByBrand([FromQuery] Brand brand, [FromQuery] int page = 1, [FromQuery] int pageSize = 21)
     {
-        var result = await _mediator.Send(new GetProductsByBrandQuery(brand));
+        var result = await _mediator.Send(new GetProductsByBrandQuery(brand, page, pageSize));
         return Ok(result);
     }
 
