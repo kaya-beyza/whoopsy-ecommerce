@@ -50,4 +50,52 @@ class ProductRemoteDataSource {
       throw Exception("Ürünler alınamadı");
     }
   }
+
+  Future<List<dynamic>> getFilteredProducts({
+    int? gender,
+    int? brand,
+    String? categoryId,
+  }) async {
+    final query = <String, String>{};
+
+    if (gender != null) query["gender"] = gender.toString();
+    if (brand != null) query["brand"] = brand.toString();
+    if (categoryId != null && categoryId.isNotEmpty) {
+      query["categoryId"] = categoryId;
+    }
+
+    final uri = Uri.parse(
+      "http://10.238.142.172:5277/api/Products/filter",
+    ).replace(queryParameters: query);
+
+    print("FILTER URL: $uri");
+
+    final response = await http.get(uri);
+
+    print("STATUS: ${response.statusCode}");
+    print("BODY: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Filter failed");
+    }
+  }
+
+  Future<List<dynamic>> getProductsByBrand(int brand) async {
+    final url = "http://10.238.142.172:5277/api/Products/by-brand?brand=$brand";
+
+    print("BRAND REQUEST: $url");
+
+    final response = await http.get(Uri.parse(url));
+
+    print("STATUS: ${response.statusCode}");
+    print("BODY: ${response.body}");
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Brand fetch failed");
+    }
+  }
 }

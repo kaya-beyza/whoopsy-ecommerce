@@ -9,6 +9,7 @@ class ProductModel extends Product {
     required super.stockQuantity,
     required super.categoryId,
     required super.brand,
+    required super.gender,
     super.mainImageUrl,
     super.imageUrls,
   });
@@ -29,7 +30,7 @@ class ProductModel extends Product {
       // ✅ önemli: backend Guid/string olabilir
       categoryId: json['categoryId']?.toString() ?? '',
       brand: json['brand'] ?? 0,
-
+      gender: json['gender'] ?? 0,
       // ✅ null gelebilir → güvenli bırak
       mainImageUrl: json['mainImageUrl'],
 

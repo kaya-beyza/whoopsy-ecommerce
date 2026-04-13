@@ -33,18 +33,18 @@ class _HomeSliderState extends State<HomeSlider> {
   final List<SliderItem> sliderItems = [
     SliderItem(
       imageUrl:
-          "https://i.pinimg.com/1200x/e3/c4/b7/e3c4b70ec6fb29a8e8d2c94abf7ece21.jpg",
-      title: "Çanta",
+          "https://res.cloudinary.com/dvesxxy8u/image/upload/q_auto/f_auto/v1776060874/ogciunxjhgvp36dhe1mj.jpg",
+      title: "Giyim",
     ),
     SliderItem(
       imageUrl:
-          "https://i.pinimg.com/1200x/c8/1f/60/c81f60f4a2234a821fefe32e49b0b2b9.jpg",
+          "https://res.cloudinary.com/dvesxxy8u/image/upload/q_auto/f_auto/v1776062764/zcffrjllrfohz6lnausc.jpg",
       title: "Aksesuar",
     ),
     SliderItem(
       imageUrl:
-          "https://i.pinimg.com/736x/76/8c/0e/768c0e5352d85a02750d5785ff043070.jpg",
-      title: "Spor Ürünleri",
+          "https://res.cloudinary.com/dvesxxy8u/image/upload/v1776061051/nhw587cydc7x0kcaq5le.jpg",
+      title: "Ayakkabi",
     ),
   ];
 

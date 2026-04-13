@@ -36,7 +36,7 @@ class CategorySection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 260,
+          height: 290,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding:

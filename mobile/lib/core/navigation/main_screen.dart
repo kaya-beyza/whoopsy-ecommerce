@@ -3,6 +3,9 @@ import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dar
 import 'package:mobile/features/auth/presentation/pages/account_page.dart';
 import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
+import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/favorites_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/search_page.dart';
 import 'package:provider/provider.dart';
 import '../../features/dashboard/presentation/screens/home_screen.dart';
 
@@ -24,26 +27,64 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void _navigate(int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+        break;
+
+      case 1:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const SearchPage()),
+        );
+        break;
+
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const CartPage()),
+        );
+        break;
+
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const FavoritesPage()),
+        );
+        break;
+
+      case 4:
+        final isLoggedIn = context.read<AuthProvider>().isLoggedIn;
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                isLoggedIn ? const AccountPage() : const LoginPage(),
+          ),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
 
-    final List<Widget> pages = [
-      const HomeScreen(),
-      const Center(child: Text("Search")),
-      const Center(child: Text("Cart")),
-      const Center(child: Text("Favorites")),
-      isLoggedIn ? const AccountPage() : const LoginPage(),
-    ];
-
     return Scaffold(
-      body: pages[currentIndex],
+      body: const HomeScreen(), // default
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
           setState(() {
             currentIndex = index;
           });
+
+          _navigate(index); // 👇
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,

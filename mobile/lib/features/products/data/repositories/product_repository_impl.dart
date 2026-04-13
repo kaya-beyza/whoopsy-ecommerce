@@ -8,22 +8,21 @@ class ProductRepositoryImpl implements IProductRepository {
 
   ProductRepositoryImpl(this.remoteDataSource);
 
-  // ✅ TÜM ÜRÜNLER
+  /// 🔥 TÜM ÜRÜNLER
   @override
   Future<List<Product>> getAllProducts() async {
     final jsonList = await remoteDataSource.getAllProducts();
-
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 
-  // ✅ CATEGORY FILTER (hala lazım olabilir)
+  /// 🔥 CATEGORY
   @override
   Future<List<Product>> getProductsByCategoryId(String id) async {
     final jsonList = await remoteDataSource.getProductsByCategoryId(id);
-
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 
+  /// 🔥 GENDER (+ optional category)
   Future<List<Product>> getProductsByGender(int gender,
       {String? categoryId}) async {
     final jsonList = await remoteDataSource.getProductsByGender(
@@ -32,5 +31,28 @@ class ProductRepositoryImpl implements IProductRepository {
     );
 
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  /// 🔥 BRAND (🔥 SENDE EKSİK OLAN)
+  Future<List<Product>> getProductsByBrand(int brand) async {
+    final jsonList = await remoteDataSource.getProductsByBrand(brand);
+
+    return jsonList.map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  /// 🔥 FILTER (en son fallback)
+  @override
+  Future<List<Product>> getFilteredProducts({
+    int? gender,
+    int? brand,
+    String? categoryId,
+  }) async {
+    final jsonList = await remoteDataSource.getFilteredProducts(
+      gender: gender,
+      brand: brand,
+      categoryId: categoryId,
+    );
+
+    return jsonList.map((e) => ProductModel.fromJson(e)).toList();
   }
 }

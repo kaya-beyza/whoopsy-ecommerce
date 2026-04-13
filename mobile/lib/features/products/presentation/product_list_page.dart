@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
+import 'package:mobile/features/products/presentation/filter_page.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -27,10 +28,21 @@ class _ProductListPageState extends State<ProductListPage> {
 
   late final ProductRepositoryImpl _productRepo;
 
+  int? _selectedGender;
+  int? _selectedBrand;
+  String? _selectedCategoryId;
+
+  bool _hasUserAppliedFilter = false;
+
   @override
   void initState() {
     super.initState();
     _setup();
+
+    _selectedGender = widget.genderId;
+    _selectedBrand = widget.brandId;
+    _selectedCategoryId = widget.categoryId;
+
     _fetchProducts();
   }
 
@@ -41,23 +53,25 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Future<void> _fetchProducts() async {
     try {
-      List<Product> result;
+      List<Product> result = [];
 
-      if (widget.genderId != null) {
+      /// 1️⃣ BASE DATA
+      if (_selectedGender != null) {
         result = await _productRepo.getProductsByGender(
-          widget.genderId!,
-          categoryId: widget.categoryId,
+          _selectedGender!,
+          categoryId: _selectedCategoryId,
         );
-      } else if (widget.categoryId != null) {
+      } else if (_selectedCategoryId != null) {
         result = await _productRepo.getProductsByCategoryId(
-          widget.categoryId!,
+          _selectedCategoryId!,
         );
       } else {
         result = await _productRepo.getAllProducts();
       }
 
-      if (widget.brandId != null) {
-        result = result.where((p) => p.brand == widget.brandId).toList();
+      /// 2️⃣ FRONTEND FILTER (🔥 ASIL OLAY)
+      if (_selectedBrand != null) {
+        result = result.where((p) => p.brand == _selectedBrand).toList();
       }
 
       setState(() {
@@ -65,6 +79,8 @@ class _ProductListPageState extends State<ProductListPage> {
         _isLoading = false;
       });
     } catch (e) {
+      print("ERROR: $e");
+
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -72,11 +88,46 @@ class _ProductListPageState extends State<ProductListPage> {
     }
   }
 
+  Future<void> _openFilter() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FilterPage(
+          initialGender: _selectedGender,
+          initialBrand: _selectedBrand,
+          initialCategoryId: _selectedCategoryId,
+        ),
+      ),
+    );
+
+    if (result == null) return;
+
+    // 🔥 1. loading başlat
+    setState(() {
+      _isLoading = true;
+    });
+
+    // 🔥 2. state güncelle
+    _selectedGender = result["gender"];
+    _selectedBrand = result["brand"];
+    _selectedCategoryId = result["categoryId"];
+    _hasUserAppliedFilter = true;
+
+    // 🔥 3. fetch et
+    await _fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Ürünler"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.tune),
+            onPressed: _openFilter,
+          ),
+        ],
       ),
       body: _buildBody(),
     );
@@ -130,28 +181,19 @@ class ProductCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 IMAGE
             Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.network(
-                      product.mainImageUrl ?? "",
+              child: product.mainImageUrl != null &&
+                      product.mainImageUrl!.isNotEmpty
+                  ? Image.network(
+                      product.mainImageUrl!,
                       fit: BoxFit.cover,
+                      width: double.infinity,
+                    )
+                  : Container(
+                      color: Colors.grey.shade200,
+                      child: const Center(child: Icon(Icons.image)),
                     ),
-                  ),
-
-                  // ❤️ FAVORITE
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Icon(Icons.favorite_border, size: 20),
-                  ),
-                ],
-              ),
             ),
-
-            // 🔥 TEXT
             Padding(
               padding: const EdgeInsets.all(8),
               child: Text(
@@ -160,17 +202,13 @@ class ProductCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Text(
                 "${product.price} ₺",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-
             const SizedBox(height: 6),
           ],
         ),

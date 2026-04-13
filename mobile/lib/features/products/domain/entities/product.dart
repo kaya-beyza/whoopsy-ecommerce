@@ -7,7 +7,7 @@ class Product {
 
   final String categoryId; // backend Guid → String olarak tutuyoruz
   final int brand; // 🔥 EKLENDİ (çok önemli)
-
+  final int gender;
   final String? mainImageUrl;
   final List<String> imageUrls;
 
@@ -19,6 +19,7 @@ class Product {
     required this.stockQuantity,
     required this.categoryId,
     required this.brand,
+    required this.gender,
     this.mainImageUrl,
     this.imageUrls = const [],
   });
@@ -33,7 +34,7 @@ class Product {
       stockQuantity: json['stockQuantity'],
       categoryId: json['categoryId'],
       brand: json['brand'], // 🔥 önemli
-
+      gender: json['gender'] ?? 0,
       mainImageUrl: json['mainImageUrl'],
       imageUrls: (json['imageUrls'] as List<dynamic>?)
               ?.map((e) => e.toString())

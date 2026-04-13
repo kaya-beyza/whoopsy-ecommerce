@@ -61,7 +61,7 @@ class BrandSection extends StatelessWidget {
 
         // MARKALAR LİSTESİ
         SizedBox(
-          height: 135,
+          height: 145,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(right: 16),
