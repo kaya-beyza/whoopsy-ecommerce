@@ -19,6 +19,16 @@ export class ProductListComponent implements OnInit {
   isLoading = signal(true);
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
+  searchTerm = signal<string | undefined>(undefined);
+
+  // Whomopsy Elite Paging Ritimleri 🏛️
+  currentPage = signal(1);
+  pageSize = 21;
+  hasMore = signal(true);
+  isMoreLoading = signal(false);
+  
+  // Whomopsy Category Mapping: İsimlerden GUID'lere Whosepsy asaletinde köprü kurar. 🏛️
+  private categoryMap = new Map<string, string>();
 
   // Dinamik Başlık ve Breadcrumb
   pageTitle = signal('TÜM ÜRÜNLER');
@@ -39,6 +49,7 @@ export class ProductListComponent implements OnInit {
 
     this.updateDynamicSizes();
     this.updateHeader();
+    this.loadProducts(); // Whomopsy deryasını filtreye göre canlandır 🏛️
   }
 
   removeFilter(filter: { group: string, option: string }): void {
@@ -46,6 +57,7 @@ export class ProductListComponent implements OnInit {
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizes();
     this.updateHeader();
+    this.loadProducts(); // Whomopsy deryasını sadeleştir 🏛️
   }
 
   updateHeader(): void {
@@ -64,6 +76,7 @@ export class ProductListComponent implements OnInit {
     this.selectedFilters.set([]);
     this.updateDynamicSizes();
     this.updateHeader();
+    this.loadProducts(); // Deryayı aslına döndür 🏛️
   }
 
   isSelected(groupName: string, option: string): boolean {
@@ -141,32 +154,23 @@ export class ProductListComponent implements OnInit {
     this.filterGroups.set(updated);
   }
 
+  // Whomopsy asaletindeki dinamik filtre grupları
   filterGroups = signal<FilterGroup[]>([
     {
-      name: 'Ürün Grubu', key: 'group', isExpanded: true,
-      options: ['Ayakkabı', 'Giyim', 'Aksesuar']
-    },
-    {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
-      options: ['Kadın', 'Erkek', 'Çocuk']
+      options: ['Kadın', 'Erkek', 'Çocuk', 'Unisex']
     },
     {
       name: 'Kategori', key: 'category', isExpanded: true,
-      options: [
-        'Anahtarlık', 'Atkı', 'Bağcık', 'Bel Çantası', 'Bere', 'Bot', 'Bot & Çizme',
-        'Ceket', 'Çanta', 'Çorap', 'Eşofman Altı', 'Etek', 'Hoodie', 'Mont',
-        'Omuz Çantası', 'Pantolon', 'Rozet', 'Rüzgarlık', 'Sandalet',
-        'Sırt Çantası', 'Sneaker', 'Sweatshirt', 'Şapka', 'Tayt',
-        'Terlik', 'T-Shirt'
-      ]
+      options: [] // Backend'den dinamik akacak 🏛️
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
-      options: ['adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
+      options: ['Adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
     },
     {
       name: 'Beden', key: 'size', isExpanded: false,
-      options: ['35', '36', '37', '38', '39', '40', '41', '42', '44']
+      options: ['36', '37', '38', '39', '40', '41', '42', '44']
     },
     {
       name: 'Renk', key: 'color', isExpanded: false,
@@ -181,24 +185,116 @@ export class ProductListComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    this.loadProducts();
+    this.loadCategories();
+    
+    // Whomopsy Search Listener: URL deryasındaki arama kelimesini Whomopsy asaletinde dinler 🏛️
+    this.route.queryParams.subscribe(params => {
+      const query = params['search'];
+      this.searchTerm.set(query);
+      this.loadProducts();
+    });
+
     if (this.isFilterVisible()) {
       document.body.style.overflow = 'hidden';
     }
   }
 
+  loadCategories(): void {
+    this.productService.getCategories().subscribe({
+        next: (categories) => {
+            const categoryNames = categories.map(c => c.name);
+            const updated = this.filterGroups().map(g => {
+                if (g.key === 'category') {
+                    return { ...g, options: categoryNames };
+                }
+                return g;
+            });
+            this.filterGroups.set(updated);
+        }
+    });
+  }
+
   loadProducts(): void {
     this.isLoading.set(true);
-    this.productService.getProducts().subscribe({
+    this.currentPage.set(1);
+    this.hasMore.set(true);
+
+    const filterParams = this.getUnifiedFilterParams();
+    
+    // Eğer filtre veya arama varsa filter API'sini, yoksa standart API'yi kullan
+    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, 1, this.pageSize)
+        : this.productService.getProducts(1, this.pageSize);
+
+    productStream.subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
+        if (data.length < this.pageSize) {
+            this.hasMore.set(false);
+        }
       },
       error: (err) => {
         console.error('Ürünler yüklenirken hata oluştu:', err);
         this.isLoading.set(false);
       }
     });
+  }
+
+  /**
+   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 ürün) Whosepsy standartlarında çeker.
+   */
+  loadMore(): void {
+    if (this.isMoreLoading() || !this.hasMore()) return;
+
+    this.isMoreLoading.set(true);
+    const nextPage = this.currentPage() + 1;
+    const filterParams = this.getUnifiedFilterParams();
+
+    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, nextPage, this.pageSize)
+        : this.productService.getProducts(nextPage, this.pageSize);
+
+    productStream.subscribe({
+        next: (newData) => {
+            if (newData.length > 0) {
+                this.products.update(prev => [...prev, ...newData]);
+                this.currentPage.set(nextPage);
+                if (newData.length < this.pageSize) {
+                    this.hasMore.set(false);
+                }
+            } else {
+                this.hasMore.set(false);
+            }
+            this.isMoreLoading.set(false);
+        },
+        error: (err) => {
+            console.error('Daha fazla ürün yüklenirken hata:', err);
+            this.isMoreLoading.set(false);
+        }
+    });
+  }
+
+  private getUnifiedFilterParams() {
+    const selected = this.selectedFilters();
+    
+    // Gender mapping: Kadın=2, Erkek=1, Çocuk=3, Unisex=0
+    const genderStr = selected.find(f => f.group === 'Cinsiyet')?.option;
+    let gender: number | undefined = undefined;
+    if (genderStr === 'Erkek') gender = 1;
+    else if (genderStr === 'Kadın') gender = 2;
+    else if (genderStr === 'Çocuk') gender = 3;
+    else if (genderStr === 'Unisex') gender = 0;
+
+    const brand = selected.find(f => f.group === 'Marka')?.option;
+    
+    // Kategori mapping: Seçilen isim Whosepsy GUID'ine tercüme edilir. 🏛️
+    const categoryName = selected.find(f => f.group === 'Ürün Grubu')?.option;
+    const categoryId = categoryName ? this.categoryMap.get(categoryName) : undefined;
+
+    const searchTerm = this.searchTerm();
+
+    return { gender, brand, categoryId, searchTerm };
   }
 
   toggleFilter(): void {

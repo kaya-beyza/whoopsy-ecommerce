@@ -16,7 +16,7 @@ public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilt
 
     public async Task<List<ProductDto>> Handle(GetProductsByFilterQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetByFilterAsync(request.Gender, request.Brand, request.CategoryId, cancellationToken);
+        var products = await _productRepository.GetByFilterAsync(request.Gender, request.Brand, request.CategoryId, request.SearchTerm, cancellationToken, request.Page, request.PageSize);
 
         return products.Select(p => new ProductDto
         {

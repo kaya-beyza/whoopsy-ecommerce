@@ -15,7 +15,7 @@ public class GetProductsByGenderHandler : IRequestHandler<GetProductsByGenderQue
 
     public async Task<List<ProductDto>> Handle(GetProductsByGenderQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetByGenderAsync(request.Gender, request.CategoryId, cancellationToken);
+        var products = await _productRepository.GetByGenderAsync(request.Gender, request.CategoryId, cancellationToken, request.Page, request.PageSize);
 
         return products.Select(p => new ProductDto
         {

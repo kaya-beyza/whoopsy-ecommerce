@@ -21,6 +21,12 @@ export class ProductListWithCategoryidComponent implements OnInit {
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
 
+  // Paging Ritimleri
+  currentPage = signal(1);
+  pageSize = 21;
+  hasMore = signal(true);
+  isMoreLoading = signal(false);
+
   // Breadcrumb
   baseCategoryName = signal('AYAKKABI');
   pageTitle = signal('TÜM AYAKKABILAR');
@@ -41,6 +47,8 @@ export class ProductListWithCategoryidComponent implements OnInit {
 
     this.updateDynamicSizes();
     this.updateHeader();
+    const id = this.route.snapshot.params['id'];
+    if (id) this.loadProducts(id);
   }
 
   removeFilter(filter: { group: string, option: string }): void {
@@ -48,6 +56,8 @@ export class ProductListWithCategoryidComponent implements OnInit {
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizes();
     this.updateHeader();
+    const id = this.route.snapshot.params['id'];
+    if (id) this.loadProducts(id);
   }
 
   updateHeader(): void {
@@ -62,9 +72,17 @@ export class ProductListWithCategoryidComponent implements OnInit {
   }
 
   clearFilters(): void {
+    const id = this.route.snapshot.params['id'];
     this.selectedFilters.set([]);
+    
+    // Kategori özelinde varsayılan cinsiyet filtresini geri yükle 🏛️
+    if (id === '019d433e-9c19-771a-aee0-08812c0b5562') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Kadın' }]);
+    else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Erkek' }]);
+    else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Çocuk' }]);
+
     this.updateDynamicSizes();
     this.updateHeader();
+    if (id) this.loadProducts(id);
   }
 
   isSelected(groupName: string, option: string): boolean {
@@ -140,32 +158,23 @@ export class ProductListWithCategoryidComponent implements OnInit {
     this.filterGroups.set(updated);
   }
 
+  // Whomopsy asaletindeki dinamik filtre grupları
   filterGroups = signal<FilterGroup[]>([
     {
-      name: 'Ürün Grubu', key: 'group', isExpanded: true,
-      options: ['Ayakkabı', 'Giyim', 'Aksesuar']
-    },
-    {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
-      options: ['Kadın', 'Erkek', 'Çocuk']
+      options: ['Kadın', 'Erkek', 'Çocuk', 'Unisex']
     },
     {
       name: 'Kategori', key: 'category', isExpanded: true,
-      options: [
-        'Anahtarlık', 'Atkı', 'Bağcık', 'Bel Çantası', 'Bere', 'Bot', 'Bot & Çizme',
-        'Ceket', 'Çanta', 'Çorap', 'Eşofman Altı', 'Etek', 'Hoodie', 'Mont',
-        'Omuz Çantası', 'Pantolon', 'Rozet', 'Rüzgarlık', 'Sandalet',
-        'Sırt Çantası', 'Sneaker', 'Sweatshirt', 'Şapka', 'Tayt',
-        'Terlik', 'T-Shirt'
-      ]
+      options: [] // Backend'den dinamik akacak 🏛️
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
-      options: ['adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
+      options: ['Adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
     },
     {
       name: 'Beden', key: 'size', isExpanded: false,
-      options: ['35', '36', '37', '38', '39', '40', '41', '42', '44']
+      options: ['36', '37', '38', '39', '40', '41', '42', '44']
     },
     {
       name: 'Renk', key: 'color', isExpanded: false,
@@ -178,6 +187,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
   ]);
 
   ngOnInit(): void {
+    this.loadCategories();
     this.route.params.pipe(
       switchMap(params => {
         const id = params['id'];
@@ -205,17 +215,121 @@ export class ProductListWithCategoryidComponent implements OnInit {
         }
 
         this.updateHeader();
-        return this.productService.getProductsByCategoryId(id);
+        
+        // Whomopsy Elite Router Alignment: Anasayfadan gelen o özel GUID'leri saptıyoruz 🏛️
+        const isGenderId = (id === '019d433e-9c19-771a-aee0-08812c0b5562' || 
+                           id === '019d53b6-10cf-78cd-97f1-99f5330f56db' || 
+                           id === '019d53b6-4407-71e7-9b93-958477fe69d1');
+
+        if (isGenderId) {
+            this.loadProducts(undefined, id); // Category ID yok, sadece özel Gender GUID var.
+        } else {
+            this.loadProducts(id); // Gerçek bir kategori GUID'i var.
+        }
+        return [];
       })
-    ).subscribe({
+    ).subscribe();
+  }
+
+  loadProducts(categoryId?: string, specialGenderId?: string): void {
+    this.isLoading.set(true);
+    this.currentPage.set(1);
+    this.hasMore.set(true);
+
+    const filterParams = this.getUnifiedFilterParams();
+    
+    // Eğer anasayfadan gelen özel bir cinsiyet GUID'i varsa onu Gender paramına eşliyoruz 🏛️
+    let gender = filterParams.gender;
+    if (specialGenderId === '019d433e-9c19-771a-aee0-08812c0b5562') gender = 2; // Kadın
+    else if (specialGenderId === '019d53b6-10cf-78cd-97f1-99f5330f56db') gender = 1; // Erkek
+    else if (specialGenderId === '019d53b6-4407-71e7-9b93-958477fe69d1') gender = 3; // Çocuk
+
+    this.productService.getProductsByFilter(gender, filterParams.brand, categoryId, undefined, 1, this.pageSize).subscribe({
       next: (data) => {
         this.products.set(data);
         this.isLoading.set(false);
+        if (data.length < this.pageSize) {
+            this.hasMore.set(false);
+        }
       },
-      error: (err) => {
-        console.error('Kategori ürünleri yüklenirken hata:', err);
-        this.isLoading.set(false);
-      }
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  /**
+   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 Kategori Ürünü) Whosepsy standartlarında çeker.
+   */
+  loadMore(): void {
+    if (this.isMoreLoading() || !this.hasMore()) return;
+
+    this.isMoreLoading.set(true);
+    const nextPage = this.currentPage() + 1;
+    const id = this.route.snapshot.params['id'];
+    const filterParams = this.getUnifiedFilterParams();
+    
+    // Whomopsy Elite Paging: Aynı özel Gender GUID mantığını burada da mühürlüyoruz 🏛️
+    const isGenderId = (id === '019d433e-9c19-771a-aee0-08812c0b5562' || 
+                       id === '019d53b6-10cf-78cd-97f1-99f5330f56db' || 
+                       id === '019d53b6-4407-71e7-9b93-958477fe69d1');
+
+    let gender = filterParams.gender;
+    let finalCategoryId: string | undefined = id;
+    
+    if (isGenderId) {
+        if (id === '019d433e-9c19-771a-aee0-08812c0b5562') gender = 2;
+        else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') gender = 1;
+        else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') gender = 3;
+        finalCategoryId = undefined;
+    }
+
+    this.productService.getProductsByFilter(gender, filterParams.brand, finalCategoryId, undefined, nextPage, this.pageSize).subscribe({
+        next: (newData) => {
+            if (newData.length > 0) {
+                this.products.update(prev => [...prev, ...newData]);
+                this.currentPage.set(nextPage);
+                if (newData.length < this.pageSize) {
+                    this.hasMore.set(false);
+                }
+            } else {
+                this.hasMore.set(false);
+            }
+            this.isMoreLoading.set(false);
+        },
+        error: (err) => {
+            console.error('Daha fazla kategori ürünü yüklenirken hata:', err);
+            this.isMoreLoading.set(false);
+        }
+    });
+  }
+
+  private getUnifiedFilterParams() {
+    const selected = this.selectedFilters();
+    
+    // Gender mapping: Kadın=2, Erkek=1, Çocuk=3, Unisex=0
+    const genderStr = selected.find(f => f.group === 'Cinsiyet')?.option;
+    let gender: number | undefined = undefined;
+    if (genderStr === 'Erkek') gender = 1;
+    else if (genderStr === 'Kadın') gender = 2;
+    else if (genderStr === 'Çocuk') gender = 3;
+    else if (genderStr === 'Unisex') gender = 0;
+
+    const brand = selected.find(f => f.group === 'Marka')?.option;
+
+    return { gender, brand };
+  }
+
+  loadCategories(): void {
+    this.productService.getCategories().subscribe({
+        next: (categories) => {
+            const categoryNames = categories.map(c => c.name);
+            const updated = this.filterGroups().map(g => {
+                if (g.key === 'category') {
+                    return { ...g, options: categoryNames };
+                }
+                return g;
+            });
+            this.filterGroups.set(updated);
+        }
     });
   }
 

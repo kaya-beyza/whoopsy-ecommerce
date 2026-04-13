@@ -16,7 +16,7 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<Pr
 
     public async Task<List<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetAllAsync(cancellationToken);
+        var products = await _productRepository.GetAllAsync(cancellationToken, request.Page, request.PageSize);
 
         return products.Select(p => new ProductDto
         {

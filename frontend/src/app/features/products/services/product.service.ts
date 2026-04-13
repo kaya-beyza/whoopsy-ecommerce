@@ -9,6 +9,7 @@ import { Product } from '../models/product.model';
 export class ProductService {
   // Gerçek Backend API URL'i (CORS ayarları backend tarafında yapılmış varsayılmaktadır)
   private apiUrl = 'http://localhost:5277/api/products';
+  private categoriesUrl = 'http://localhost:5277/api/categories';
 
   constructor(private http: HttpClient) { }
 
@@ -16,8 +17,8 @@ export class ProductService {
    * Veritabanındaki ürünleri getirir ve onları whOOPSy tasarım 
    * standartlarına (Resimler, Markalar, Badge'ler) eşler.
    */
-  getProducts(): Observable<Product[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
+  getProducts(page: number = 1, pageSize: number = 21): Observable<Product[]> {
+    return this.http.get<any[]>(`${this.apiUrl}?page=${page}&pageSize=${pageSize}`).pipe(
       map(backendProducts => backendProducts.map(bp => this.mapToEliteProduct(bp))),
       catchError(err => {
         console.error('Whoopsy API hatası! Veritabanı sessizliği:', err);
@@ -27,20 +28,57 @@ export class ProductService {
   }
 
   /**
+   * Backend deryasındaki tüm kategorileri (Kadın, Erkek, Çocuk) Whomopsy asaletinde çeker.
+   */
+  getCategories(): Observable<any[]> {
+    return this.http.get<any[]>(this.categoriesUrl).pipe(
+        catchError(err => {
+            console.error('Whoopsy Kategori API hatası!:', err);
+            return of([]);
+        })
+    );
+  }
+
+  /**
    * Belirtilen kategoriye ait ürünleri getirir.
    */
-  getProductsByCategoryId(categoryId: string | number): Observable<Product[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(products => products.filter(p => p.categoryId == categoryId).map(bp => this.mapToEliteProduct(bp)))
+  getProductsByCategoryId(categoryId: string | number, page: number = 1, pageSize: number = 21): Observable<Product[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/by-category/${categoryId}?page=${page}&pageSize=${pageSize}`).pipe(
+      map(backendProducts => backendProducts.map(bp => this.mapToEliteProduct(bp))),
+      catchError(err => {
+        console.error('Whoopsy API hatası! Veritabanı sessizliği:', err);
+        return of([]);
+      })
     );
   }
 
   /**
    * Belirtilen markaya ait ürünleri getirir.
    */
-  getProductsByBrand(brand: string): Observable<Product[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      map(products => products.map(bp => this.mapToEliteProduct(bp)).filter(p => p.brand.toLowerCase() === brand.toLowerCase()))
+  getProductsByBrand(brand: string, page: number = 1, pageSize: number = 21): Observable<Product[]> {
+    // Whomopsy Brand Alignment: Backend Enum (NewBalance) boşluksuz yapı bekliyor.
+    const alignedBrand = brand.replace(/\s/g, ''); 
+    return this.http.get<any[]>(`${this.apiUrl}/by-brand?brand=${alignedBrand}&page=${page}&pageSize=${pageSize}`).pipe(
+      map(backendProducts => backendProducts.map(bp => this.mapToEliteProduct(bp)).filter(p => p.brand.toLowerCase() === brand.toLowerCase()))
+    );
+  }
+
+  /**
+   * Birden fazla filtreyi (Cinsiyet, Marka, Kategori, Arama) Whosepsy asaletinde Whomopsy deryasına iletir.
+   */
+  getProductsByFilter(gender?: number, brand?: string, categoryId?: string, searchTerm?: string, page: number = 1, pageSize: number = 21): Observable<Product[]> {
+    let url = `${this.apiUrl}/filter?page=${page}&pageSize=${pageSize}`;
+    if (gender !== undefined) url += `&gender=${gender}`;
+    if (brand) url += `&brand=${brand.replace(/\s/g, '')}`;
+    if (categoryId) url += `&categoryId=${categoryId}`;
+    if (searchTerm) url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+
+    return this.http.get<any[]>(url).pipe(
+      map(backendProducts => backendProducts.map(bp => this.mapToEliteProduct(bp))),
+      catchError(err => {
+        console.error('Whoopsy Filtreleme Hatası! Veritabanı sessizliği:', err);
+        return of([]);
+      })
     );
   }
 
@@ -59,13 +97,19 @@ export class ProductService {
 
   private mapToEliteProduct(bp: any): Product {
     const name = bp.name || 'Whoopsy Ürünü';
-    const slug = name.toLowerCase().replace(/ /g, '-');
+    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-    // Görsel ve Marka havuzundan isim bazlı eşleme
+    // Whomopsy Elite Mapping: Sayısal Şifreleri Çözme
+    const brandName = this.getBrandName(bp.brand);
+    const genderName = this.getGenderName(bp.gender);
+
+    // Görsel havuzundan marka ve kategoriye göre eşleme (Backend linki bozuksa veya yoksa)
     const visualPool = this.ELITE_MOCK_POOL.find(p =>
-      name.toLowerCase().includes(p.brand.toLowerCase()) ||
-      name.toLowerCase().includes(p.name.split(' ')[0].toLowerCase())
+      p.brand.toLowerCase() === brandName.toLowerCase()
     ) || this.ELITE_MOCK_POOL[0];
+
+    // Backend'den gelen resim yolunu Whomopsy asaletinde temizleme
+    const backendImage = bp.mainImageUrl && bp.mainImageUrl.startsWith('http') ? bp.mainImageUrl : visualPool.imageUrl;
 
     return {
       id: bp.id || Math.random(),
@@ -73,21 +117,46 @@ export class ProductService {
       description: bp.description || 'Whoopsy asaletini yansıtan özel tasarım.',
       price: bp.price || 0,
       stock: bp.stockQuantity || 0,
-      categoryId: bp.categoryId || 1,
-      // Visual Enrichment:
-      brand: visualPool.brand,
-      imageUrl: visualPool.imageUrl,
-      hoverImageUrl: visualPool.hoverImageUrl,
-      originalPrice: bp.price ? bp.price + 400 : undefined,
-      discountLabel: bp.price > 4000 ? '%10 İndirim' : undefined,
-      category: 'Ayakkabı',
+      categoryId: bp.categoryId,
+      // Visual Enrichment (Whomopsy Elite Entegrasyon):
+      brand: brandName,
+      category: genderName,
+      imageUrl: backendImage,
+      hoverImageUrl: bp.imageUrls?.[0] || visualPool.hoverImageUrl,
+      images: bp.imageUrls || [backendImage],
+      originalPrice: bp.price ? bp.price + 450 : undefined,
+      discountLabel: bp.price > 4000 ? '%15 İndirim' : undefined,
       rating: 4.8,
       isBestseller: bp.price > 4500,
-      isNew: bp.id % 2 === 0,
+      isNew: true,
       slug: slug,
       sizes: [38, 39, 40, 41, 42, 43, 44],
       colors: ['Siyah', 'Beyaz', 'Bej']
     };
+  }
+
+  // Whomopsy Codebreaker: Gender Enum Çözücü
+  private getGenderName(id: number): string {
+    const genders: any = {
+      0: 'Unisex',
+      1: 'Erkek',
+      2: 'Kadın',
+      3: 'Çocuk'
+    };
+    return genders[id] || 'Unisex';
+  }
+
+  // Whomopsy Codebreaker: Brand Enum Çözücü
+  private getBrandName(id: number): string {
+    const brands: any = {
+      1: 'Adidas',
+      2: 'Converse',
+      3: 'New Balance',
+      4: 'Nike',
+      5: 'Puma',
+      6: 'Vans'
+    };
+    return brands[id] || 'Whoopsy';
   }
 
   // Visual Pool (Resimler ve Markalar için referans)
