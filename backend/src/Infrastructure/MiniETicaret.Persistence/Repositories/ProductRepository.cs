@@ -54,6 +54,8 @@ public class ProductRepository : IProductRepository
             .Include(p => p.Images)
             .ToListAsync(cancellationToken);
     }
+
+
     public async Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken)
     {
         image.ProductId = productId;
@@ -102,6 +104,31 @@ public class ProductRepository : IProductRepository
                     .ToListAsync(cancellationToken);
                       
     } 
+    public async Task<List<Product>> GetByBrandAsync(Brand brand, CancellationToken cancellationToken)
+    {
+    return await _context.Products
+        .Where(p => p.Brand == brand)
+        .Include(p => p.Images)
+        .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Product>> GetByFilterAsync(Gender? gender, Brand? brand, Guid? categoryId, CancellationToken cancellationToken)
+    {
+        var query = _context.Products.AsQueryable();
+
+        if(gender.HasValue)
+            query = query.Where(p => p.Gender == gender.Value);
+
+        if(brand.HasValue)
+            query = query.Where(p => p.Brand == brand.Value);
+
+        if(categoryId.HasValue)
+            query = query.Where(p => p.CategoryId == categoryId.Value);
+
+        return await query
+                    .Include(p => p.Images)
+                    .ToListAsync(cancellationToken);            
+    }
     public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
     {
         var images = await _context.ProductImages

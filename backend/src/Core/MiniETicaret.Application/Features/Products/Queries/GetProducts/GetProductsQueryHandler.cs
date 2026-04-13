@@ -28,6 +28,7 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<Pr
             CategoryId = p.CategoryId,
             CategoryName = p.Category?.Name ?? "",
             Gender = p.Gender,
+            Brand = p.Brand,
             MainImageUrl = p.Images?.FirstOrDefault(i => i.IsMain)?.Url,
             ImageUrls = p.Images?.Select(i => i.Url).ToList() ?? new()
             //kontrol edeceğim tekrar

@@ -12,6 +12,7 @@ public record UpdateProductCommand
     int StockQuantity,
     Guid CategoryId,
     Gender Gender,
+    Brand Brand,
     bool IsActive
 ) : IRequest<bool>;
 

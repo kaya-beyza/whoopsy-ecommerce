@@ -25,6 +25,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             IsActive = true,
             CreatedDate = DateTime.UtcNow.AddHours(3),
             Gender = request.Gender,
+            Brand = request.Brand
         };
 
         await _productRepository.AddAsync(product, cancellationToken);
