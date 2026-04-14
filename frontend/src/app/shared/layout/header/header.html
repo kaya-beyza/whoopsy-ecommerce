@@ -34,7 +34,7 @@
     </div>
 
     <div class="header-icons">
-      <button class="icon-btn" aria-label="Ara">
+      <button class="icon-btn" aria-label="Ara" (click)="toggleSearch()">
         <span class="material-symbols-sharp">search</span>
       </button>
 
@@ -51,5 +51,38 @@
     </div>
 
   </div>
+
+  <!-- Whomopsy Elite Search Overlay: Ekranı asaletle kaplayan arama katmanı 🏛️ -->
+  @if (isSearchOpen()) {
+  <div class="search-overlay" (click)="$event.stopPropagation()">
+    <div class="search-overlay__container">
+      <div class="search-overlay__header">
+        <button class="close-search" (click)="toggleSearch()">
+          <span class="material-symbols-sharp">close</span>
+        </button>
+      </div>
+      <div class="search-overlay__content">
+        <div class="search-field">
+          <span class="material-symbols-sharp search-field-icon">search</span>
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (keyup.enter)="onSearchSubmit()"
+            placeholder="Kategori, Ürün veya Marka Ara." 
+            class="search-input"
+            autofocus
+          >
+        </div>
+        <div class="search-tips">
+          <span class="tip-label">Popüler:</span>
+          <span class="tip-tag">adidas</span>
+          <span class="tip-tag">Puma Speedcat</span>
+          <span class="tip-tag">New Balance 9060</span>
+        </div>
+      </div>
+    </div>
+    <div class="search-overlay__backdrop" (click)="toggleSearch()"></div>
+  </div>
+  }
 
 </header>

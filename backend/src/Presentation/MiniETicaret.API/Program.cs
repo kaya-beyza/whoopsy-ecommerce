@@ -64,6 +64,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+
 // Seed Data
 /*Uygulama başlarken SeedData'yı çalıştır. İlk seferde Admin/User rolleri eklenir,
  sonraki seferlerde atlanır.*/
@@ -71,6 +72,8 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<MiniETicaretDbContext>();
     await SeedData.SeedAsync(context);
+    //await ProductSeedData.SeedAsync(context);
+    //await SubCategorySeedData.SeedAsync(context);
 }
 
 // Middleware Pipelinem 

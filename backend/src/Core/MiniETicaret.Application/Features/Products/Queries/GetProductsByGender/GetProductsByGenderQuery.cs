@@ -6,5 +6,7 @@ namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByGender
 
 public record GetProductsByGenderQuery(
     Gender? Gender = null,
-    Guid? CategoryId = null
+    Guid? CategoryId = null,
+    int? Page = 1,
+    int? PageSize = 21
 ) : IRequest<List<ProductDto>>;

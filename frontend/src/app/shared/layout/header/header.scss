@@ -198,4 +198,140 @@
   75% {
     transform: translate(-20%, -40%);
   }
-}
+}
+
+/* --- Whosepsy Elite Search Overlay Aesthetics: Ekranı asaletle kaplayan arama katmanı 🏛️ --- */
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    animation: searchFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &__backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(15px);
+        z-index: -1;
+    }
+
+    &__container {
+        width: 100%;
+        max-width: 800px;
+        padding: 60px 20px;
+        margin-top: 100px;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 40px;
+
+        .close-search {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #000;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+
+            .material-symbols-sharp {
+                font-size: 32px !important;
+                font-variation-settings: 'wght' 200;
+            }
+
+            &:hover {
+                transform: rotate(90deg);
+                color: var(--color-primary);
+            }
+        }
+    }
+
+    .search-field {
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+
+        &-icon {
+            font-size: 36px !important;
+            margin-right: 24px;
+            color: #000;
+            font-variation-settings: 'wght' 200;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-family: var(--font-body);
+            font-size: 42px;
+            font-weight: 300;
+            color: #000;
+            outline: none;
+            letter-spacing: -1px;
+
+            &::placeholder {
+                color: #ddd;
+            }
+        }
+    }
+
+    .search-tips {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+
+        .tip-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tip-tag {
+            font-size: 14px;
+            color: #000;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 2px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 0;
+                height: 1px;
+                background: #000;
+                transition: width 0.3s ease;
+            }
+
+            &:hover::after {
+                width: 100%;
+            }
+        }
+    }
+}
+
+@keyframes searchFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
