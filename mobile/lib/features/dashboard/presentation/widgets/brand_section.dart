@@ -13,12 +13,10 @@ class BrandSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // BAŞLIK VE BUTON SATIRI
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween, // Biri en sola, diğeri en sağa
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const Text(
@@ -29,13 +27,12 @@ class BrandSection extends StatelessWidget {
                   letterSpacing: 0.5,
                 ),
               ),
-              // Sadece yazı şeklinde buton
               TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const ProductListPage(), // 🔥 TÜM ÜRÜNLER
+                      builder: (_) => const ProductListPage(),
                     ),
                   );
                 },
@@ -44,11 +41,11 @@ class BrandSection extends StatelessWidget {
                   minimumSize: const Size(50, 30),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: Text(
+                child: const Text(
                   "Ürünleri Gör →",
                   style: TextStyle(
                     fontSize: 12,
-                    color: const Color.fromARGB(255, 82, 83, 84),
+                    color: Color.fromARGB(255, 82, 83, 84),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -56,10 +53,7 @@ class BrandSection extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 12),
-
-        // MARKALAR LİSTESİ
         SizedBox(
           height: 145,
           child: ListView.builder(
@@ -79,33 +73,35 @@ class BrandSection extends StatelessWidget {
                       width: 100,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: Stack(
-                          children: [
-                            Image.network(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            splashColor: Colors.black.withOpacity(0.05),
+                            onTap: () {
+                              print("CLICKED BRAND ID: ${item.id}");
+                              print("CLICKED BRAND NAME: ${item.name}");
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProductListPage(
+                                    brandId: item.id,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Image.network(
                               item.image,
                               height: 90,
                               width: 100,
                               fit: BoxFit.cover,
-                            ),
-                            Positioned.fill(
-                              child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  splashColor: Colors.black.withOpacity(0.05),
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ProductListPage(
-                                          brandId: item.id, // 🔥 BURASI
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                              errorBuilder: (_, __, ___) => Container(
+                                color: Colors.grey.shade200,
+                                child: const Icon(Icons.image_not_supported),
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -125,7 +121,7 @@ class BrandSection extends StatelessWidget {
               );
             },
           ),
-        )
+        ),
       ],
     );
   }

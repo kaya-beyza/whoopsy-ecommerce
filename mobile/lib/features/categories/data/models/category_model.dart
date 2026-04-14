@@ -6,6 +6,7 @@ class CategoryModel extends Category {
     required super.name,
     super.description,
     super.parentId,
+    super.subCategories,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
@@ -14,6 +15,9 @@ class CategoryModel extends Category {
       name: json['name'] ?? '',
       description: json['description'],
       parentId: json['parentId'],
+      subCategories: (json['subCategories'] as List? ?? [])
+          .map((e) => CategoryModel.fromJson(e))
+          .toList(),
     );
   }
 
@@ -23,6 +27,8 @@ class CategoryModel extends Category {
       'name': name,
       'description': description,
       'parentId': parentId,
+      'subCategories':
+          subCategories.map((e) => (e as CategoryModel).toJson()).toList(),
     };
   }
 }

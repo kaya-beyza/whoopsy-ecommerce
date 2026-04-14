@@ -30,4 +30,28 @@ class CategoryRemoteDataSource {
       throw Exception("Kategori hatası: ${response.statusCode}");
     }
   }
+
+  Future<List<dynamic>> getCategoryTree() async {
+    final url = "$baseUrl/Categories/tree";
+    print("CATEGORY TREE URL: $url");
+
+    final response = await http.get(Uri.parse(url));
+
+    print("CATEGORY TREE STATUS: ${response.statusCode}");
+    print("CATEGORY TREE BODY: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+
+      if (decoded is List) {
+        return decoded;
+      } else if (decoded is Map && decoded.containsKey("data")) {
+        return decoded["data"];
+      } else {
+        throw Exception("Beklenmeyen tree response formatı");
+      }
+    } else {
+      throw Exception("Kategori tree hatası: ${response.statusCode}");
+    }
+  }
 }

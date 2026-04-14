@@ -33,24 +33,24 @@ class ProductRepositoryImpl implements IProductRepository {
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 
-  /// 🔥 BRAND (🔥 SENDE EKSİK OLAN)
   Future<List<Product>> getProductsByBrand(int brand) async {
     final jsonList = await remoteDataSource.getProductsByBrand(brand);
 
     return jsonList.map((json) => ProductModel.fromJson(json)).toList();
   }
 
-  /// 🔥 FILTER (en son fallback)
   @override
   Future<List<Product>> getFilteredProducts({
     int? gender,
     int? brand,
     String? categoryId,
+    int page = 1,
   }) async {
     final jsonList = await remoteDataSource.getFilteredProducts(
       gender: gender,
       brand: brand,
       categoryId: categoryId,
+      page: page,
     );
 
     return jsonList.map((e) => ProductModel.fromJson(e)).toList();

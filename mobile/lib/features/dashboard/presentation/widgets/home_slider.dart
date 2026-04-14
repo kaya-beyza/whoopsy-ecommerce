@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/features/categories/data/datasources/category_remote_data_source.dart';
 import 'package:mobile/features/categories/data/repositories/category_repository_impl.dart';
 import 'package:mobile/features/categories/domain/entities/category.dart';
-import 'package:mobile/features/categories/presentation/category_products_page.dart';
 import 'package:mobile/features/products/presentation/product_list_page.dart';
-import 'package:provider/provider.dart';
 
 // Resim ve başlığı bir arada tutmak için basit bir model
 class SliderItem {
@@ -25,11 +23,13 @@ class HomeSlider extends StatefulWidget {
 class _HomeSliderState extends State<HomeSlider> {
   final PageController _controller = PageController();
   int index = 0;
-  Timer? _timer; // Timer'ı iptal edebilmek için referansını tutuyoruz
-  List<Category> categories = []; // 🔥 backend data
+  Timer? _timer;
+  List<Category> categories = [];
   bool isLoading = true;
+
   final repository = CategoryRepositoryImpl(CategoryRemoteDataSource());
-  // Veri yapısını model kullanacak şekilde güncelledik
+
+  // Sadece senin göstermek istediğin slider kartları
   final List<SliderItem> sliderItems = [
     SliderItem(
       imageUrl:
@@ -57,7 +57,6 @@ class _HomeSliderState extends State<HomeSlider> {
 
   @override
   void dispose() {
-    // State yok edilirken Timer'ı mutlaka iptal etmeliyiz (hafıza sızıntısını önlemek için)
     _timer?.cancel();
     _controller.dispose();
     super.dispose();
@@ -65,9 +64,9 @@ class _HomeSliderState extends State<HomeSlider> {
 
   void _startAutoSlide() {
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (_controller.hasClients && categories.isNotEmpty) {
+      if (_controller.hasClients && sliderItems.isNotEmpty) {
         int currentPage = _controller.page?.round() ?? 0;
-        index = (currentPage + 1) % categories.length;
+        index = (currentPage + 1) % sliderItems.length;
 
         _controller.animateToPage(
           index,
@@ -78,9 +77,11 @@ class _HomeSliderState extends State<HomeSlider> {
     });
   }
 
-  String? _findCategoryIdByTitle(String title) {
+  // Sadece ana kategoriler içinde arar
+  String? _findMainCategoryId(String title) {
     try {
       return categories
+          .where((c) => c.parentId == null)
           .firstWhere(
             (c) => c.name.toLowerCase().trim() == title.toLowerCase().trim(),
           )
@@ -107,14 +108,14 @@ class _HomeSliderState extends State<HomeSlider> {
   }
 
   @override
-  void Dispose() {
-    _timer?.cancel();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const SizedBox(
+        height: 500,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return SizedBox(
       height: 500,
       child: PageView.builder(
@@ -122,46 +123,48 @@ class _HomeSliderState extends State<HomeSlider> {
         itemCount: sliderItems.length,
         itemBuilder: (context, i) {
           final item = sliderItems[i];
+
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Stack(
-                // Resim ve metni üst üste koymak için Stack
                 children: [
-                  // 1. Arka plandaki Resim
                   Image.network(
                     item.imageUrl,
                     fit: BoxFit.cover,
-                    width: double.infinity, // Genişliği tam kapla
-                    height: double.infinity, // Yüksekliği tam kapla
+                    width: double.infinity,
+                    height: double.infinity,
                     errorBuilder: (_, __, ___) =>
                         const Icon(Icons.image_not_supported),
                   ),
                   Positioned.fill(
                     child: Material(
-                      color: Colors.transparent, // Resmin görünmesi için şeffaf
+                      color: Colors.transparent,
                       child: InkWell(
-                        splashColor:
-                            Colors.white.withOpacity(0.3), // Tıklama rengi
+                        splashColor: Colors.white.withOpacity(0.3),
                         highlightColor: Colors.white.withOpacity(0.1),
                         onTap: () {
-                          final categoryId = _findCategoryIdByTitle(item.title);
+                          final mainCategoryId =
+                              _findMainCategoryId(item.title);
 
-                          if (categoryId == null) {
+                          print("SLIDER TITLE: ${item.title}");
+                          print("MAIN CATEGORY ID: $mainCategoryId");
+
+                          if (mainCategoryId == null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                   content: Text(
                                       "Kategori bulunamadı: ${item.title}")),
                             );
-                            return; // 🚨 API çağrısı yapma
+                            return;
                           }
 
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) => ProductListPage(
-                                categoryId: categoryId,
+                                categoryId: mainCategoryId,
                               ),
                             ),
                           );
@@ -169,37 +172,35 @@ class _HomeSliderState extends State<HomeSlider> {
                       ),
                     ),
                   ),
-                  // 2. Metnin okunabilirliği için alt kısma hafif karartma (Gradyan)
                   Positioned(
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    height: 100, // Sadece alt kısmı kapla
+                    height: 100,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withOpacity(0.7), // Altta koyu
-                            Colors.transparent, // Üste doğru şeffaf
+                            Colors.black.withOpacity(0.7),
+                            Colors.transparent,
                           ],
                         ),
                       ),
                     ),
                   ),
-
-                  // 3. Sol Alt Köşedeki Metin
                   Positioned(
-                    bottom: 20, // Alttan boşluk
-                    left: 20, // Soldan boşluk
-                    right: 20, // Sağdan boşluk (metin çok uzunsa taşmasın diye)
+                    bottom: 20,
+                    left: 20,
+                    right: 20,
                     child: Text(
                       item.title,
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],

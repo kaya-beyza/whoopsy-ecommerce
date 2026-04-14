@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/categories/data/datasources/category_remote_data_source.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
+import 'package:mobile/features/products/data/models/product_model.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/filter_page.dart';
@@ -9,12 +11,14 @@ class ProductListPage extends StatefulWidget {
   final String? categoryId;
   final int? brandId;
   final int? genderId;
+  final String? mainCategoryName;
 
   const ProductListPage({
     super.key,
     this.categoryId,
     this.brandId,
     this.genderId,
+    this.mainCategoryName,
   });
 
   @override
@@ -53,23 +57,80 @@ class _ProductListPageState extends State<ProductListPage> {
 
   Future<void> _fetchProducts() async {
     try {
+      print("CATEGORY: $_selectedCategoryId");
+      print("BRAND: $_selectedBrand");
+      print("GENDER: $_selectedGender");
       List<Product> result = [];
 
-      /// 1️⃣ BASE DATA
+      /// 1️⃣ GENDER + optional category
       if (_selectedGender != null) {
         result = await _productRepo.getProductsByGender(
           _selectedGender!,
           categoryId: _selectedCategoryId,
         );
-      } else if (_selectedCategoryId != null) {
-        result = await _productRepo.getProductsByCategoryId(
-          _selectedCategoryId!,
+      }
+
+      /// 2️⃣ CATEGORY
+      else if (_selectedCategoryId != null) {
+        final categoryDataSource = CategoryRemoteDataSource();
+        final categoryTree = await categoryDataSource.getCategoryTree();
+        final treeList = categoryTree.cast<Map<String, dynamic>>();
+
+        final selectedMainCategory = treeList.firstWhere(
+          (c) => c["id"] == _selectedCategoryId,
+          orElse: () => <String, dynamic>{},
         );
-      } else {
+
+        if (selectedMainCategory.isNotEmpty) {
+          final subCategories =
+              (selectedMainCategory["subCategories"] as List? ?? [])
+                  .cast<Map<String, dynamic>>();
+
+          if (subCategories.isEmpty) {
+            result = [];
+          } else {
+            final futures = subCategories.map((sub) {
+              return _productRepo.getProductsByCategoryId(sub["id"]);
+            }).toList();
+
+            final results = await Future.wait(futures);
+
+            final temp = <Product>[];
+            for (final list in results) {
+              temp.addAll(list);
+            }
+
+            result = {
+              for (final p in temp) p.id: p,
+            }.values.toList();
+          }
+        } else {
+          // alt kategori ise direkt kendi ürünleri
+          result = await _productRepo.getProductsByCategoryId(
+            _selectedCategoryId!,
+          );
+        }
+      }
+
+      /// 3️⃣ BRAND ONLY
+      else if (_selectedBrand != null) {
+        print("SELECTED BRAND: $_selectedBrand");
+
+        final data = await _productRepo.getProductsByBrand(
+          _selectedBrand!,
+        );
+
+        result = data;
+
+        print("RESULT COUNT: ${result.length}");
+      }
+
+      /// 4️⃣ ALL
+      else {
         result = await _productRepo.getAllProducts();
       }
 
-      /// 2️⃣ FRONTEND FILTER (🔥 ASIL OLAY)
+      /// 5️⃣ FRONTEND BRAND FILTER
       if (_selectedBrand != null) {
         result = result.where((p) => p.brand == _selectedBrand).toList();
       }
@@ -80,6 +141,7 @@ class _ProductListPageState extends State<ProductListPage> {
       });
     } catch (e) {
       print("ERROR: $e");
+      print("SELECTED BRAND: $_selectedBrand");
 
       setState(() {
         _errorMessage = e.toString();

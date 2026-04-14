@@ -55,18 +55,20 @@ class ProductRemoteDataSource {
     int? gender,
     int? brand,
     String? categoryId,
+    int page = 1,
+    int pageSize = 20,
   }) async {
     final query = <String, String>{};
 
     if (gender != null) query["gender"] = gender.toString();
     if (brand != null) query["brand"] = brand.toString();
-    if (categoryId != null && categoryId.isNotEmpty) {
-      query["categoryId"] = categoryId;
-    }
+    if (categoryId != null) query["categoryId"] = categoryId;
 
-    final uri = Uri.parse(
-      "http://10.238.142.172:5277/api/Products/filter",
-    ).replace(queryParameters: query);
+    query["page"] = page.toString();
+    query["pageSize"] = pageSize.toString();
+
+    final uri =
+        Uri.parse("$baseUrl/Products/filter").replace(queryParameters: query);
 
     print("FILTER URL: $uri");
 
@@ -76,14 +78,15 @@ class ProductRemoteDataSource {
     print("BODY: ${response.body}");
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final decoded = jsonDecode(response.body);
+      return decoded["data"]; // 🔥 önemli
     } else {
       throw Exception("Filter failed");
     }
   }
 
   Future<List<dynamic>> getProductsByBrand(int brand) async {
-    final url = "http://10.238.142.172:5277/api/Products/by-brand?brand=$brand";
+    final url = "$baseUrl/Products/by-brand?brand=$brand&page=1&pageSize=100";
 
     print("BRAND REQUEST: $url");
 
