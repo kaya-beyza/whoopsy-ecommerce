@@ -2,8 +2,9 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MiniETicaret.Application.Features.Categories.Commands.CreateCategory;
 using MiniETicaret.Application.Features.Categories.Commands.UpdateCategory;
-using MiniETicaret.Application.Features.Categories.Queries.GetCategories;
 using MiniETicaret.Application.Features.Categories.Commands.DeleteCategory;
+using MiniETicaret.Application.Features.Categories.Queries.GetCategories;
+using MiniETicaret.Application.Features.Categories.Queries.GetCategoryTree;
 
 namespace MiniETicaret.API.Controllers;
 
@@ -25,6 +26,13 @@ public class CategoriesController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("tree")]
+    public async Task<IActionResult> GetTree()
+    {
+        var result = await _mediator.Send(new GetCategoryTreeQuery());
+        return Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(CreateCategoryCommand command)
     {
@@ -33,23 +41,22 @@ public class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id,UpdateCategoryCommand command)
+    public async Task<IActionResult> Update(Guid id, UpdateCategoryCommand command)
     {
-        var result = await _mediator.Send(command with {Id = id});
-        if(result == false)
+        var result = await _mediator.Send(command with { Id = id });
+        if (result == false)
             return NotFound();
 
-        return Ok(result);    
+        return Ok(result);
     }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await _mediator.Send(new DeleteCategoryCommand(id));
-        if(result == false)
+        if (result == false)
             return NotFound();
 
-        return Ok(result);    
+        return Ok(result);
     }
-
-
 }
