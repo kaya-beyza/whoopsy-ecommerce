@@ -18,6 +18,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -27,64 +28,28 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void _navigate(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
-        break;
-
-      case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const SearchPage()),
-        );
-        break;
-
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const CartPage()),
-        );
-        break;
-
-      case 3:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const FavoritesPage()),
-        );
-        break;
-
-      case 4:
-        final isLoggedIn = context.read<AuthProvider>().isLoggedIn;
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                isLoggedIn ? const AccountPage() : const LoginPage(),
-          ),
-        );
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
 
+    /// 🔥 SAYFALAR BURADA
+    final List<Widget> pages = [
+      const HomeScreen(),
+      const SearchPage(),
+      const CartPage(),
+      const FavoritesPage(),
+      isLoggedIn ? const AccountPage() : const LoginPage(),
+    ];
+
     return Scaffold(
-      body: const HomeScreen(), // default
+      body: pages[currentIndex], // 🔥 BURASI DEĞİŞİYOR
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
           setState(() {
-            currentIndex = index;
+            currentIndex = index; // 🔥 sadece index değiştir
           });
-
-          _navigate(index); // 👇
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.black,
