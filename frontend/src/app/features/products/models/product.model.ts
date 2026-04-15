@@ -8,7 +8,9 @@ export interface Product {
     imageUrl: string;
     hoverImageUrl?: string;
     category: string;
-    categoryId?: number | string; // 👈 Dinamik ID (Number veya Guid) desteği
+    categoryId?: number | string;
+    genderId?: number;
+    genderLabel?: string;
     subCategory?: string;
     brand: string;
     rating: number;

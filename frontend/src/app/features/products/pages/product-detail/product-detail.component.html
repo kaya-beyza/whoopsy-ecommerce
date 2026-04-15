@@ -29,9 +29,7 @@
       <div class="bc-inner">
         <a routerLink="/">Anasayfa</a>
         <span class="sep">/</span>
-        <a routerLink="/urunler">Tüm Ürünler</a>
-        <span class="sep">/</span>
-        <a [routerLink]="['/urunler/kategori', p.categoryId]">{{ p.category }}</a>
+        <a routerLink="/urunler" [queryParams]="{ gender: p.genderId }">{{ p.genderLabel }}</a>
         <span class="sep">/</span>
         <span class="current">{{ p.name }}</span>
       </div>
@@ -67,16 +65,9 @@
       <!-- ── RIGHT: INFO PANEL ── -->
       <div class="info-section">
         <div class="sticky-panel">
-          <header class="product-header">
-            <div class="header-top">
-              <span class="brand-name">{{ p.brand }}</span>
-              <div class="rating-row">
-                <span class="material-symbols-sharp">star</span>
-                <span class="rate">{{ p.rating }}</span>
-              </div>
-            </div>
-            <h1 class="product-name">{{ p.name }}</h1>
-            <p class="product-subtitle">Modern Şehir Koleksiyonu</p>
+          <header class="product-header-elite">
+            <span class="brand-title-extra">{{ p.brand }}</span>
+            <h1 class="product-subtitle-elite">{{ p.name.toLowerCase().startsWith(p.brand.toLowerCase()) ? p.name.slice(p.brand.length).trim() : p.name }}</h1>
           </header>
 
           <div class="price-block">
