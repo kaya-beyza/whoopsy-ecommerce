@@ -57,6 +57,28 @@ export class ProductService {
     );
   }
 
+  
+  getCartRecommendations(): Observable<Product[]> {
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      // Sadece ilk 4 ürünü alıp mapliyoruz
+      map(products => products.slice(0, 4).map(bp => {
+        // 1. Adım: Önce takım arkadaşının kullandığı orijinal mapping'i alıyoruz (Fiyatlar, hover vb. bozulmasın diye)
+        const baseProduct = this.mapToEliteProduct(bp); 
+        
+        // 2. Adım: Sadece resim ve kategori verisini gerçek backend verisiyle ezip döndürüyoruz
+        return {
+          ...baseProduct,
+          imageUrl: bp.mainImageUrl || baseProduct.imageUrl,
+          category: bp.categoryName || baseProduct.category
+        };
+      })),
+      catchError(err => {
+        console.error('Önerilen ürünler çekilirken hata oluştu:', err);
+        return of([]);
+      })
+    );
+  }
+
   private mapToEliteProduct(bp: any): Product {
     const name = bp.name || 'Whoopsy Ürünü';
     const slug = name.toLowerCase().replace(/ /g, '-');

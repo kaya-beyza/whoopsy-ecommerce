@@ -30,7 +30,12 @@
           
           <div class="form-group">
             <label for="categoryId">Kategori</label>
-            <input type="text" id="categoryId" name="categoryId" [(ngModel)]="productData.categoryId" required placeholder="Kategori ID">
+            <select id="categoryId" name="categoryId" [(ngModel)]="productData.categoryId" required>
+              <option value="" disabled selected>Lütfen bir kategori seçiniz...</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </option>
+            </select>
           </div>
 
           <div class="form-group">

@@ -17,6 +17,16 @@ export class ProductCreateComponent implements OnInit {
   // Düzenleme modunda mıyız kontrolü için değişken (Null ise ekleme modundayız)
   editingProductId: string | null = null;
 
+  // --- YENİ EKLENEN KATEGORİ LİSTESİ ---
+  // Not: Buradaki ID'leri, backend'den aldığınız GERÇEK ID'lerle değiştirmeyi unutmayın!
+  categories = [
+    { id: '019d4349-58cf-735a-b227-6b...', name: 'Giyim' },
+    { id: '3fa85f64-5717-4562-b3fc-2c9...', name: 'Ayakkabı' },
+    { id: '019d4306-51b4-707d-9cf1-74e...', name: 'Çanta' },
+    { id: '019d433e-9c19-771a-aee0-088...', name: 'Aksesuar' }
+  ];
+  // ------------------------------------
+
   productData: CreateProduct = {
     name: '', description: '', price: 0, stockQuantity: 0, categoryId: '' 
   };
