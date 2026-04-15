@@ -101,6 +101,7 @@
                 <!-- Actual Product Cards -->
                 <ng-container *ngIf="!isLoading()">
                     <div class="product-card" *ngFor="let product of products()"
+                        [routerLink]="['/urunler/detay', product.id]"
                         (mouseleave)="setQuickAddProduct(null)">
 
                         <div class="card-image-wrapper">
@@ -109,16 +110,16 @@
                             <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
                                 }}</span>
 
-                            <button class="wishlist-btn">
+                            <button class="wishlist-btn" (click)="$event.stopPropagation()">
                                 <span class="material-symbols-sharp">favorite</span>
                             </button>
 
                             <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                            <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id)">
+                            <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
                                 <span class="material-symbols-sharp">add</span>
                             </div>
 
-                            <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id">
+                            <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
                                 <p class="quick-add-title">HIZLI EKLE</p>
                                 <div class="sizes-grid">
                                     <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"

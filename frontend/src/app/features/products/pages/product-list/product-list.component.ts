@@ -1,13 +1,13 @@
 import { Component, OnInit, signal, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product, FilterGroup } from '../../models/product.model';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
@@ -187,10 +187,20 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     
-    // Whomopsy Search Listener: URL deryasındaki arama kelimesini Whomopsy asaletinde dinler 🏛️
+    // Whomopsy Route Listener: URL deryasındaki arama ve cinsiyet kilitlerini Whosepsy asaletinde dinler 🏛️
     this.route.queryParams.subscribe(params => {
       const query = params['search'];
+      const gender = params['gender'];
+      
       this.searchTerm.set(query);
+      
+      if (gender) {
+        const genderName = this.getGenderNameById(Number(gender));
+        if (genderName && !this.isSelected('Cinsiyet', genderName)) {
+          this.selectedFilters.set([{ group: 'Cinsiyet', option: genderName }]);
+        }
+      }
+
       this.loadProducts();
     });
 
@@ -356,5 +366,14 @@ export class ProductListComponent implements OnInit {
       'Bordo': '#800000'
     };
     return colors[color] || '#ccc';
+  }
+
+  private getGenderNameById(id: number): string {
+    const genders: any = {
+      1: 'Erkek',
+      2: 'Kadın',
+      3: 'Çocuk'
+    };
+    return genders[id] || 'Unisex';
   }
 }

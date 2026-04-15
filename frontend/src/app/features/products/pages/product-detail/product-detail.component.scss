@@ -21,11 +21,11 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
-    color: #888;
+    color: #999;
 
     a {
       color: #888;
@@ -159,53 +159,31 @@
     top: 120px;
   }
 
-  .product-header {
+  .product-header-elite {
     border-bottom: 1px solid #eee;
     padding-bottom: 30px;
     margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
 
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-
-      .brand-name {
-        font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        color: #888;
-        text-transform: uppercase;
-      }
-
-      .rating-row {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 14px;
-        font-weight: 700;
-
-        span:first-child {
-          color: #ffbc00;
-          font-size: 20px;
-          font-variation-settings: 'FILL' 1;
-        }
-      }
-    }
-
-    .product-name {
-      font-family: var(--font-nav);
-      font-size: 42px;
-      font-weight: 800;
-      line-height: 1.1;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-    }
-
-    .product-subtitle {
-      color: #777;
+    .brand-title-extra {
       font-size: 14px;
       font-weight: 500;
+      color: #888;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-family: var(--font-body);
+      text-transform: capitalize;
+    }
+
+    .product-subtitle-elite {
+      font-size: 28px;
+      font-weight: 800;
+      color: #000;
+      line-height: 1.2;
+      margin: 0;
+      font-family: var(--font-nav);
+      text-transform: none;
     }
   }
 
@@ -216,22 +194,25 @@
     gap: 15px;
 
     .current-price {
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 24px;
+      font-weight: 500;
+      letter-spacing: -0.5px;
     }
 
     .original-price {
-      color: #999;
+      color: #bbb;
       text-decoration: line-through;
-      font-size: 18px;
+      font-size: 16px;
+      font-weight: 400;
     }
 
     .installment-info {
-      font-size: 11px;
-      background: #f0f0f0;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 700;
+      font-size: 10px;
+      color: #888;
+      border: 1px solid #eee;
+      padding: 3px 12px;
+      border-radius: 2px;
+      font-weight: 400;
       margin-left: auto;
     }
   }
@@ -327,12 +308,12 @@
     .add-to-cart-btn {
       flex: 1;
       height: 60px;
-      background: #000;
+      background: #111;
       color: #fff;
       border: none;
-      font-weight: 800;
-      font-size: 15px;
-      letter-spacing: 1px;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.5px;
       display: flex;
       align-items: center;
       justify-content: center;

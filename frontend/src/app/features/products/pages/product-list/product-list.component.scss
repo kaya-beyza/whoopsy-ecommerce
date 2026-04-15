@@ -388,6 +388,7 @@
     /* --- Product Card Refresh --- */
     .product-card {
         transition: transform 0.3s ease;
+        cursor: pointer;
 
         .card-image-wrapper {
             position: relative;
@@ -400,6 +401,7 @@
                 height: 100%;
                 object-fit: contain;
                 transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
             }
 
             .wishlist-btn {
@@ -519,6 +521,9 @@
                 text-transform: uppercase;
                 color: #888;
                 margin-bottom: 5px;
+                cursor: pointer;
+                display: inline-block;
+                &:hover { color: #000; }
             }
 
             .product-title {
@@ -526,6 +531,8 @@
                 font-weight: 600;
                 margin-bottom: 8px;
                 color: #000;
+                cursor: pointer;
+                &:hover { color: var(--color-primary, #666); }
             }
 
             .price-row {
