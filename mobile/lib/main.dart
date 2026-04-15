@@ -7,6 +7,8 @@ import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 import 'package:mobile/features/dashboard/presentation/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
+//*****adb reverse tcp:5277 tcp:5277*****/
+
 final storage = FlutterSecureStorage();
 
 final authLocal = AuthLocalDataSource();

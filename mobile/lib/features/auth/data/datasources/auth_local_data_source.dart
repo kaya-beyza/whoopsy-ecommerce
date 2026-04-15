@@ -11,6 +11,16 @@ class AuthLocalDataSource {
     await storage.write(key: 'accessToken', value: token);
   }
 
+  Future<void> saveUser({
+    required String token,
+    required String name,
+    required String email,
+  }) async {
+    await storage.write(key: 'accessToken', value: token);
+    await storage.write(key: 'name', value: name);
+    await storage.write(key: 'email', value: email);
+  }
+
   Future<String?> getToken() async {
     return await storage.read(key: 'accessToken');
   }
@@ -20,23 +30,37 @@ class AuthLocalDataSource {
   }
 
   Future<void> tryAutoLogin(BuildContext context) async {
-    final token = await getToken();
+    final token = await storage.read(key: 'accessToken');
 
-    if (token != null) {
-      //  JWT DECODE EKLE
-      final decoded = JwtDecoder.decode(token);
+    if (token == null || token.isEmpty) return;
 
-      final name =
-          decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+    final savedName = await storage.read(key: 'name');
+    final savedEmail = await storage.read(key: 'email');
 
-      final email = decoded[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
+    /// 🔥 fallback decode
+    String name = savedName ?? "";
+    String email = savedEmail ?? "";
 
-      context.read<AuthProvider>().login(
-            newToken: token,
-            userName: name,
-            userEmail: email,
-          );
+    if (name.isEmpty || email.isEmpty) {
+      try {
+        final decoded = JwtDecoder.decode(token);
+
+        name = decoded[
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ??
+            "";
+
+        email = decoded[
+                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ??
+            "";
+      } catch (e) {
+        print("DECODE ERROR: $e");
+      }
     }
+
+    context.read<AuthProvider>().login(
+          newToken: token,
+          userName: name,
+          userEmail: email,
+        );
   }
 }

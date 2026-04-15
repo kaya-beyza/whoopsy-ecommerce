@@ -51,9 +51,6 @@ class _LoginPageState extends State<LoginPage> {
 
       print("TOKEN: $token");
 
-      // 🔐 TOKEN SAVE
-      await local.saveToken(token);
-
       // 🔥 JWT DECODE
       final decoded = JwtDecoder.decode(token);
 
@@ -65,6 +62,11 @@ class _LoginPageState extends State<LoginPage> {
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ??
           email;
 
+      await local.saveUser(
+        token: token,
+        name: name,
+        email: emailFromToken,
+      );
       print("NAME: $name");
 
       // 🔥 PROVIDER UPDATE
@@ -75,11 +77,11 @@ class _LoginPageState extends State<LoginPage> {
           );
 
       // 🚀 NAVIGATION
-     Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-      (route) => false,
-    );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()),
+        (route) => false,
+      );
     } catch (e) {
       print("LOGIN ERROR: $e");
 
@@ -153,9 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+                    isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: () {
                     setState(() {

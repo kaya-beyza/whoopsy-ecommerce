@@ -20,15 +20,6 @@ class _MainScreenState extends State<MainScreen> {
   int currentIndex = 0;
 
   @override
-  void initState() {
-    super.initState();
-
-    Future.microtask(() {
-      AuthLocalDataSource().tryAutoLogin(context);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
 
