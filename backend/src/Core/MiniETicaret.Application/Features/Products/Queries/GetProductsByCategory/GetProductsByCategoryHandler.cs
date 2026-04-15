@@ -15,7 +15,7 @@ public class GetProductsByCategoryQueryHandler : IRequestHandler<GetProductsByCa
 
     public async Task<List<ProductDto>> Handle(GetProductsByCategoryQuery request, CancellationToken cancellationToken)
     {
-        var products = await _producRepository.GetByCategoryIdAsync(request.CategoryId, cancellationToken);
+        var products = await _producRepository.GetByCategoryIdAsync(request.CategoryId, cancellationToken, request.Page, request.PageSize);
 
         return products.Select(p => new ProductDto
         {

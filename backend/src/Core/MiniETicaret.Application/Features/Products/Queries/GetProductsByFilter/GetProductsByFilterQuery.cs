@@ -7,5 +7,8 @@ namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByFilter
 public record GetProductsByFilterQuery(
     Gender? Gender = null,
     Brand? Brand = null,
-    Guid? CategoryId = null
+    Guid? CategoryId = null,
+    string? SearchTerm = null,
+    int? Page = 1,
+    int? PageSize = 21
 ) : IRequest<List<ProductDto>>;

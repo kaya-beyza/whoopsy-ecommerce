@@ -4,20 +4,16 @@
     <div class="slides-container">
       @for (slide of slides; track $index) {
       <div class="slide" [class.active]="currentSlide === $index" [class.is-video]="slide.type === 'video'">
-
         <div class="hero-media-wrapper">
           @if (slide.type === 'video') {
-          <video autoplay loop muted playsinline class="hero-main-media">
-            <source [src]="slide.src" type="video/mp4">
-          </video>
+          <video [src]="slide.src" autoplay loop muted playsinline preload="auto" class="hero-main-media"></video>
           } @else {
-          <img [src]="slide.src" [alt]="slide.tag" class="hero-main-media">
+          <img [src]="slide.src" [alt]="slide.title" class="hero-main-media">
           }
         </div>
 
         @if (slide.type === 'video') {
         <div class="hero-content-block">
-          <span class="hero-tag">{{ slide.tag }}</span>
           <h1 class="hero-title" [innerHTML]="slide.title"></h1>
           <p class="hero-desc">{{ slide.desc }}</p>
           <div class="hero-actions">

@@ -16,7 +16,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.HasIndex(c => c.Name)
+        builder.HasIndex(c =>new{c.Name,c.ParentId})
             .IsUnique();
 
         builder.Property(c => c.Description)
@@ -24,6 +24,12 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 
         builder.Property(c => c.IsActive)
             .HasDefaultValue(true);
+
+        //Self-referencing:Kategori => Alt Kategoriler İlişkisi
+        builder.HasOne(c=>c.ParentCategory)
+        .WithMany(c=>c.SubCategories)
+        .HasForeignKey(c=>c.ParentId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(c => c.Products)
             .WithOne(p => p.Category)
