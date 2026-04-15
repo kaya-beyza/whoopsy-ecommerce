@@ -112,6 +112,23 @@
         display: block;
 
         &:hover { color: #000; }
+
+        &.footer-link-with-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .material-symbols-sharp {
+                font-size: 18px;
+                color: #888;
+                font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 20;
+                transition: color 0.3s ease;
+            }
+
+            &:hover .material-symbols-sharp {
+                color: #000;
+            }
+        }
     }
 }
 

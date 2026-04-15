@@ -112,6 +112,7 @@ import { Product, FilterGroup } from '../../models/product.model';
                     <!-- Actual Product Cards -->
                     <ng-container *ngIf="!isLoading()">
                         <div class="product-card" *ngFor="let product of products()"
+                            [routerLink]="['/urunler/detay', product.id]"
                             (mouseleave)="setQuickAddProduct(null)">
 
                             <div class="card-image-wrapper">
@@ -120,16 +121,16 @@ import { Product, FilterGroup } from '../../models/product.model';
                                 <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
                                     }}</span>
 
-                                <button class="wishlist-btn">
+                                <button class="wishlist-btn" (click)="$event.stopPropagation()">
                                     <span class="material-symbols-sharp">favorite</span>
                                 </button>
 
                                 <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                                <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id)">
+                                <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
                                     <span class="material-symbols-sharp">add</span>
                                 </div>
 
-                                <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id">
+                                <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
                                     <p class="quick-add-title">HIZLI EKLE</p>
                                     <div class="sizes-grid">
                                         <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
@@ -442,6 +443,8 @@ import { Product, FilterGroup } from '../../models/product.model';
     }
 
     .product-card {
+        transition: transform 0.3s ease;
+        cursor: pointer;
         .card-image-wrapper {
             position: relative;
             aspect-ratio: 1 / 1.25;
@@ -451,6 +454,7 @@ import { Product, FilterGroup } from '../../models/product.model';
                 width: 100%; height: 100%;
                 object-fit: contain;
                 transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+                cursor: pointer;
             }
             .badge {
                 position: absolute; top: 15px; left: 15px;
@@ -477,8 +481,8 @@ import { Product, FilterGroup } from '../../models/product.model';
         &:hover img { transform: scale(1.05); }
         .card-info {
             padding: 15px 0;
-            .brand-name { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 5px; }
-            .product-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000; }
+            .brand-name { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 5px; cursor: pointer; display: inline-block; &:hover { color: #000; } }
+            .product-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000; cursor: pointer; &:hover { color: #666; } }
             .price-row {
                 .current-price { font-weight: 700; font-size: 15px; &.discounted { color: #e8000d; } }
                 .original-price { font-size: 13px; color: #999; text-decoration: line-through; margin-right: 10px; }
