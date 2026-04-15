@@ -30,46 +30,52 @@ class _SearchPageState extends State<SearchPage> {
   Future<void> _loadInitial() async {
     setState(() => _isLoading = true);
 
-    final data = await _repo.getAllProducts();
+    try {
+      // 🔥 farklı sayfalardan çek
+      final page1 = await _repo.getFilteredProducts(page: 1);
+      final page2 = await _repo.getFilteredProducts(page: 2);
+      final page3 = await _repo.getFilteredProducts(page: 3);
 
-    setState(() {
-      _products = data.take(10).toList(); // öneri
-      _isLoading = false;
-    });
+      final combined = [
+        ...page1,
+        ...page2,
+        ...page3,
+      ];
+
+      combined.shuffle(); // 🔥 karıştır
+
+      setState(() {
+        _products = combined.take(10).toList();
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("INIT ERROR: $e");
+      setState(() => _isLoading = false);
+    }
   }
 
   /// 🔥 SEARCH LOGIC
   Future<void> _search(String query) async {
-    if (query.isEmpty) {
+    if (query.trim().isEmpty) {
       _loadInitial();
       return;
     }
 
     setState(() => _isLoading = true);
 
-    /// 1️⃣ BACKEND BASE DATA (akıllı seçim)
-    List<Product> base = await _repo.getAllProducts();
+    try {
+      final result = await _repo.getFilteredProducts(
+        searchTerm: query.trim(),
+      );
 
-    /// 2️⃣ FRONTEND FILTER
-    final filtered = base.where((p) {
-      final q = query.toLowerCase();
-
-      final name = p.name.toLowerCase();
-      final category = p.name?.toLowerCase() ?? "";
-
-      final brand = _brandToText(p.brand).toLowerCase();
-      final gender = _genderToText(p.gender).toLowerCase();
-
-      return name.contains(q) ||
-          category.contains(q) ||
-          brand.contains(q) ||
-          gender.contains(q);
-    }).toList();
-
-    setState(() {
-      _products = filtered;
-      _isLoading = false;
-    });
+      setState(() {
+        _products = result;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print("SEARCH ERROR: $e");
+      setState(() => _isLoading = false);
+    }
   }
 
   /// 🔥 BRAND TEXT
@@ -145,7 +151,11 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   const SizedBox(width: 10),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () {
+                      FocusScope.of(context).unfocus(); // klavye kapanır
+                      _controller.clear();
+                      _search("");
+                    },
                     child: const Text(
                       "İPTAL ET",
                       style: TextStyle(fontWeight: FontWeight.bold),

@@ -55,6 +55,7 @@ class ProductRemoteDataSource {
     int? gender,
     int? brand,
     String? categoryId,
+    String? searchTerm,
     int page = 1,
     int pageSize = 20,
   }) async {
@@ -62,7 +63,12 @@ class ProductRemoteDataSource {
 
     if (gender != null) query["gender"] = gender.toString();
     if (brand != null) query["brand"] = brand.toString();
-    if (categoryId != null) query["categoryId"] = categoryId;
+    if (categoryId != null && categoryId.isNotEmpty) {
+      query["categoryId"] = categoryId;
+    }
+    if (searchTerm != null && searchTerm.isNotEmpty) {
+      query["searchTerm"] = searchTerm;
+    }
 
     query["page"] = page.toString();
     query["pageSize"] = pageSize.toString();
@@ -79,7 +85,16 @@ class ProductRemoteDataSource {
 
     if (response.statusCode == 200) {
       final decoded = jsonDecode(response.body);
-      return decoded["data"]; // 🔥 önemli
+
+      if (decoded is List) {
+        return decoded;
+      }
+
+      if (decoded is Map<String, dynamic> && decoded.containsKey("data")) {
+        return decoded["data"] as List<dynamic>;
+      }
+
+      throw Exception("Beklenmeyen response formatı");
     } else {
       throw Exception("Filter failed");
     }

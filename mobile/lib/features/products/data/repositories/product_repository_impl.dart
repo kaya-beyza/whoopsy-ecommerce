@@ -44,12 +44,14 @@ class ProductRepositoryImpl implements IProductRepository {
     int? gender,
     int? brand,
     String? categoryId,
+    String? searchTerm,
     int page = 1,
   }) async {
     final jsonList = await remoteDataSource.getFilteredProducts(
       gender: gender,
       brand: brand,
       categoryId: categoryId,
+      searchTerm: searchTerm,
       page: page,
     );
 
