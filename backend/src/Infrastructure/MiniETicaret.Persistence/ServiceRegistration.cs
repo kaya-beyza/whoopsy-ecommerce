@@ -20,6 +20,8 @@ public static class ServiceRegistration
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IFavoriteRepository, FavoriteRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
         return services;
     }
 
