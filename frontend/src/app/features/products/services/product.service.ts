@@ -139,10 +139,12 @@ export class ProductService {
       description: bp.description || 'Whoopsy asaletini yansıtan özel tasarım.',
       price: bp.price || 0,
       stock: bp.stockQuantity || 0,
+      genderId: bp.gender,
+      genderLabel: genderName,
+      category: bp.categoryName || (bp.category?.name) || 'Koleksiyon',
       categoryId: bp.categoryId,
       // Visual Enrichment (Whomopsy Elite Entegrasyon):
       brand: brandName,
-      category: genderName,
       imageUrl: backendImage,
       hoverImageUrl: bp.imageUrls?.[0] || visualPool.hoverImageUrl,
       images: bp.imageUrls || [backendImage],

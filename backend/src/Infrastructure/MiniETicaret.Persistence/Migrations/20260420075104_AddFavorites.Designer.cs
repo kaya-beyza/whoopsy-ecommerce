@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniETicaret.Persistence.Context;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniETicaret.Persistence.Migrations
 {
     [DbContext(typeof(MiniETicaretDbContext))]
-    partial class MiniETicaretDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260420075104_AddFavorites")]
+    partial class AddFavorites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,37 +79,6 @@ namespace MiniETicaret.Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users", (string)null);
-                });
-
-            modelBuilder.Entity("MiniETicaret.Domain.Entities.CartItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("UpdatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId", "ProductId")
-                        .IsUnique();
-
-                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("MiniETicaret.Domain.Entities.Category", b =>
@@ -462,25 +434,6 @@ namespace MiniETicaret.Persistence.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("MiniETicaret.Domain.Entities.CartItem", b =>
-                {
-                    b.HasOne("MiniETicaret.Domain.Entities.Product", "Product")
-                        .WithMany("CartItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MiniETicaret.Domain.Entities.AppUser", "User")
-                        .WithMany("CartItems")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("MiniETicaret.Domain.Entities.Category", b =>
                 {
                     b.HasOne("MiniETicaret.Domain.Entities.Category", "ParentCategory")
@@ -586,8 +539,6 @@ namespace MiniETicaret.Persistence.Migrations
 
             modelBuilder.Entity("MiniETicaret.Domain.Entities.AppUser", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Favorites");
 
                     b.Navigation("Orders");
@@ -611,8 +562,6 @@ namespace MiniETicaret.Persistence.Migrations
 
             modelBuilder.Entity("MiniETicaret.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Favorites");
 
                     b.Navigation("Images");
