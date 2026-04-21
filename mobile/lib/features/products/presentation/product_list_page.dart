@@ -164,12 +164,12 @@ class _ProductListPageState extends State<ProductListPage> {
 
     if (result == null) return;
 
-    // 🔥 1. loading başlat
+    //  1. loading başlat
     setState(() {
       _isLoading = true;
     });
 
-    // 🔥 2. state güncelle
+    //  2. state güncelle
     _selectedGender = result["gender"];
     _selectedBrand = result["brand"];
     _selectedCategoryId = result["categoryId"];
@@ -236,43 +236,97 @@ class ProductCard extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: product.mainImageUrl != null &&
-                      product.mainImageUrl!.isNotEmpty
-                  ? Image.network(
-                      product.mainImageUrl!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    )
-                  : Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🔥 IMAGE + ICONS
+          Expanded(
+            child: Stack(
+              children: [
+                /// IMAGE
+                Positioned.fill(
+                  child: Image.network(
+                    product.mainImageUrl ?? "",
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
                       color: Colors.grey.shade200,
-                      child: const Center(child: Icon(Icons.image)),
+                      child: const Icon(Icons.image_not_supported),
                     ),
+                  ),
+                ),
+
+                Positioned(
+                  right: 4,
+                  bottom: 4,
+                  child: Column(
+                    children: [
+                      /// 🛒 SEPET
+                      _iconButton(
+                        icon: Icons.shopping_bag_outlined,
+                        onTap: () {
+                          print("Sepete eklendi: ${product.name}");
+                        },
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      /// ❤️ FAVORİ
+                      _iconButton(
+                        icon: Icons.favorite_border,
+                        onTap: () {
+                          print("Favoriye eklendi: ${product.name}");
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                product.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
+          ),
+
+          const SizedBox(height: 6),
+
+          /// NAME
+          Text(
+            product.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 13),
+          ),
+
+          const SizedBox(height: 4),
+
+          /// PRICE
+          Text(
+            "${product.price} ₺",
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                "${product.price} ₺",
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 6),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 🔥 TRANSPARENT ICON BUTTON
+  Widget _iconButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.3), // 🔥 transparan
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 18,
+          color: Colors.white,
         ),
       ),
     );

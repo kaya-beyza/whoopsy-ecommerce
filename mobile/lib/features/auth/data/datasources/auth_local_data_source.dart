@@ -37,7 +37,7 @@ class AuthLocalDataSource {
     final savedName = await storage.read(key: 'name');
     final savedEmail = await storage.read(key: 'email');
 
-    /// 🔥 fallback decode
+    ///  fallback decode
     String name = savedName ?? "";
     String email = savedEmail ?? "";
 

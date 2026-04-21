@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
+import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import '../../products/domain/entities/product.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -16,9 +18,10 @@ class ProductDetailPage extends StatefulWidget {
 class _ProductDetailPageState extends State<ProductDetailPage> {
   final PageController _pageController = PageController();
   int currentPage = 0;
-
-  // Şimdilik mock. Sonra ProductImages tablosundan gelecek.
+  String selectedSize = ""; // Başlangıçta hiçbiri seçili değil
   late final List<String> productImages;
+  List<Product> similarProducts = [];
+  bool isLoadingSimilar = true;
 
   // Şimdilik mock. Sonra backend’den gelecek.
   final List<String> sizes = ["XS", "S", "M", "L"];
@@ -33,6 +36,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             if (widget.product.mainImageUrl != null)
               widget.product.mainImageUrl!,
           ];
+    _loadSimilarProducts();
+  }
+
+  Future<void> _loadSimilarProducts() async {
+    try {
+      final repo = ProductRepositoryImpl(ProductRemoteDataSource());
+      final data = await repo.getFilteredProducts(
+        categoryId: widget.product.categoryId,
+        brand: widget.product.brand,
+        gender: widget.product.gender,
+      );
+      setState(() {
+        similarProducts = data
+            .where((p) => p.id != widget.product.id) // listelenen ürünü çıkart.
+            .take(10)
+            .toList();
+
+        isLoadingSimilar = false;
+      });
+    } catch (e) {
+      print("SIMILAR ERROR: $e");
+      setState(() => isLoadingSimilar = false);
+    }
   }
 
   @override
@@ -57,7 +83,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Padding(
-                padding: const EdgeInsets.only(top: 40), // 🔥 ÜST BOŞLUK
+                padding: const EdgeInsets.only(top: 40),
                 child: Stack(
                   children: [
                     PageView.builder(
@@ -159,16 +185,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   Row(
                     children: [
                       const Text(
-                        "Stok: ",
-                        style: TextStyle(fontWeight: FontWeight.w700),
-                      ),
-                      Text("${widget.product.stockQuantity} adet"),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Text(
                         "Ürün Kodu: ",
                         style: TextStyle(fontWeight: FontWeight.w700),
                       ),
@@ -176,7 +192,6 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     ],
                   ),
                   const SizedBox(height: 24),
-
                   if (sizes.isNotEmpty) ...[
                     const Text(
                       "Bedenler",
@@ -190,21 +205,39 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       spacing: 10,
                       runSpacing: 10,
                       children: sizes.map((size) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 12,
+                        final isSelected = selectedSize == size;
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedSize = size;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 18,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              //seçili ise siyah değilse beyaz arkaplan
+                              color: isSelected ? Colors.black : Colors.white,
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: Text(
+                              size,
+                              style: TextStyle(
+                                  color:
+                                      isSelected ? Colors.white : Colors.black,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
                           ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
-                          ),
-                          child: Text(size),
                         );
                       }).toList(),
                     ),
                     const SizedBox(height: 28),
                   ],
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -224,52 +257,62 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 32),
-
+                  const SizedBox(height: 10),
                   const Text(
-                    "Aynı Kategorideki Ürünler",
+                    "Benzer Ürünler",
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 14),
-
-                  // Şimdilik placeholder alan. Sonra categoryId ile çekilecek.
                   SizedBox(
                     height: 260,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: 4,
+                      itemCount: similarProducts.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
-                        return SizedBox(
-                          width: 160,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Image.network(
-                                  "https://picsum.photos/220/320?$index",
-                                  fit: BoxFit.cover,
-                                  width: double.infinity,
+                        final p = similarProducts[index];
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProductDetailPage(product: p),
+                              ),
+                            );
+                          },
+                          child: SizedBox(
+                            width: 160,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Image.network(
+                                    p.mainImageUrl ?? "",
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.image_not_supported),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                "Benzer ürün",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                "1.250,00 TL",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                const SizedBox(height: 8),
+                                Text(
+                                  p.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 4),
+                                Text(
+                                  "${p.price} TL",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },

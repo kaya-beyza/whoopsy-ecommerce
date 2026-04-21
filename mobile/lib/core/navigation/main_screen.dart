@@ -23,7 +23,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
 
-    /// 🔥 SAYFALAR BURADA
+    ///  SAYFALAR BURADA
     final List<Widget> pages = [
       const HomeScreen(),
       const SearchPage(),
@@ -33,13 +33,12 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     return Scaffold(
-      body: pages[currentIndex], // 🔥 BURASI DEĞİŞİYOR
-
+      body: pages[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
           setState(() {
-            currentIndex = index; // 🔥 sadece index değiştir
+            currentIndex = index; //  sadece index değiştir
           });
         },
         type: BottomNavigationBarType.fixed,

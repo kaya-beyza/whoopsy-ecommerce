@@ -26,12 +26,12 @@ class _SearchPageState extends State<SearchPage> {
     _loadInitial();
   }
 
-  /// 🔥 BAŞLANGIÇ → öneriler
+  ///  BAŞLANGIÇ → öneriler
   Future<void> _loadInitial() async {
     setState(() => _isLoading = true);
 
     try {
-      // 🔥 farklı sayfalardan çek
+      //  farklı sayfalardan çek
       final page1 = await _repo.getFilteredProducts(page: 1);
       final page2 = await _repo.getFilteredProducts(page: 2);
       final page3 = await _repo.getFilteredProducts(page: 3);
@@ -42,7 +42,7 @@ class _SearchPageState extends State<SearchPage> {
         ...page3,
       ];
 
-      combined.shuffle(); // 🔥 karıştır
+      combined.shuffle(); //  karıştır
 
       setState(() {
         _products = combined.take(10).toList();
@@ -54,7 +54,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  /// 🔥 SEARCH LOGIC
+  ///  SEARCH LOGIC
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
       _loadInitial();
@@ -78,7 +78,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  /// 🔥 BRAND TEXT
+  ///  BRAND TEXT
   String _brandToText(int? brand) {
     switch (brand) {
       case 1:
@@ -98,7 +98,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  /// 🔥 GENDER TEXT
+  ///  GENDER TEXT
   String _genderToText(int? gender) {
     switch (gender) {
       case 1:
