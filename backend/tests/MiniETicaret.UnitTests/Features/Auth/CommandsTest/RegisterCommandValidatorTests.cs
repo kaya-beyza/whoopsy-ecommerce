@@ -138,7 +138,7 @@ public class RegisterCommandValidatorTests
     }
 
     // ══════════════════════════════════════════
-    // TEST 7: Şifre 6 karakterden kısa ise hata döner
+    // TEST 7: Şifre 8 karakterden kısa ise hata döner
     // ══════════════════════════════════════════
     [Fact]
     public void Validate_PasswordTooShort_ShouldHaveError()
@@ -147,7 +147,7 @@ public class RegisterCommandValidatorTests
         {
             FullName = "Ahmet Yılmaz",
             Email = "ahmet@mail.com",
-            Password = "abc"
+            Password = "Abc1"
         };
 
         var result = _validator.Validate(command);
@@ -155,7 +155,7 @@ public class RegisterCommandValidatorTests
         Assert.False(result.IsValid);
         Assert.Contains(result.Errors,
             e => e.PropertyName == "Password"
-              && e.ErrorMessage == "Şifre en az 6 karakter olmalıdır.");
+              && e.ErrorMessage == "Şifre en az 8 karakter olmalıdır.");
     }
 
     // ══════════════════════════════════════════
@@ -189,7 +189,9 @@ public class RegisterCommandValidatorTests
         {
             FullName = "Ahmet Yılmaz",
             Email = "ahmet@mail.com",
-            Password = "sifre123"
+            Password = "Sifre123",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         var result = _validator.Validate(command);

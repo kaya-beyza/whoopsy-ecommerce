@@ -23,7 +23,9 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Test Kullanıcı",
             Email = "test@example.com",
-            Password = "Test123!"
+            Password = "Test123!",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         // ACT — register endpoint'ine POST at
@@ -44,7 +46,9 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Duplicate User",
             Email = "duplicate@example.com",
-            Password = "Test123!"
+            Password = "Test123!",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         // İlk kayıt — başarılı olmalı
@@ -54,7 +58,7 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/Auth/register", registerRequest);
 
         // ASSERT — 500 dönmeli (email zaten var)
-        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     // ══════════════════════════════════════════
@@ -68,7 +72,9 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Login Test User",
             Email = "logintest@example.com",
-            Password = "Login123!"
+            Password = "Login123!",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
         await _client.PostAsJsonAsync("/api/Auth/register", registerRequest);
 
@@ -98,7 +104,9 @@ public class AuthControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Wrong Pass User",
             Email = "wrongpass@example.com",
-            Password = "Correct123!"
+            Password = "Correct123!",
+            PhoneNumber = "5511234567",
+            BirthDate = new DateTime(1990,1,1) 
         };
         await _client.PostAsJsonAsync("/api/Auth/register", registerRequest);
 
