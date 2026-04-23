@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+// Eğer order.model.ts içinde OrderResponse arayüzü tanımlıysa bu import kalabilir.
 import { OrderResponse } from '../models/order.model';
 
 @Injectable({
@@ -8,25 +9,30 @@ import { OrderResponse } from '../models/order.model';
 })
 export class OrderService {
   private http = inject(HttpClient);
-  private apiUrl = 'https://localhost:5001/api/orders';
+  
+  // DÜZELTME 1: Endpoint adresinin sonuna '/Orders' eklendi.
+  private apiUrl = 'http://localhost:5277/api/Orders';
 
-  // GetOrdersQuery'yi tetikleyecek metod
   getOrders(
     pageIndex: number, 
     pageSize: number, 
     status?: string, 
     startDate?: string, 
     endDate?: string
-  ): Observable<OrderResponse> {
+  ): Observable<any> { // UYARI: Backend direkt veri dönüyorsa <any> yapmak daha güvenlidir
     
+    // DÜZELTME 2: Backend 'page' ve 'size' bekliyor, 'pageIndex' ve 'pageSize' değil.
     let params = new HttpParams()
-      .set('pageIndex', pageIndex.toString())
-      .set('pageSize', pageSize.toString());
+      .set('page', pageIndex.toString())
+      .set('size', pageSize.toString());
 
     if (status) params = params.set('status', status);
+    
+    // Not: Backend controller'ında şu an startDate ve endDate yok. 
+    // Buradan göndersin bile backend bunları şimdilik yok sayacaktır.
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
 
-    return this.http.get<OrderResponse>(this.apiUrl, { params });
+    return this.http.get<any>(this.apiUrl, { params });
   }
 }

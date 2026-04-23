@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { Order } from '../../models/order.model';
 
+
 @Component({
   selector: 'app-order-list',
   standalone: true,
@@ -49,14 +50,24 @@ export class OrderListComponent implements OnInit {
 
     this.orderService.getOrders(this.pageIndex, this.pageSize, this.selectedStatus, this.startDate, this.endDate)
       .subscribe({
-        next: (response) => {
-          this.orders = response.items;
-          this.totalCount = response.totalCount;
-          this.totalPages = Math.ceil(this.totalCount / this.pageSize);
-          // Yükleme efektini (Skeleton) tam görebilmen için çok kısa bir gecikme ekledik
+        next: (response: any) => {
+          // Gelen veriyi konsola yazdırıyoruz (Sorun çıkarsa F12'den bakmak için)
+          console.log("BACKEND'DEN GELEN SİPARİŞ VERİSİ:", response);
+
+          // Backend veriyi 'data' veya 'value' içine sararak gönderiyorsa dışarı çıkar
+          let payload = response;
+          if (response.data) payload = response.data;
+          else if (response.value) payload = response.value;
+
+          // Verileri tablonun değişkenlerine güvenli bir şekilde ata
+          this.orders = payload.items ? payload.items : (Array.isArray(payload) ? payload : []);
+          this.totalCount = payload.totalCount ? payload.totalCount : this.orders.length;
+          this.totalPages = Math.ceil(this.totalCount / this.pageSize) || 1;
+          
           setTimeout(() => this.isLoading = false, 600); 
         },
         error: (err) => {
+          console.error("HATA:", err);
           this.errorMessage = 'Siparişler yüklenirken bir sorun oluştu.';
           this.isLoading = false;
           this.showToast('Sunucu ile bağlantı kurulamadı!', 'error');

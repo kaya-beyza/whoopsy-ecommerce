@@ -51,7 +51,11 @@ export class RegisterComponent {
       this.errorMessage = 'Lütfen zorunlu alanları doldurun.';
       return;
     }
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.errorMessage = 'Geçerli bir email adresi giriniz.';
+      return;
+    }
     if (this.password !== this.confirmPassword) {
       this.errorMessage = 'Şifreler eşleşmiyor.';
       return;
