@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/categories/data/datasources/category_remote_data_source.dart';
+import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/models/product_model.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/filter_page.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
+import 'package:provider/provider.dart';
 
 class ProductListPage extends StatefulWidget {
   final String? categoryId;
@@ -175,7 +177,7 @@ class _ProductListPageState extends State<ProductListPage> {
     _selectedCategoryId = result["categoryId"];
     _hasUserAppliedFilter = true;
 
-    // 🔥 3. fetch et
+    //  3. fetch et
     await _fetchProducts();
   }
 
@@ -227,6 +229,9 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final favService = context.watch<FavoriteService>();
+
+    final isFav = favService.isFavorite(product.id);
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -239,7 +244,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /// 🔥 IMAGE + ICONS
+          ///  IMAGE + ICONS
           Expanded(
             child: Stack(
               children: [
@@ -272,9 +277,15 @@ class ProductCard extends StatelessWidget {
 
                       /// ❤️ FAVORİ
                       _iconButton(
-                        icon: Icons.favorite_border,
-                        onTap: () {
-                          print("Favoriye eklendi: ${product.name}");
+                        icon: isFav ? Icons.favorite : Icons.favorite_border,
+                        onTap: () async {
+                          try {
+                            await context
+                                .read<FavoriteService>()
+                                .toggleFavorite(product.id);
+                          } catch (e) {
+                            print(e);
+                          }
                         },
                       ),
                     ],
@@ -309,7 +320,7 @@ class ProductCard extends StatelessWidget {
     );
   }
 
-  /// 🔥 TRANSPARENT ICON BUTTON
+  ///  TRANSPARENT ICON BUTTON
   Widget _iconButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -320,7 +331,7 @@ class ProductCard extends StatelessWidget {
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3), // 🔥 transparan
+          color: Colors.black.withOpacity(0.3), //  transparan
           shape: BoxShape.circle,
         ),
         child: Icon(

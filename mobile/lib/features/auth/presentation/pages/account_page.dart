@@ -44,6 +44,13 @@ class AccountPage extends StatelessWidget {
                 onPressed: () {
                   context.read<AuthProvider>().logout();
                 },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.black26),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero, // daha düz görünüm
+                  ),
+                ),
                 child: const Text(
                   "OTURUMU KAPAT",
                   style: TextStyle(color: Color.fromARGB(255, 40, 40, 40)),
@@ -59,14 +66,22 @@ class AccountPage extends StatelessWidget {
   }
 
   Widget _buildMenuItem(IconData icon, String title) {
-    return Card(
-      elevation: 2,
-      child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-        onTap: () {},
-      ),
+    return Column(
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Icon(icon, size: 22),
+          title: Text(
+            title,
+            style: const TextStyle(fontSize: 14),
+          ),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+          onTap: () {},
+        ),
+        const Divider(
+          height: 1,
+        )
+      ],
     );
   }
 }

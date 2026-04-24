@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteDataSource {
-   final String baseUrl = "http://localhost:5277/api";
+  final String baseUrl = "http://localhost:5277/api";
 
   Future<String> login(String email, String password) async {
     final response = await http.post(
@@ -14,13 +14,14 @@ class AuthRemoteDataSource {
       }),
     );
 
-    print("LOGIN RESPONSE: ${response.body}");
+    print("LOGIN STATUS: ${response.statusCode}");
+    print("LOGIN BODY: ${response.body}");
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return data['accessToken'];
+      return data['accessToken']; // sadece token
     } else {
-      throw Exception("Login failed: ${response.body}");
+      throw Exception("Login failed");
     }
   }
 

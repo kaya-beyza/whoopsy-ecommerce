@@ -3,6 +3,7 @@ import 'package:mobile/features/products/data/datasources/product_remote_data_so
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
+import 'package:mobile/features/products/presentation/product_list_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -186,39 +187,8 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                       itemCount: _products.length,
                       itemBuilder: (_, i) {
-                        final p = _products[i];
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProductDetailPage(product: p),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  child: Image.network(
-                                    p.mainImageUrl ?? "",
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(6),
-                                  child: Text(
-                                    p.name,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Text("${p.price} ₺"),
-                              ],
-                            ),
-                          ),
+                        return ProductCard(
+                          product: _products[i],
                         );
                       },
                     ),

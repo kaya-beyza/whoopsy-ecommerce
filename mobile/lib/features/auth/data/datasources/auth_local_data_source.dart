@@ -13,10 +13,12 @@ class AuthLocalDataSource {
 
   Future<void> saveUser({
     required String token,
+    required String userId,
     required String name,
     required String email,
   }) async {
     await storage.write(key: 'accessToken', value: token);
+    await storage.write(key: 'userId', value: userId);
     await storage.write(key: 'name', value: name);
     await storage.write(key: 'email', value: email);
   }
@@ -27,6 +29,10 @@ class AuthLocalDataSource {
 
   Future<void> clear() async {
     await storage.deleteAll();
+  }
+
+  Future<String?> getUserId() async {
+    return await storage.read(key: 'userId');
   }
 
   Future<void> tryAutoLogin(BuildContext context) async {

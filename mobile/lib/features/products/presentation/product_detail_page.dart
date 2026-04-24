@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
+import 'package:mobile/features/products/presentation/product_list_page.dart';
+import 'package:provider/provider.dart';
 import '../../products/domain/entities/product.dart';
 
 class ProductDetailPage extends StatefulWidget {
@@ -63,6 +66,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final favService = context.watch<FavoriteService>();
+    final isFav = favService.isFavorite(widget.product.id);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: CustomScrollView(
@@ -133,16 +139,27 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     Positioned(
                       bottom: 20,
                       right: 16,
-                      child: Container(
-                        width: 42,
-                        height: 42,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border,
-                          color: Colors.black,
+                      child: GestureDetector(
+                        onTap: () async {
+                          try {
+                            await context
+                                .read<FavoriteService>()
+                                .toggleFavorite(widget.product.id);
+                          } catch (e) {
+                            print("FAVORITE ERROR: $e");
+                          }
+                        },
+                        child: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                     ),
@@ -273,46 +290,10 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                       itemCount: similarProducts.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 12),
                       itemBuilder: (context, index) {
-                        final p = similarProducts[index];
-
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProductDetailPage(product: p),
-                              ),
-                            );
-                          },
-                          child: SizedBox(
-                            width: 160,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Image.network(
-                                    p.mainImageUrl ?? "",
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    errorBuilder: (_, __, ___) =>
-                                        const Icon(Icons.image_not_supported),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  p.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "${p.price} TL",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
+                        return SizedBox(
+                          width: 160,
+                          child: ProductCard(
+                            product: similarProducts[index],
                           ),
                         );
                       },

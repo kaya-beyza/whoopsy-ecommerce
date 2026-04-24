@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:mobile/core/navigation/main_screen.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:mobile/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
@@ -135,22 +137,49 @@ class _RegisterPageState extends State<RegisterPage> {
                         final remote = AuthRemoteDataSource();
                         final local = AuthLocalDataSource();
 
-                        // 🔥 REGISTER API CALL
-                        final token =
-                            await remote.register(fullName, email, password);
+                        ///  1. REGISTER
+                        await remote.register(fullName, email, password);
 
-                        // 🔐 TOKEN KAYDET
-                        await local.saveToken(token);
+                        ///  2. LOGIN (KRİTİK)
+                        final token = await remote.login(email, password);
 
-                        // 👤 PROVIDER GÜNCELLE
+                        print("REGISTER LOGIN TOKEN: $token");
+
+                        ///  3. JWT DECODE
+                        final decoded = JwtDecoder.decode(token);
+
+                        final userId = decoded[
+                            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
+                        final name = decoded[
+                                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] ??
+                            fullName;
+
+                        final emailFromToken = decoded[
+                                "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ??
+                            email;
+
+                        ///  4. SAVE
+                        await local.saveUser(
+                          token: token,
+                          userId: userId,
+                          name: name,
+                          email: emailFromToken,
+                        );
+
+                        ///  5. PROVIDER
                         context.read<AuthProvider>().login(
                               newToken: token,
-                              userName: fullName,
-                              userEmail: email,
+                              userName: name,
+                              userEmail: emailFromToken,
                             );
 
-                        // 🔄 LOGIN SAYFASINA DÖN / ANA SAYFAYA GEÇ
-                        Navigator.pop(context);
+                        ///  6. ANA SAYFAYA GİT
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (_) => const MainScreen()),
+                          (route) => false,
+                        );
                       } catch (e) {
                         print("REGISTER ERROR: $e");
 

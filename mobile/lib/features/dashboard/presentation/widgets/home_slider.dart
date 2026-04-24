@@ -44,7 +44,7 @@ class _HomeSliderState extends State<HomeSlider> {
     SliderItem(
       imageUrl:
           "https://res.cloudinary.com/dvesxxy8u/image/upload/v1776061051/nhw587cydc7x0kcaq5le.jpg",
-      title: "Ayakkabi",
+      title: "Ayakkabı",
     ),
   ];
 

@@ -46,12 +46,12 @@ class _LoginPageState extends State<LoginPage> {
       final remote = AuthRemoteDataSource();
       final local = AuthLocalDataSource();
 
-      // 🔥 API CALL
+      //  API CALL
       final token = await remote.login(email, password);
 
       print("TOKEN: $token");
 
-      // 🔥 JWT DECODE
+      //  JWT DECODE
       final decoded = JwtDecoder.decode(token);
 
       final name = decoded[
@@ -61,9 +61,12 @@ class _LoginPageState extends State<LoginPage> {
       final emailFromToken = decoded[
               "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ??
           email;
+      final userId = decoded[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
 
       await local.saveUser(
         token: token,
+        userId: userId,
         name: name,
         email: emailFromToken,
       );
