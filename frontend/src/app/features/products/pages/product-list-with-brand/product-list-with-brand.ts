@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product, FilterGroup } from '../../models/product.model';
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-product-list-with-brand',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   template: `
     <div class="shop-container" [class.filter-open]="isFilterVisible()">
         <!-- Top Breadcrumb: Elegant Top-Left -->
@@ -31,7 +32,7 @@ import { Product, FilterGroup } from '../../models/product.model';
                     <span>{{ isFilterVisible() ? 'Filtreleri Gizle' : 'Filtreleri Göster' }}</span>
                 </button>
                 <div class="v-divider"></div>
-                <span class="product-count">{{ products().length }} Ürün Listeleniyor</span>
+                <span class="product-count">{{ totalCount() }} Ürün Listeleniyor</span>
             </div>
 
             <!-- Dynamic Filter Chips -->
@@ -111,52 +112,13 @@ import { Product, FilterGroup } from '../../models/product.model';
 
                     <!-- Actual Product Cards -->
                     <ng-container *ngIf="!isLoading()">
-                        <div class="product-card" *ngFor="let product of products()"
-                            [routerLink]="['/urunler/detay', product.id]"
-                            (mouseleave)="setQuickAddProduct(null)">
-
-                            <div class="card-image-wrapper">
-                                <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
-                                <span class="badge new" *ngIf="product.isNew">YENİ</span>
-                                <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
-                                    }}</span>
-
-                                <button class="wishlist-btn" (click)="$event.stopPropagation()">
-                                    <span class="material-symbols-sharp">favorite</span>
-                                </button>
-
-                                <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                                <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
-                                    <span class="material-symbols-sharp">add</span>
-                                </div>
-
-                                <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
-                                    <p class="quick-add-title">HIZLI EKLE</p>
-                                    <div class="sizes-grid">
-                                        <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
-                                            class="size-btn">
-                                            {{ size }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card-info">
-                                <p class="brand-name">{{ product.brand }}</p>
-                                <h3 class="product-title">{{ product.name }}</h3>
-                                <div class="price-row">
-                                    <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice |
-                                        number:'1.0-0' }} TL</span>
-                                    <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price
-                                        |
-                                        number:'1.0-0' }} TL</span>
-                                </div>
-                            </div>
-                        </div>
+                      @for (product of products(); track product.id) {
+                        <app-product-card [product]="product" />
+                      }
                     </ng-container>
                 </div>
 
-                <!-- Whomopsy Elite Paging: Load More Button 🏛️ -->
+                <!-- Load More Implementation -->
                 <div class="load-more-container" *ngIf="hasMore() && !isLoading()">
                     <button class="load-more-btn" [class.loading]="isMoreLoading()" (click)="loadMore()" [disabled]="isMoreLoading()">
                         <span class="btn-text">{{ isMoreLoading() ? 'YÜKLENİYOR...' : 'DAHA FAZLA KEŞFET' }}</span>
@@ -456,14 +418,29 @@ import { Product, FilterGroup } from '../../models/product.model';
                 transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
                 cursor: pointer;
             }
+            .badge-container {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
+                z-index: 10;
+            }
             .badge {
-                position: absolute; top: 15px; left: 15px;
-                font-size: 9px; font-weight: 800; padding: 5px 10px;
-                border-radius: 2px; letter-spacing: 1px; z-index: 10;
+                font-family: var(--font-nav);
+                font-size: 10px;
+                font-weight: 800;
+                padding: 4px 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                border-radius: 1px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             }
             .bestseller { background: #000; color: #fff; }
-            .new { background: #fff; color: #000; border: 1px solid #eee; }
-            .discount { background: #ff3b30; color: #fff; }
+            .new { background: #fff; color: #000; border: 1px solid #f0f0f0; }
+            .discount { background: var(--color-primary, #e8000d); color: #fff; }
 
             .wishlist-btn {
                 position: absolute; top: 15px; right: 15px;
@@ -497,7 +474,7 @@ import { Product, FilterGroup } from '../../models/product.model';
       .skeleton-text.long { width: 80%; }
     }
 
-    /* Whomopsy Elite Paging: Load More Aesthetics 🏛️ */
+    /* Load More Styling */
     .load-more-container {
         display: flex;
         justify-content: center;
@@ -575,8 +552,9 @@ export class ProductListWithBrandComponent implements OnInit {
   isLoading = signal(true);
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
+  totalCount = signal(0);
 
-  // Whomopsy Elite Paging Ritimleri 🏛️
+  // Pagination state management
   currentPage = signal(1);
   pageSize = 21;
   hasMore = signal(true);
@@ -588,7 +566,7 @@ export class ProductListWithBrandComponent implements OnInit {
   // Filters
   selectedFilters = signal<{ group: string, option: string }[]>([]);
 
-  // Whomopsy asaletindeki dinamik filtre grupları
+  // Dynamic sidebar filter configuration
   filterGroups = signal<FilterGroup[]>([
     {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
@@ -596,7 +574,7 @@ export class ProductListWithBrandComponent implements OnInit {
     },
     {
       name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Backend'den dinamik akacak 🏛️
+      options: [] // Loaded dynamically from backend
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
@@ -673,14 +651,13 @@ export class ProductListWithBrandComponent implements OnInit {
 
     const filterParams = this.getUnifiedFilterParams();
 
-    // Marka bazlı sayfada her zaman en azından marka filtresi vardır 🏛️
+    // Initial data fetch for the selected brand
     this.productService.getProductsByFilter(filterParams.gender, brand, filterParams.categoryId, undefined, 1, this.pageSize).subscribe({
       next: (data) => {
-        this.products.set(data);
+        this.products.set(data.items);
+        this.totalCount.set(data.totalCount);
         this.isLoading.set(false);
-        if (data.length < this.pageSize) {
-            this.hasMore.set(false);
-        }
+        this.hasMore.set(data.items.length < data.totalCount);
       },
       error: () => this.isLoading.set(false)
     });
@@ -688,7 +665,7 @@ export class ProductListWithBrandComponent implements OnInit {
   }
 
   /**
-   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 Marka Ürünü) Whosepsy standartlarında çeker.
+   * Fetches the next set of items for the current brand.
    */
   loadMore(): void {
     if (this.isMoreLoading() || !this.hasMore()) return;
@@ -699,19 +676,18 @@ export class ProductListWithBrandComponent implements OnInit {
     const filterParams = this.getUnifiedFilterParams();
 
     this.productService.getProductsByFilter(filterParams.gender, currentBrand, filterParams.categoryId, undefined, nextPage, this.pageSize).subscribe({
-        next: (newData) => {
-            if (newData.length > 0) {
-                this.products.update(prev => [...prev, ...newData]);
+        next: (responseData) => {
+            if (responseData.items.length > 0) {
+                this.products.update(prev => [...prev, ...responseData.items]);
+                this.totalCount.set(responseData.totalCount);
                 this.currentPage.set(nextPage);
-                if (newData.length < this.pageSize) {
-                    this.hasMore.set(false);
-                }
+                this.hasMore.set(this.products().length < responseData.totalCount);
             } else {
                 this.hasMore.set(false);
             }
             this.isMoreLoading.set(false);
         },
-        error: (err) => {
+        error: (err: any) => {
             console.error('Daha fazla marka ürünü yüklenirken hata:', err);
             this.isMoreLoading.set(false);
         }
@@ -746,7 +722,7 @@ export class ProductListWithBrandComponent implements OnInit {
       this.selectedFilters.set(current.filter((_, i) => i !== index));
     }
     this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Filtre değişince deryayı tazele 🏛️
+    this.loadProducts(this.brandName()); // Refresh products based on new filters
   }
 
   private readonly sizeSets = {
@@ -810,13 +786,13 @@ export class ProductListWithBrandComponent implements OnInit {
     const current = this.selectedFilters();
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Filtre kalkınca deryayı tazele 🏛️
+    this.loadProducts(this.brandName()); // Refresh products after filter removal
   }
 
   clearFilters(): void {
     this.selectedFilters.set([{ group: 'Marka', option: this.brandName() }]);
     this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Deryayı aslına döndür 🏛️
+    this.loadProducts(this.brandName()); // Reset to default brand products
   }
 
   isSelected(groupName: string, option: string): boolean {

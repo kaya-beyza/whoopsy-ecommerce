@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { inject } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -33,6 +35,8 @@ export class RegisterComponent {
     private router: Router,
     private authService: AuthService
   ) { }
+
+  private notificationService = inject(NotificationService);
 
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent): void {
@@ -72,7 +76,7 @@ export class RegisterComponent {
       address: this.address
     };
 
-    console.log('Whoopsy Kayıt Verisi:', registerData);
+    console.log('Register Data:', registerData);
 
     this.authService.register(registerData).subscribe({
       next: (response) => {
@@ -85,5 +89,16 @@ export class RegisterComponent {
         this.errorMessage = err.error?.message || 'Kayıt sırasında bir hata oluştu.';
       }
     });
+  }
+
+  onSocialLogin(provider: string): void {
+    this.notificationService.show(`${provider} servisi üzerinden işlem başlatılıyor...`, 'info');
+    
+    setTimeout(() => {
+      // Simulate social registration session activation
+      this.authService.setSession('social-demo-token', 'social-refresh-token');
+      this.notificationService.show(`${provider} ile hesap oluşturuldu ve giriş yapıldı!`, 'success');
+      this.router.navigate(['/']);
+    }, 2000);
   }
 }

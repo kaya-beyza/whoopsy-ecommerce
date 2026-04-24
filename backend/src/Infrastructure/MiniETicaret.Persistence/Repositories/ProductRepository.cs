@@ -15,18 +15,21 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<List<Product>> GetAllAsync(CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetAllAsync(CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.AsQueryable();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         if (page.HasValue && pageSize.HasValue)
         {
             query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
 
-        return await query
+        var items = await query
           .Include(p => p.Images)
           .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
     public async Task<Product?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -54,18 +57,21 @@ public class ProductRepository : IProductRepository
             await _context.SaveChangesAsync(cancellationToken);
         }
     }
-    public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.Where(p => p.CategoryId == categoryId);
+        var totalCount = await query.CountAsync(cancellationToken);
 
         if (page.HasValue && pageSize.HasValue)
         {
             query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
 
-        return await query
+        var items = await query
             .Include(p => p.Images)
             .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
 
@@ -101,7 +107,7 @@ public class ProductRepository : IProductRepository
             .OrderBy(i => i.DisplayOrder)
             .ToListAsync(cancellationToken);
     }
-    public async Task<List<Product>> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.AsQueryable();
 
@@ -111,30 +117,37 @@ public class ProductRepository : IProductRepository
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId.Value);
 
+        var totalCount = await query.CountAsync(cancellationToken);
+
         if (page.HasValue && pageSize.HasValue)
         {
             query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
 
-        return await query
+        var items = await query
                         .Include(p => p.Images)
                         .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
-    public async Task<List<Product>> GetByBrandAsync(Brand brand, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByBrandAsync(Brand brand, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.Where(p => p.Brand == brand);
+        var totalCount = await query.CountAsync(cancellationToken);
 
         if (page.HasValue && pageSize.HasValue)
         {
             query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
 
-        return await query
+        var items = await query
             .Include(p => p.Images)
             .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
 
-    public async Task<List<Product>> GetByFilterAsync(Gender? gender, Brand? brand, Guid? categoryId, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(Gender? gender, Brand? brand, Guid? categoryId, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.AsQueryable();
 
@@ -145,7 +158,15 @@ public class ProductRepository : IProductRepository
             query = query.Where(p => p.Brand == brand.Value);
 
         if (categoryId.HasValue)
-            query = query.Where(p => p.CategoryId == categoryId.Value);
+        {
+            // Whomopsy Elite Hierarchy: Alt kategorileri de deryaya dahil ediyoruz 🏛️
+            var categoryIds = await _context.Categories
+                .Where(c => c.Id == categoryId.Value || c.ParentId == categoryId.Value)
+                .Select(c => c.Id)
+                .ToListAsync(cancellationToken);
+
+            query = query.Where(p => categoryIds.Contains(p.CategoryId));
+        }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
@@ -154,14 +175,18 @@ public class ProductRepository : IProductRepository
                                     (p.Description != null && p.Description.ToLower().Contains(lowerSearch)));
         }
 
+        var totalCount = await query.CountAsync(cancellationToken);
+
         if (page.HasValue && pageSize.HasValue)
         {
             query = query.Skip((page.Value - 1) * pageSize.Value).Take(pageSize.Value);
         }
 
-        return await query
+        var items = await query
                     .Include(p => p.Images)
                     .ToListAsync(cancellationToken);
+
+        return (items, totalCount);
     }
     public async Task<bool> SetMainImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken)
     {

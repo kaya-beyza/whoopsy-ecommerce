@@ -3,7 +3,7 @@
   <section class="hero-slider">
     <div class="slides-container">
       @for (slide of slides; track $index) {
-      <div class="slide" [class.active]="currentSlide === $index" [class.is-video]="slide.type === 'video'">
+      <div class="slide" [class.active]="currentSlide() === $index" [class.is-video]="slide.type === 'video'">
         <div class="hero-media-wrapper">
           @if (slide.type === 'video') {
           <video [src]="slide.src" autoplay loop muted playsinline preload="auto" class="hero-main-media"></video>
@@ -30,7 +30,7 @@
 
     <div class="slider-dots">
       @for (slide of slides; track $index) {
-      <span class="dot" [class.active]="currentSlide === $index" (click)="setSlide($index)"></span>
+      <span class="dot" [class.active]="currentSlide() === $index" (click)="setSlide($index)"></span>
       }
     </div>
   </section>
@@ -58,6 +58,34 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="handpicked-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Senin İçin Seçtiklerimiz</h2>
+        <a routerLink="/urunler" class="explore-link">→ Tümünü Keşfet</a>
+      </div>
+
+      <!-- Loading Skeletons -->
+      @if (isLoading()) {
+      <div class="product-grid">
+        @for (i of [1,2,3,4]; track $index) {
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text short"></div>
+          <div class="skeleton-text long"></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="product-grid">
+        @for (product of featuredProducts(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+      }
     </div>
   </section>
 

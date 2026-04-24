@@ -21,7 +21,8 @@ public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, Lis
         {
             Id = x.Id,
             Name = x.Name,
-            Description = x.Description
+            Description = x.Description,
+            ParentId = x.ParentId
         }).ToList();
     }
 }

@@ -77,11 +77,11 @@
                 </div>
 
                 <div class="social-login">
-                    <button type="button" class="google-btn">
+                    <button type="button" class="google-btn" (click)="onSocialLogin('Google')">
                         <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google Logo">
                         Google ile Devam Et
                     </button>
-                    <button type="button" class="apple-btn">
+                    <button type="button" class="apple-btn" (click)="onSocialLogin('Apple')">
                         <span class="material-icons">apple</span>
                         Apple ile Devam Et
                     </button>
@@ -92,11 +92,6 @@
                 <span>Henüz hesabınız yok mu?</span>
                 <a routerLink="/register" class="signup-link">KAYIT OL</a>
             </footer>
-
-            <div class="dev-hint">
-                <span class="material-symbols-sharp">info</span>
-                Test: admin@admin.com / admin123
-            </div>
         </div>
     </div>
 </div>

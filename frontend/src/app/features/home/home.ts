@@ -1,30 +1,30 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductService } from '../products/services/product.service';
 import { Product } from '../products/models/product.model';
-import { OnDestroy } from '@angular/core';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })
 export class Home implements OnInit, OnDestroy {
   private productService = inject(ProductService);
   
-  currentSlide = 0;
+  currentSlide = signal(0);
+  isTransitioning = signal(false);
   private autoSlideInterval: any;
   featuredProducts = signal<Product[]>([]);
   isLoading = signal(true);
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        // En öncelikli 8 ürünü vitrine çıkartıyoruz
-        this.featuredProducts.set(products.slice(0, 8));
+    this.productService.getProducts(1, 8).subscribe({
+      next: (data) => {
+        this.featuredProducts.set(data.items);
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
@@ -41,12 +41,13 @@ export class Home implements OnInit, OnDestroy {
     this.stopAutoSlide(); // Ensure no duplicates
     this.autoSlideInterval = setInterval(() => {
       this.nextSlide();
-    }, 5000); // Whomopsy asaletinde 5 saniyelik geçiş
+    }, 5000); // 5 second banner transition
   }
 
   stopAutoSlide() {
     if (this.autoSlideInterval) {
       clearInterval(this.autoSlideInterval);
+      this.autoSlideInterval = null;
     }
   }
 
@@ -65,8 +66,8 @@ export class Home implements OnInit, OnDestroy {
       type: 'image',
       src: '/assets/images/hero-1.jpg',
       tag: 'NEW ERA',
-      title: 'Asalet<br>Sokakta',
-      desc: 'Whomopsy ile özgürlüğünü keşfet.',
+      title: 'Modern<br>Zerafet',
+      desc: 'Discover your freedom.',
       link: '/urunler'
     },
     {
@@ -75,7 +76,7 @@ export class Home implements OnInit, OnDestroy {
       src: '/assets/images/cat-man.jpg',
       tag: 'URBAN CORE',
       title: 'Sokağın<br>Ritmi',
-      desc: 'Yeni sezon erkek koleksiyonu Whomopsy tesciliyle yayında.',
+      desc: 'New season collections now live.',
       link: '/urunler/kategori/019d53b6-10cf-78cd-97f1-99f5330f56db'
     },
     {
@@ -84,7 +85,7 @@ export class Home implements OnInit, OnDestroy {
       src: '/assets/images/cat-woman.jpg',
       tag: 'ESSENTIALS',
       title: 'İkonik<br>Çizgi',
-      desc: 'Tarzını Whomopsy aksesuarlarının gücüyle tamamla.',
+      desc: 'Complete your style with premium accessories.',
       link: '/urunler/kategori/019d433e-9c19-771a-aee0-08812c0b5562'
     },
     {
@@ -92,22 +93,35 @@ export class Home implements OnInit, OnDestroy {
       type: 'image',
       src: '/assets/images/cat-child.jpg',
       tag: 'TINY STEPS',
-      title: 'Minik<br>Asalet',
-      desc: 'Çocuklar için Whomopsy şıklığı her dikişte hissedilir.',
+      title: 'Çocuk<br>Dünyası',
+      desc: 'Quality and style for the next generation.',
       link: '/urunler/kategori/019d53b6-4407-71e7-9b93-958477fe69d1'
     }
   ];
 
   nextSlide() {
-    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+    if (this.isTransitioning()) return;
+    this.moveSlide((this.currentSlide() + 1) % this.slides.length);
   }
 
   prevSlide() {
-    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+    if (this.isTransitioning()) return;
+    this.moveSlide((this.currentSlide() - 1 + this.slides.length) % this.slides.length);
   }
 
   setSlide(index: number) {
-    this.currentSlide = index;
-    this.startAutoSlide(); // Reset timer on manual click
+    if (this.isTransitioning() || this.currentSlide() === index) return;
+    this.moveSlide(index);
+  }
+
+  private moveSlide(index: number) {
+    this.isTransitioning.set(true);
+    this.currentSlide.set(index);
+    this.startAutoSlide(); // Reset timer on any movement
+
+    // Synchronize with CSS transition duration (0.8s)
+    setTimeout(() => {
+      this.isTransitioning.set(false);
+    }, 800);
   }
 }

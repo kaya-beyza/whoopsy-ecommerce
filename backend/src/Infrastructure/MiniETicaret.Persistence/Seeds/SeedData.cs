@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
       public static async Task SeedAsync(MiniETicaretDbContext context)
       {
+          await OrganizeCategoriesAsync(context);
+
           if (await context.Roles.AnyAsync())
               return;
 
@@ -31,7 +33,35 @@ using Microsoft.EntityFrameworkCore;
               CreatedDate = DateTime.UtcNow
           };
 
-          await context.Roles.AddRangeAsync(adminRole, userRole);
+          await context.SaveChangesAsync();
+      }
+
+      private static async Task OrganizeCategoriesAsync(MiniETicaretDbContext context)
+      {
+          var allCategories = await context.Categories.ToListAsync();
+          
+          var giyim = allCategories.FirstOrDefault(c => c.Name == "Giyim");
+          var ayakkabi = allCategories.FirstOrDefault(c => c.Name == "Ayakkabi");
+          var aksesuar = allCategories.FirstOrDefault(c => c.Name == "Aksesuar");
+
+          if (giyim == null || ayakkabi == null || aksesuar == null) return;
+
+          // 🛡️ Whomopsy Elite: Giyim Alt Kategorileri
+          var giyimSubs = new[] { "Pantolon", "Tayt", "Esofman Ustu", "Etek", "Esofman Alti", "Ceket", "Mont", "Sweatshirt", "Sort", "Esofman Takimi", "Hoodie", "T-Shirt", "Elbise", "Forma" };
+          
+          // 🛡️ Whomopsy Elite: Ayakkabı Alt Kategorileri
+          var ayakkabiSubs = new[] { "Bot", "Babet", "Sneaker", "Sandalet" };
+
+          // 🛡️ Whomopsy Elite: Aksesuar Alt Kategorileri
+          var aksesuarSubs = new[] { "Bere", "Suluk", "Canta", "Sapka", "Basketbol Topu" };
+
+          foreach (var cat in allCategories)
+          {
+              if (giyimSubs.Contains(cat.Name)) cat.ParentId = giyim.Id;
+              else if (ayakkabiSubs.Contains(cat.Name)) cat.ParentId = ayakkabi.Id;
+              else if (aksesuarSubs.Contains(cat.Name)) cat.ParentId = aksesuar.Id;
+          }
+
           await context.SaveChangesAsync();
       }
   }

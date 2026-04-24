@@ -1,14 +1,14 @@
 <nav class="navbar" (mouseleave)="onLeave()">
   <ul class="nav-list">
-    @for (cat of categories; track cat.id) {
+    @for (cat of mainCategories(); track cat.id) {
     <li class="nav-item" [class.highlight]="cat.highlight" [class.active]="activeCategory() === cat.id"
-      (mouseenter)="onEnter(cat.id)">
+      (mouseenter)="onEnter(cat.id)" (mouseleave)="onLeave()">
       <a class="nav-link" [routerLink]="['/urunler/kategori', cat.id]">
         {{ cat.label }}
       </a>
 
       @if (activeCategory() === cat.id) {
-      <app-mega-menu [categoryId]="cat.id" />
+      <app-mega-menu [categoryId]="cat.id" [subCategories]="getSubCategories(cat.id)" />
       }
     </li>
     }
