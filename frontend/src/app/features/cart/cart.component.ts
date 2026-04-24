@@ -1,6 +1,7 @@
 import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../products/services/product.service'; 
+import { Router } from '@angular/router';
+import { ProductService } from '../products/services/product.service';
 import { Product } from '../products/models/product.model';
 
 interface CartItem {
@@ -26,6 +27,7 @@ export class CartComponent implements OnInit { // OnInit eklendi
   
   // Servisi içeri aktarıyoruz
   private productService = inject(ProductService);
+  private router = inject(Router);
 
   cartItems = signal<CartItem[]>([]);
 
@@ -62,6 +64,13 @@ export class CartComponent implements OnInit { // OnInit eklendi
 
   removeItem(id: string) {
     this.cartItems.update(items => items.filter(item => item.id !== id));
+  }
+
+  goToCheckout() {
+    if (this.cartItems().length === 0) return;
+    this.router.navigate(['/checkout'], {
+      state: { cartItems: this.cartItems(), total: this.total() }
+    });
   }
 
   addRecommendedToCart(product: Product) {

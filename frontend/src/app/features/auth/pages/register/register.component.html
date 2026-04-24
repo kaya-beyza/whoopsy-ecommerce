@@ -107,17 +107,17 @@
                     <label>CİNSİYET</label>
                     <div class="gender-selection">
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Erkek">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="0">
                             <span class="radio-custom"></span>
                             Erkek
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Kadın">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="1">
                             <span class="radio-custom"></span>
                             Kadın
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Belirtmek istemiyorum">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="2">
                             <span class="radio-custom"></span>
                             Belirtmek istemiyorum
                         </label>
