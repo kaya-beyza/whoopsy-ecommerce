@@ -178,10 +178,10 @@
               <td class="fw-600">{{ order.totalAmount }} ₺</td>
               <td>
                 <select class="status-dropdown" [ngClass]="order.status === 'İptal Edildi' ? 'status-danger' : 'status-normal'" (change)="updateStatus(order.id, $event)">
-                  <option value="Bekliyor" [selected]="order.status === 'Bekliyor'">⏳ Bekliyor</option>
-                  <option value="Hazırlanıyor" [selected]="order.status === 'Hazırlanıyor'">📦 Hazırlanıyor</option>
-                  <option value="Kargolandı" [selected]="order.status === 'Kargolandı'">🚚 Kargolandı</option>
-                  <option value="Teslim Edildi" [selected]="order.status === 'Teslim Edildi'">✅ Teslim Edildi</option>
+                  <option value="Bekliyor" [selected]="order.status === 'Bekliyor'">Bekliyor</option>
+                  <option value="Hazırlanıyor" [selected]="order.status === 'Hazırlanıyor'">Hazırlanıyor</option>
+                  <option value="Kargolandı" [selected]="order.status === 'Kargolandı'">Kargolandı</option>
+                  <option value="Teslim Edildi" [selected]="order.status === 'Teslim Edildi'">Teslim Edildi</option>
                 </select>
               </td>
               <td>

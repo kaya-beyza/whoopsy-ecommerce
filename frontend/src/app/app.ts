@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Header } from './shared/layout/header/header';
+import { NotificationComponent } from './shared/components/notification/notification';
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, NotificationComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

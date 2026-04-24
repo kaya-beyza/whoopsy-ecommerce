@@ -7,7 +7,7 @@
         </ng-container>
     </div>
 
-    <!-- Main Header: Centered & Bold -->
+    <!-- Main Header: Centered and Bold -->
     <header class="shop-header">
         <h1 class="category-name">{{ pageTitle() }}</h1>
     </header>
@@ -20,7 +20,7 @@
                 <span>{{ isFilterVisible() ? 'Filtreleri Gizle' : 'Filtreleri Göster' }}</span>
             </button>
             <div class="v-divider"></div>
-            <span class="product-count">{{ products().length }} Ürün Listeleniyor</span>
+            <span class="product-count">{{ totalCount() }} Ürün Listeleniyor</span>
         </div>
 
         <!-- Dynamic Filter Chips -->
@@ -100,52 +100,13 @@
 
                 <!-- Actual Product Cards -->
                 <ng-container *ngIf="!isLoading()">
-                    <div class="product-card" *ngFor="let product of products()"
-                        [routerLink]="['/urunler/detay', product.id]"
-                        (mouseleave)="setQuickAddProduct(null)">
-
-                        <div class="card-image-wrapper">
-                            <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
-                            <span class="badge new" *ngIf="product.isNew">YENİ</span>
-                            <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
-                                }}</span>
-
-                            <button class="wishlist-btn" (click)="$event.stopPropagation()">
-                                <span class="material-symbols-sharp">favorite</span>
-                            </button>
-
-                            <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                            <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
-                                <span class="material-symbols-sharp">add</span>
-                            </div>
-
-                            <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
-                                <p class="quick-add-title">HIZLI EKLE</p>
-                                <div class="sizes-grid">
-                                    <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
-                                        class="size-btn">
-                                        {{ size }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-info">
-                            <p class="brand-name">{{ product.brand }}</p>
-                            <h3 class="product-title">{{ product.name }}</h3>
-                            <div class="price-row">
-                                <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice |
-                                    number:'1.0-0' }} TL</span>
-                                <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price
-                                    |
-                                    number:'1.0-0' }} TL</span>
-                            </div>
-                        </div>
-                    </div>
+                  @for (product of products(); track product.id) {
+                    <app-product-card [product]="product" />
+                  }
                 </ng-container>
             </div>
 
-            <!-- Whomopsy Elite Paging: Load More Button 🏛️ -->
+            <!-- Load More Implementation -->
             <div class="load-more-container" *ngIf="hasMore() && !isLoading()">
                 <button class="load-more-btn" [class.loading]="isMoreLoading()" (click)="loadMore()" [disabled]="isMoreLoading()">
                     <span class="btn-text">{{ isMoreLoading() ? 'YÜKLENİYOR...' : 'DAHA FAZLA KEŞFET' }}</span>

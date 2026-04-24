@@ -4,11 +4,12 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product, FilterGroup } from '../../models/product.model';
 import { switchMap } from 'rxjs';
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-product-list-with-categoryid',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './product-list-with-categoryid.component.html',
   styleUrl: './product-list-with-categoryid.component.scss'
 })
@@ -20,6 +21,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
   isLoading = signal(true);
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
+  totalCount = signal(0);
 
   // Paging Ritimleri
   currentPage = signal(1);
@@ -62,10 +64,10 @@ export class ProductListWithCategoryidComponent implements OnInit {
 
   updateHeader(): void {
     const genderFilters = this.selectedFilters().filter(f => f.group === 'Cinsiyet');
-    const baseName = this.baseCategoryName().toUpperCase();
+    const baseName = this.baseCategoryName().toLocaleUpperCase('tr-TR');
 
-    if (genderFilters.length === 1 && genderFilters[0].option.toUpperCase() !== baseName) {
-      this.pageTitle.set(`${genderFilters[0].option.toUpperCase()} ${baseName}`);
+    if (genderFilters.length === 1 && genderFilters[0].option.toLocaleUpperCase('tr-TR') !== baseName) {
+      this.pageTitle.set(`${genderFilters[0].option.toLocaleUpperCase('tr-TR')} ${baseName}`);
     } else {
       this.pageTitle.set(baseName);
     }
@@ -75,7 +77,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
     const id = this.route.snapshot.params['id'];
     this.selectedFilters.set([]);
     
-    // Kategori özelinde varsayılan cinsiyet filtresini geri yükle 🏛️
+    // Restore default gender filter for specific categories based on GUID
     if (id === '019d433e-9c19-771a-aee0-08812c0b5562') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Kadın' }]);
     else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Erkek' }]);
     else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') this.selectedFilters.set([{ group: 'Cinsiyet', option: 'Çocuk' }]);
@@ -158,7 +160,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
     this.filterGroups.set(updated);
   }
 
-  // Whomopsy asaletindeki dinamik filtre grupları
+  // Dynamic filter groups for the sidebar
   filterGroups = signal<FilterGroup[]>([
     {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
@@ -166,7 +168,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
     },
     {
       name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Backend'den dinamik akacak 🏛️
+      options: [] // Loaded dynamically from API
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
@@ -187,48 +189,77 @@ export class ProductListWithCategoryidComponent implements OnInit {
   ]);
 
   ngOnInit(): void {
-    this.loadCategories();
-    this.route.params.pipe(
-      switchMap(params => {
-        const id = params['id'];
-        this.isLoading.set(true);
+    // Resolve current category and title based on route parameters and metadata
+    this.productService.getCategories().subscribe(categories => {
+      this.route.params.pipe(
+        switchMap(params => {
+          const id = params['id'];
+          this.isLoading.set(true);
+  
+          // 1. Özel Gender GUID'lerini Tanıma
+          let label = '';
+          let displayLabel = '';
+  
+          if (id === '019d433e-9c19-771a-aee0-08812c0b5562') {
+            label = 'KADIN';
+            displayLabel = 'Kadın';
+          } else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') {
+            label = 'ERKEK';
+            displayLabel = 'Erkek';
+          } else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') {
+            label = 'ÇOCUK';
+            displayLabel = 'Çocuk';
+          }
+  
+          // If not a pre-defined gender ID, search within the fetched categories
+          if (!label) {
+            const foundCat = categories.find(c => c.id === id);
+            if (foundCat) {
+              label = foundCat.name.toLocaleUpperCase('tr-TR');
+              displayLabel = foundCat.name;
+            } else {
+              label = 'KOLEKSİYON';
+              displayLabel = 'Koleksiyon';
+            }
+          }
+  
+          this.baseCategoryName.set(label);
+          this.breadcrumbItems.set(['Anasayfa', 'Koleksiyon', displayLabel]);
+          this.pageTitle.set(`TÜM ${label} ÜRÜNLERİ`);
+  
+          if (displayLabel === 'Kadın' || displayLabel === 'Erkek' || displayLabel === 'Çocuk') {
+            this.selectedFilters.set([{ group: 'Cinsiyet', option: displayLabel }]);
+            this.pageTitle.set(`${label} KOLEKSİYONU`);
+          } else {
+            this.selectedFilters.set([]);
+          }
+  
+          this.updateHeader();
 
-        let label = 'AYAKKABI';
-        let displayLabel = '';
-
-        if (id === '019d433e-9c19-771a-aee0-08812c0b5562') {
-          label = 'KADIN';
-          displayLabel = 'Kadın';
-        } else if (id === '019d53b6-10cf-78cd-97f1-99f5330f56db') {
-          label = 'ERKEK';
-          displayLabel = 'Erkek';
-        } else if (id === '019d53b6-4407-71e7-9b93-958477fe69d1') {
-          label = 'ÇOCUK';
-          displayLabel = 'Çocuk';
-        }
-
-        this.baseCategoryName.set(label);
-        this.breadcrumbItems.set(['Anasayfa', 'Koleksiyon', displayLabel || 'Ayakkabı']);
-
-        if (displayLabel) {
-          this.selectedFilters.set([{ group: 'Cinsiyet', option: displayLabel }]);
-        }
-
-        this.updateHeader();
-        
-        // Whomopsy Elite Router Alignment: Anasayfadan gelen o özel GUID'leri saptıyoruz 🏛️
-        const isGenderId = (id === '019d433e-9c19-771a-aee0-08812c0b5562' || 
-                           id === '019d53b6-10cf-78cd-97f1-99f5330f56db' || 
-                           id === '019d53b6-4407-71e7-9b93-958477fe69d1');
-
-        if (isGenderId) {
-            this.loadProducts(undefined, id); // Category ID yok, sadece özel Gender GUID var.
-        } else {
-            this.loadProducts(id); // Gerçek bir kategori GUID'i var.
-        }
-        return [];
-      })
-    ).subscribe();
+          // Update category filter options in the sidebar
+          const categoryNames = categories.map(c => c.name);
+          const updatedGroups = this.filterGroups().map(g => {
+              if (g.key === 'category') {
+                  return { ...g, options: categoryNames };
+              }
+              return g;
+          });
+          this.filterGroups.set(updatedGroups);
+          
+          // Align routing state with hierarchical filtering requirements
+          const isGenderId = (id === '019d433e-9c19-771a-aee0-08812c0b5562' || 
+                             id === '019d53b6-10cf-78cd-97f1-99f5330f56db' || 
+                             id === '019d53b6-4407-71e7-9b93-958477fe69d1');
+  
+          if (isGenderId) {
+              this.loadProducts(undefined, id);
+          } else {
+              this.loadProducts(id);
+          }
+          return [];
+        })
+      ).subscribe();
+    });
   }
 
   loadProducts(categoryId?: string, specialGenderId?: string): void {
@@ -238,7 +269,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
 
     const filterParams = this.getUnifiedFilterParams();
     
-    // Eğer anasayfadan gelen özel bir cinsiyet GUID'i varsa onu Gender paramına eşliyoruz 🏛️
+    // Map gender GUIDs to the numeric Gender filter for the API call
     let gender = filterParams.gender;
     if (specialGenderId === '019d433e-9c19-771a-aee0-08812c0b5562') gender = 2; // Kadın
     else if (specialGenderId === '019d53b6-10cf-78cd-97f1-99f5330f56db') gender = 1; // Erkek
@@ -246,18 +277,17 @@ export class ProductListWithCategoryidComponent implements OnInit {
 
     this.productService.getProductsByFilter(gender, filterParams.brand, categoryId, undefined, 1, this.pageSize).subscribe({
       next: (data) => {
-        this.products.set(data);
+        this.products.set(data.items);
+        this.totalCount.set(data.totalCount);
         this.isLoading.set(false);
-        if (data.length < this.pageSize) {
-            this.hasMore.set(false);
-        }
+        this.hasMore.set(data.items.length < data.totalCount);
       },
       error: () => this.isLoading.set(false)
     });
   }
 
   /**
-   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 Kategori Ürünü) Whosepsy standartlarında çeker.
+   * Fetches the next page of products based on current category and active filters.
    */
   loadMore(): void {
     if (this.isMoreLoading() || !this.hasMore()) return;
@@ -267,7 +297,7 @@ export class ProductListWithCategoryidComponent implements OnInit {
     const id = this.route.snapshot.params['id'];
     const filterParams = this.getUnifiedFilterParams();
     
-    // Whomopsy Elite Paging: Aynı özel Gender GUID mantığını burada da mühürlüyoruz 🏛️
+    // Apply the same gender GUID mapping for hierarchical pagination
     const isGenderId = (id === '019d433e-9c19-771a-aee0-08812c0b5562' || 
                        id === '019d53b6-10cf-78cd-97f1-99f5330f56db' || 
                        id === '019d53b6-4407-71e7-9b93-958477fe69d1');
@@ -283,19 +313,18 @@ export class ProductListWithCategoryidComponent implements OnInit {
     }
 
     this.productService.getProductsByFilter(gender, filterParams.brand, finalCategoryId, undefined, nextPage, this.pageSize).subscribe({
-        next: (newData) => {
-            if (newData.length > 0) {
-                this.products.update(prev => [...prev, ...newData]);
+        next: (responseData) => {
+            if (responseData.items.length > 0) {
+                this.products.update(prev => [...prev, ...responseData.items]);
+                this.totalCount.set(responseData.totalCount);
                 this.currentPage.set(nextPage);
-                if (newData.length < this.pageSize) {
-                    this.hasMore.set(false);
-                }
+                this.hasMore.set(this.products().length < responseData.totalCount);
             } else {
                 this.hasMore.set(false);
             }
             this.isMoreLoading.set(false);
         },
-        error: (err) => {
+        error: (err: any) => {
             console.error('Daha fazla kategori ürünü yüklenirken hata:', err);
             this.isMoreLoading.set(false);
         }

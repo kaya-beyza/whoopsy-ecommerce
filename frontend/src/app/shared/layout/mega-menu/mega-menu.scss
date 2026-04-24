@@ -1,165 +1,185 @@
-@use "../../../../styles/variables" as v;
-
-.mega-menu-full-width {
+.mega-menu-elite {
   position: absolute;
-  top: 100%;
-  left: calc(-1 * (100vw - 100%) / 2);
-  width: 100vw;
-
-  /* Görsel Ayarlar */
-  background: #ffffff;
-  border-bottom: 1px solid #eeeeee;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
-  z-index: 9999;
-
-  /* Animasyon (Slide Down) */
-  animation: megaSlideDown 0.3s cubic-bezier(0.2, 1, 0.2, 1);
+  top: calc(100% - 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  
+  // Enhanced layout architecture for modern navigation
+  width: max-content;
+  min-width: 750px;
+  max-width: 950px;
+  
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.12);
+  
+  z-index: 1000;
+  padding: 30px;
   overflow: hidden;
+  
+  animation: boutiqueSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   transform-origin: top;
-}
 
-@keyframes megaSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-    max-height: 0;
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    max-height: 800px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50px; 
+    left: -100px;
+    right: -100px;
+    height: 50px;
+    background: transparent;
+    z-index: -1;
   }
 }
 
-.mega-container {
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  padding: 50px 4%;
-  gap: 80px;
+@keyframes boutiqueSlideIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-15px) scale(0.98); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
 }
 
-.mega-columns {
+.mega-content-wrapper {
   display: flex;
-  flex: 1;
   gap: 60px;
 }
 
-.mega-col {
+// ── LINKS COLUMN ──────────────────────────
+.mega-links-column {
   flex: 1;
+  min-width: 320px;
 
-  .col-title {
-    font-family: var(--font-nav);
-    font-size: 14px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #000;
-    margin-bottom: 24px;
-    letter-spacing: 0.8px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 10px;
+  .column-header {
+    margin-bottom: 25px;
+    
+    .column-tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .column-title {
+      font-family: var(--font-nav);
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      letter-spacing: -0.5px;
+    }
   }
-}
 
-.col-links {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 30px;
+  }
 
-  li a.mega-item-link {
-    font-family: var(--font-body);
-    font-size: 14px;
-    color: #666;
-    text-decoration: none;
-    transition: all 0.2s ease;
+  .mega-link {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    text-decoration: none;
+    padding: 10px 0;
+    color: #666;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+
+    .link-label {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .link-count {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 6px;
+      background: #f7f7f7;
+      border-radius: 4px;
+      color: #aaa;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: all 0.3s;
+    }
 
     &:hover {
       color: #000;
       padding-left: 5px;
-    }
-
-    .hot-badge {
-      background: var(--color-primary);
-      color: white;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 2px;
-      text-transform: uppercase;
-    }
-  }
-}
-
-/* --- SAĞ: Promo Fotoğraf Alanı --- */
-.mega-promo {
-  width: 420px;
-  flex-shrink: 0;
-
-  .promo-box {
-    position: relative;
-    width: 100%;
-    height: 320px;
-    background: #f8f8f8;
-    overflow: hidden;
-
-    img.promo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s ease;
-    }
-
-    &:hover img.promo-img {
-      transform: scale(1.05);
-    }
-  }
-
-  .promo-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 30px;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-    color: white;
-
-    .promo-tag {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      margin-bottom: 6px;
-      display: block;
-    }
-
-    .promo-title {
-      font-family: var(--font-nav);
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1.1;
-      margin-bottom: 15px;
-      text-transform: uppercase;
-    }
-
-    .promo-btn {
-      display: inline-block;
-      padding: 12px 28px;
-      background: white;
-      color: black;
-      font-weight: 700;
-      font-size: 12px;
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: all 0.2s;
-
-      &:hover {
-        background: var(--color-primary);
-        color: white;
+      
+      .link-count {
+        opacity: 1;
+        transform: translateX(0);
       }
     }
   }
 }
+
+// ── FEATURED SECTION ──────────────────────
+.mega-featured-section {
+  flex: 0 0 320px;
+
+  .featured-card {
+    position: relative;
+    height: 100%;
+    min-height: 250px;
+    background: #f8f8f8;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 30px;
+    display: flex;
+    align-items: flex-end;
+    background-image: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+
+    .card-content {
+      position: relative;
+      z-index: 2;
+
+      .feat-tag {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        color: #888;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .feat-title {
+        font-family: var(--font-nav);
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 12px;
+        color: #000;
+      }
+
+      .feat-desc {
+        font-size: 13px;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .feat-link {
+        font-size: 11px;
+        font-weight: 700;
+        color: #000;
+        text-decoration: none;
+        letter-spacing: 1px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 4px;
+        transition: all 0.3s;
+
+        &:hover {
+          color: var(--color-primary);
+          border-color: var(--color-primary);
+          padding-left: 10px;
+        }
+      }
+    }
+  }
+}

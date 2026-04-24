@@ -2,10 +2,11 @@ using System.Security.Cryptography.X509Certificates;
 using MediatR;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Application.DTOs;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProducts;
 
-public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<ProductDto>>
+public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, PagedResultDto<ProductDto>>
 {
     private readonly IProductRepository _productRepository;
 
@@ -14,11 +15,11 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<Pr
         _productRepository = productRepository;
     }
 
-    public async Task<List<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResultDto<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetAllAsync(cancellationToken, request.Page, request.PageSize);
+        var (products, totalCount) = await _productRepository.GetAllAsync(cancellationToken, request.Page, request.PageSize);
 
-        return products.Select(p => new ProductDto
+        var items = products.Select(p => new ProductDto
         {
             Id = p.Id,
             Name = p.Name,
@@ -31,7 +32,8 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, List<Pr
             Brand = p.Brand,
             MainImageUrl = p.Images?.FirstOrDefault(i => i.IsMain)?.Url,
             ImageUrls = p.Images?.Select(i => i.Url).ToList() ?? new()
-            //kontrol edeceğim tekrar
         }).ToList();
+
+        return new PagedResultDto<ProductDto>(items, totalCount, request.Page, request.PageSize);
     }
 }
