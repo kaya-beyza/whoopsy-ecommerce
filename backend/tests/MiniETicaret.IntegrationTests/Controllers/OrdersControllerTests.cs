@@ -23,7 +23,9 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Test User",
             Email = email,
-            Password = "Test123!"
+            Password = "Test123!",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
         var registerResponse = await _client.PostAsJsonAsync("/api/Auth/register", register);
         var registerBody = await registerResponse.Content.ReadAsStringAsync();
@@ -61,7 +63,9 @@ public class OrdersControllerTests : IClassFixture<CustomWebApplicationFactory>
             Description = "Test açıklama",
             Price = 100.00m,
             StockQuantity = 50,
-            CategoryId = categoryId
+            CategoryId = categoryId,
+            Gender = 0,  // Unisex
+            Brand = 1    // Adidas
         };
         var prodResponse = await _client.PostAsJsonAsync("/api/Products", product);
         var prodBody = await prodResponse.Content.ReadAsStringAsync();

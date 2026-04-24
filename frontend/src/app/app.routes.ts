@@ -12,17 +12,14 @@ export const routes: Routes = [
     component: LoginComponent
   },
 
-
-
-  // 2. KULLANICILAR SAYFASI
+  // 2. KAYIT SAYFASI (Layout Dışında - Sade Sayfa)
   {
     path: 'register',
     component: RegisterComponent
   },
 
-  // 2. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
+  // 3. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
   {
-
     path: '',
     component: MainLayoutComponent,
     children: [
@@ -43,39 +40,36 @@ export const routes: Routes = [
       // ── SİPARİŞLER ──
       {
         path: 'orders',
+        // canActivate: [authGuard],
         loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
       },
 
-      // ── ÜRÜNLER (Product List) ──
+      // ── ÜRÜNLER LİSTESİ ──
       {
         path: 'urunler',
         loadChildren: () => import('./features/products/products.routes').then(m => m.routes)
+      },
+
+      // ── ÜRÜN EKLEME SAYFASI (Senin dalından geldi) ──
+      {
+        path: 'products/create',
+        // canActivate: [authGuard], 
+        loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
+      },
+
+      // ── SEPET SAYFASI (Senin dalından geldi) ──
+      {
+        path: 'cart',
+        // canActivate: [authGuard], 
+        loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
       }
     ]
   },
 
-  // 3. HATALI ROTA KONTROLÜ
+  // 4. HATALI ROTA KONTROLÜ (Bilinmeyen bir URL girilirse anasayfaya atar)
   {
     path: '**',
     redirectTo: '',
-    pathMatch: 'full',
-    // canActivate: [authGuard],
-    loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
-  },
-
-  // 4. YENİ EKLENEN: ÜRÜN EKLEME SAYFASI
-  {
-    path: 'products/create',
-    // İleride giriş yapmayanların ürün eklemesini engellemek için burayı da açabilirsin:
-    // canActivate: [authGuard], 
-    loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
-  },
-
-  // VARSAYILAN YÖNLENDİRME (En altta kalmalı)
-  {
-    path: '',
-    redirectTo: 'login',
     pathMatch: 'full'
-
   }
 ];

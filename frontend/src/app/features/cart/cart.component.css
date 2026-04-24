@@ -1,0 +1,367 @@
+/* --- BU BİLEŞENİN KAPSADIĞI TÜM EKRANI ZORLA BEYAZ YAPAR --- */
+:host {
+  display: block;
+  background-color: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Genel Konteyner */
+.cart-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #000;
+}
+
+/* Başlık */
+.cart-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 40px;
+  text-transform: uppercase;
+}
+
+/* Düzen: Sol ürünler, sağ özet (Grid) */
+.cart-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 60px;
+}
+
+/* --- ÜRÜN LİSTESİ (SOL TARAF) --- */
+.cart-item {
+  display: flex;
+  gap: 20px;
+  padding-bottom: 30px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e5e5e5; /* İnce Gri Çizgi */
+}
+
+.item-image-wrapper {
+  width: 140px;
+  height: 190px;
+  flex-shrink: 0;
+  background-color: #f5f5f5; /* Hafif Gri Arka Plan Görsel İçin */
+}
+
+.item-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.item-header h2 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+}
+
+.btn-remove {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.btn-remove:hover {
+  color: #000;
+}
+
+.item-meta {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 15px 0;
+}
+
+.item-price {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 auto 0;
+}
+
+/* Miktar Butonları */
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e5e5; /* İnce Gri Çizgi */
+  width: fit-content;
+  margin-top: 15px;
+}
+
+.quantity-controls button {
+  background: none;
+  border: none;
+  width: 35px;
+  height: 35px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #000;
+}
+
+.quantity-controls button:hover {
+  background-color: #f5f5f5;
+}
+
+.quantity-controls span {
+  width: 30px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* --- SİPARİŞ ÖZETİ (SAĞ TARAF) --- */
+.cart-summary-section {
+  position: relative;
+}
+
+.summary-card {
+  position: sticky; /* Sayfa kaydıkça özet kartı ekranda kalır */
+  top: 40px;
+  background: #fff;
+  padding: 30px;
+  border: 1px solid #e5e5e5; /* İnce Gri Çizgi */
+}
+
+.summary-card h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 25px 0;
+  text-transform: uppercase;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  font-size: 14px;
+  color: #333;
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: #000; /* Kalın Siyah Çizgi */
+  margin: 20px 0;
+}
+
+.total-row {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+}
+
+.btn-checkout {
+  width: 100%;
+  background-color: #000; /* Tam Siyah */
+  color: #fff; /* Tam Beyaz Metin */
+  border: none;
+  padding: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-top: 25px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+
+.btn-checkout:hover {
+  background-color: #333;
+}
+
+.summary-note {
+  font-size: 11px;
+  color: #999;
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* --- BOŞ SEPET --- */
+.empty-cart {
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.empty-cart h2 {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.empty-cart p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.btn-continue {
+  background-color: transparent;
+  color: #000;
+  border: 1px solid #000; /* Siyah Çerçeve */
+  padding: 15px 40px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-continue:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+/* SEPET İÇİN MOBİL UYUMLULUK */
+@media (max-width: 900px) {
+  .cart-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 500px) {
+  .cart-item {
+    gap: 15px;
+  }
+  
+  .item-image-wrapper {
+    width: 100px;
+    height: 140px;
+  }
+}
+
+/* --- YENİ: ÖNERİLEN ÜRÜNLER BÖLÜMÜ --- */
+.recommendations-section {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.recommendations-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Dinamik ve Kompakt Grid Yapısı */
+.recommendations-grid {
+  display: grid;
+  /* Kartları minimum 180px, maksimum sığabildiği kadar ayarlar */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  justify-content: center;
+}
+
+.rec-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  max-width: 240px; /* Kartın devasa olmasını engelleyen kritik satır */
+  margin: 0 auto;   /* Kartı kendi hücresinde ortalar */
+  width: 100%;
+}
+
+.rec-image {
+  position: relative;
+  width: 100%;
+  height: 260px; /* Görseller için sabit, şık bir yükseklik */
+  background-color: #f5f5f5;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.rec-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.rec-card:hover .rec-image img {
+  transform: scale(1.05);
+}
+
+/* Hızlı Sepete Ekle Butonu */
+.btn-quick-add {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transform: translateY(100%);
+  transition: transform 0.3s ease, background-color 0.2s, color 0.2s;
+}
+
+.rec-card:hover .btn-quick-add {
+  transform: translateY(0);
+}
+
+.btn-quick-add:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.rec-info {
+  text-align: left;
+}
+
+.rec-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rec-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+/* ÖNERİLEN ÜRÜNLER İÇİN MOBİL UYUMLULUK */
+@media (max-width: 900px) {
+  .recommendations-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .rec-image {
+    height: 220px;
+  }
+
+  .btn-quick-add {
+    transform: translateY(0);
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+}

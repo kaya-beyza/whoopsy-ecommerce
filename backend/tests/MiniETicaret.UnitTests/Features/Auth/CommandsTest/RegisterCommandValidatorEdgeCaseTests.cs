@@ -21,7 +21,9 @@ public class RegisterCommandValidatorEdgeCaseTests
         {
             FullName = "Al",
             Email = "al@mail.com",
-            Password = "sifre123"
+            Password = "Sifre123",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         var result = _validator.Validate(command);
@@ -60,7 +62,9 @@ public class RegisterCommandValidatorEdgeCaseTests
         {
             FullName = new string('A', 100),  // tam 100 karakter
             Email = "ahmet@mail.com",
-            Password = "sifre123"
+            Password = "Sifre123",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         var result = _validator.Validate(command);
@@ -78,7 +82,9 @@ public class RegisterCommandValidatorEdgeCaseTests
         {
             FullName = "Ahmet Yılmaz",
             Email = "ahmet@mail.com",
-            Password = new string('x', 50)  // tam 50 karakter
+            Password = "A" + new string('a', 48) + "1",  // tam 50 karakter (1 büyük + 48 küçük + 1 rakam)
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         var result = _validator.Validate(command);
@@ -87,16 +93,18 @@ public class RegisterCommandValidatorEdgeCaseTests
     }
 
     // ══════════════════════════════════════════
-    // TEST 5: Şifre tam 6 karakter — alt sınır, geçmeli
+    // TEST 5: Şifre tam 8 karakter — alt sınır, geçmeli
     // ══════════════════════════════════════════
     [Fact]
-    public void Validate_PasswordExactly6Chars_ShouldPass()
+    public void Validate_PasswordExactly8Chars_ShouldPass()
     {
         var command = new RegisterCommand
         {
             FullName = "Ahmet Yılmaz",
             Email = "ahmet@mail.com",
-            Password = "abc123"  // tam 6 karakter
+            Password = "Abcdef12",  // tam 8 karakter (1 büyük + 5 küçük + 2 rakam)
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
 
         var result = _validator.Validate(command);
