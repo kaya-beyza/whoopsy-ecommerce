@@ -1,0 +1,153 @@
+@use '../../../../../styles/variables' as *;
+
+.result-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: #fafafa;
+}
+
+.result-card {
+  background: #ffffff;
+  border: 1px solid #eeeeee;
+  border-radius: 20px;
+  padding: 64px 48px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+}
+
+.icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.check-circle,
+.cross-circle {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.check-circle {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+.cross-circle {
+  background: #fdecea;
+  color: #b71c1c;
+}
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: #0f0f0f;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.meta {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: left;
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #efefef;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #888;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .value {
+      color: #0f0f0f;
+      font-weight: 500;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  width: 100%;
+  padding: 18px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+
+  &.primary {
+    background: #000;
+    color: #fff;
+
+    &:hover {
+      background: #222;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  &.ghost {
+    background: transparent;
+    color: #0f0f0f;
+    border: 1px solid #dcdcdc;
+
+    &:hover {
+      border-color: #0f0f0f;
+      background: #fafafa;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .result-card {
+    padding: 40px 24px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+}
