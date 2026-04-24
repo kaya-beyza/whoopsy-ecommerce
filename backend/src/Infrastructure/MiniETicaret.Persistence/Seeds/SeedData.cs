@@ -33,6 +33,7 @@ using Microsoft.EntityFrameworkCore;
               CreatedDate = DateTime.UtcNow
           };
 
+          await context.Roles.AddRangeAsync(adminRole, userRole);
           await context.SaveChangesAsync();
       }
 
