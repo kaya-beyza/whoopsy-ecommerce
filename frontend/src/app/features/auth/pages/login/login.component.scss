@@ -138,7 +138,7 @@
   background: #ffffff;
   overflow-y: auto; 
   
-  /* --- Elite Scrollbar (Whoopsy Standard) --- */
+  /* --- Custom Scrollbar Styling --- */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -157,20 +157,20 @@
   .login-container {
     width: 100%;
     max-width: 460px;
-    margin: auto; // Smart centering: fits? center. overflows? start.
-    padding: 60px 80px; 
-  }
-
-  .form-header {
-    text-align: center;
-    margin-bottom: 35px; // Standardized spacing
-
-    .logo-main {
-      display: flex; // Görünürlüğü garanti et
-      justify-content: center;
-      margin-bottom: 35px;
-      opacity: 1 !important;
-    }
+        margin: auto;
+        padding: 60px 80px; 
+      }
+    
+      .form-header {
+        text-align: center;
+        margin-bottom: 35px;
+    
+        .logo-main {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 35px;
+          opacity: 1 !important;
+        }
 
     .header-titles {
       margin-top: 20px;
@@ -252,9 +252,9 @@
         }
 
         &:focus {
-          border-color: var(--color-primary); // Whoopsy Kırmızısı
+          border-color: var(--color-primary); /* Primary brand color */
           background: #fff;
-          box-shadow: 0 5px 20px rgba(181, 0, 0, 0.05); // Hafif marka rüzgarı
+          box-shadow: 0 5px 20px rgba(181, 0, 0, 0.05); /* Subtle brand shadow */
           .input-icon { color: var(--color-primary); }
         }
       }
@@ -282,6 +282,35 @@
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     }
   }
+
+  /* --- Error Message Presentation Styling --- */
+  .error-msg {
+    margin-top: 25px;
+    padding: 14px 20px;
+    background: rgba(220, 38, 38, 0.05);
+    border: 1px solid rgba(220, 38, 38, 0.1);
+    border-radius: 12px;
+    color: var(--color-primary);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+
+    .material-symbols-sharp {
+      font-size: 18px;
+      font-variation-settings: 'wght' 300;
+    }
+  }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
 /* --- Social --- */

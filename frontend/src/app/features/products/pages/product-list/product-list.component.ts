@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product, FilterGroup } from '../../models/product.model';
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
@@ -20,14 +21,15 @@ export class ProductListComponent implements OnInit {
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
   searchTerm = signal<string | undefined>(undefined);
+  totalCount = signal(0);
 
-  // Whomopsy Elite Paging Ritimleri 🏛️
+  // Pagination state management
   currentPage = signal(1);
   pageSize = 21;
   hasMore = signal(true);
   isMoreLoading = signal(false);
   
-  // Whomopsy Category Mapping: İsimlerden GUID'lere Whosepsy asaletinde köprü kurar. 🏛️
+  // Category mapping: translates display names to unique GUIDs
   private categoryMap = new Map<string, string>();
 
   // Dinamik Başlık ve Breadcrumb
@@ -49,7 +51,7 @@ export class ProductListComponent implements OnInit {
 
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Whomopsy deryasını filtreye göre canlandır 🏛️
+    this.loadProducts(); // Refresh view based on selected filters
   }
 
   removeFilter(filter: { group: string, option: string }): void {
@@ -57,7 +59,7 @@ export class ProductListComponent implements OnInit {
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Whomopsy deryasını sadeleştir 🏛️
+    this.loadProducts(); // Re-load products after filter removal
   }
 
   updateHeader(): void {
@@ -76,7 +78,7 @@ export class ProductListComponent implements OnInit {
     this.selectedFilters.set([]);
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Deryayı aslına döndür 🏛️
+    this.loadProducts(); // Reset to default product list
   }
 
   isSelected(groupName: string, option: string): boolean {
@@ -154,7 +156,7 @@ export class ProductListComponent implements OnInit {
     this.filterGroups.set(updated);
   }
 
-  // Whomopsy asaletindeki dinamik filtre grupları
+  // Dynamic sidebar filter configuration
   filterGroups = signal<FilterGroup[]>([
     {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
@@ -162,7 +164,7 @@ export class ProductListComponent implements OnInit {
     },
     {
       name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Backend'den dinamik akacak 🏛️
+      options: [] // Loaded dynamically from backend
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
@@ -187,7 +189,7 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     
-    // Whomopsy Route Listener: URL deryasındaki arama ve cinsiyet kilitlerini Whosepsy asaletinde dinler 🏛️
+    // Route Listener: updates state based on search query or gender parameters
     this.route.queryParams.subscribe(params => {
       const query = params['search'];
       const gender = params['gender'];
@@ -238,11 +240,10 @@ export class ProductListComponent implements OnInit {
 
     productStream.subscribe({
       next: (data) => {
-        this.products.set(data);
+        this.products.set(data.items);
+        this.totalCount.set(data.totalCount);
         this.isLoading.set(false);
-        if (data.length < this.pageSize) {
-            this.hasMore.set(false);
-        }
+        this.hasMore.set(data.items.length < data.totalCount);
       },
       error: (err) => {
         console.error('Ürünler yüklenirken hata oluştu:', err);
@@ -252,7 +253,7 @@ export class ProductListComponent implements OnInit {
   }
 
   /**
-   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 ürün) Whosepsy standartlarında çeker.
+   * Fetches the next set of items while maintaining current filter state.
    */
   loadMore(): void {
     if (this.isMoreLoading() || !this.hasMore()) return;
@@ -266,19 +267,18 @@ export class ProductListComponent implements OnInit {
         : this.productService.getProducts(nextPage, this.pageSize);
 
     productStream.subscribe({
-        next: (newData) => {
-            if (newData.length > 0) {
-                this.products.update(prev => [...prev, ...newData]);
+        next: (responseData) => {
+            if (responseData.items.length > 0) {
+                this.products.update(prev => [...prev, ...responseData.items]);
+                this.totalCount.set(responseData.totalCount);
                 this.currentPage.set(nextPage);
-                if (newData.length < this.pageSize) {
-                    this.hasMore.set(false);
-                }
+                this.hasMore.set(this.products().length < responseData.totalCount);
             } else {
                 this.hasMore.set(false);
             }
             this.isMoreLoading.set(false);
         },
-        error: (err) => {
+        error: (err: any) => {
             console.error('Daha fazla ürün yüklenirken hata:', err);
             this.isMoreLoading.set(false);
         }
@@ -298,7 +298,7 @@ export class ProductListComponent implements OnInit {
 
     const brand = selected.find(f => f.group === 'Marka')?.option;
     
-    // Kategori mapping: Seçilen isim Whosepsy GUID'ine tercüme edilir. 🏛️
+    // Category mapping: translate label to identifier for API consumption
     const categoryName = selected.find(f => f.group === 'Ürün Grubu')?.option;
     const categoryId = categoryName ? this.categoryMap.get(categoryName) : undefined;
 

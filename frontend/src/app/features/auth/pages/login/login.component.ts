@@ -4,7 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TokenService } from '../../../../core/services/token.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { LoginRequest } from '../../../../core/models/auth.model';
+import { inject } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -27,6 +29,8 @@ export class LoginComponent {
     private router: Router
   ) { }
 
+  private notificationService = inject(NotificationService);
+
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent): void {
     const x = (e.clientX / window.innerWidth) * 100;
@@ -48,7 +52,7 @@ export class LoginComponent {
 
     // ───── TEST LOGIN ─────
     if (this.email === 'admin@admin.com' && this.password === 'admin123') {
-      this.tokenService.setTokens('fake-test-token', 'fake-refresh-token');
+      this.authService.setSession('fake-test-token', 'fake-refresh-token');
       this.router.navigate(['/']);
       return;
     }
@@ -68,8 +72,19 @@ export class LoginComponent {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.Message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.';
+        this.errorMessage = err.error?.Message || 'E-posta veya şifre hatalı.';
       }
     });
+  }
+
+  onSocialLogin(provider: string): void {
+    this.notificationService.show(`${provider} servisi ile güvenli bağlantı kuruluyor...`, 'info');
+    
+    setTimeout(() => {
+      // Simulate social login session activation
+      this.authService.setSession('social-demo-token', 'social-refresh-token');
+      this.notificationService.show(`${provider} hesabı ile giriş başarılı! Hoş geldin.`, 'success');
+      this.router.navigate(['/']);
+    }, 1800);
   }
 }

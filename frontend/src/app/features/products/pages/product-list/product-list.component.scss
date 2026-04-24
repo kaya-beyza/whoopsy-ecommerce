@@ -404,6 +404,44 @@
                 cursor: pointer;
             }
 
+            .badge-container {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
+                z-index: 10;
+            }
+
+            .badge {
+                font-family: var(--font-nav);
+                font-size: 10px;
+                font-weight: 800;
+                padding: 4px 10px;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+                border-radius: 1px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+                &.bestseller {
+                    background: #000;
+                    color: #fff;
+                }
+
+                &.new {
+                    background: #fff;
+                    color: #000;
+                    border: 1px solid #f0f0f0;
+                }
+
+                &.discount {
+                    background: var(--color-primary, #e8000d);
+                    color: #fff;
+                }
+            }
+
             .wishlist-btn {
                 position: absolute;
                 top: 15px;
@@ -585,7 +623,7 @@
     }
 }
 
-/* Whomopsy Elite Paging: Load More Aesthetics 🏛️ */
+/* Load More Aesthetics */
 .load-more-container {
     display: flex;
     justify-content: center;

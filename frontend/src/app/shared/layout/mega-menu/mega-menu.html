@@ -1,40 +1,39 @@
-@if (groups.length > 0) {
-<div class="mega-menu-full-width">
+@if (subCategories.length > 0) {
+<div class="mega-menu-elite">
   <div class="mega-container">
-
-    <div class="mega-columns">
-      @for (group of groups; track group.title) {
-      <div class="mega-col">
-        <h4 class="col-title">{{ group.title }}</h4>
-        <ul class="col-links">
-          @for (item of group.items; track item.label) {
-          <li>
-            <a class="mega-item-link" [routerLink]="item.link">
-              {{ item.label }}
-              @if (item.hot) {
-              <span class="hot-badge">YENİ</span>
-              }
-            </a>
-          </li>
+    <div class="mega-content-wrapper">
+      
+      <!-- ── LINKS COLUMN ────────────────────────── -->
+      <div class="mega-links-column">
+        <div class="column-header">
+          <span class="column-tag">KOLEKSİYON</span>
+          <h4 class="column-title">Kategoriler</h4>
+        </div>
+        
+        <div class="links-grid">
+          @for (cat of subCategories; track cat.id) {
+          <a class="mega-link" [routerLink]="['/urunler/kategori', cat.id]">
+            <span class="link-label">{{ cat.label }}</span>
+            <span class="link-count">Yeni</span>
+          </a>
           }
-        </ul>
-      </div>
-      }
-    </div>
-
-    <div class="mega-promo">
-      <div class="promo-box">
-        <img src="assets/images/mega-menu-promo.jpg" alt="Yeni Koleksiyon" class="promo-img">
-
-        <div class="promo-overlay">
-          <span class="promo-tag">BU SEZON</span>
-          <h3 class="promo-title">YENİ KOLEKSİYON</h3>
-          <p class="promo-sub">İlk senin olsun</p>
-          <a class="promo-btn" routerLink="/yeni">KEŞFET</a>
         </div>
       </div>
-    </div>
 
+      <!-- ── FEATURED SECTION ────────────────────── -->
+      <div class="mega-featured-section">
+        <div class="featured-card">
+          <div class="card-overlay"></div>
+          <div class="card-content">
+            <span class="feat-tag">ÖNE ÇIKAN</span>
+            <h5 class="feat-title">Sizin İçin Seçtiklerimiz</h5>
+            <p class="feat-desc">Yeni sezon koleksiyonumuzun en seçkin parçalarını hemen keşfedin.</p>
+            <a [routerLink]="['/urunler/kategori', categoryId]" class="feat-link">TÜMÜNÜ GÖR →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 }

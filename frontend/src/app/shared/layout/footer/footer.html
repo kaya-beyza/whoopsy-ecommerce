@@ -26,15 +26,14 @@
         <div class="footer-middle">
             <div class="footer-col">
                 <h3>Kategoriler</h3>
-                <a href="#">Kadın</a>
-                <a href="#">Erkek</a>
-                <a href="#">Çocuk</a>
-                <a href="#">Koleksiyon</a>
-                <a href="#">İndirim</a>
+                <a [routerLink]="['/urunler/kategori', 'a5e8fbef-1e30-4c30-b33e-3085e5bd13b6']">Ayakkabı</a>
+                <a [routerLink]="['/urunler/kategori', '34a4f1f4-5a50-44ef-ab7c-fd7753c0cdfd']">Giyim</a>
+                <a [routerLink]="['/urunler/kategori', 'fb59ff4e-c92d-4c1f-8c34-34373e1badba']">Aksesuar</a>
+                <a [routerLink]="['/urunler/kategori', '485762be-7130-485e-984c-fa34cd90b87b']">Diğer</a>
             </div>
             <div class="footer-col">
                 <h3>Hızlı Erişim</h3>
-                <a routerLink="/urunler" class="footer-link-with-icon">
+                <a href="#" class="footer-link-with-icon" (click)="openSearch($event)">
                     <span class="material-symbols-sharp">search</span>
                     Ara
                 </a>
