@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
-import 'package:mobile/features/products/presentation/product_detail_page.dart';
 import 'package:mobile/features/products/presentation/product_list_page.dart';
 
 class SearchPage extends StatefulWidget {
@@ -27,15 +26,14 @@ class _SearchPageState extends State<SearchPage> {
     _loadInitial();
   }
 
-  ///  BAŞLANGIÇ → öneriler
+  ///  BAŞLANGIÇ → PAGINATION FIX
   Future<void> _loadInitial() async {
     setState(() => _isLoading = true);
 
     try {
-      //  farklı sayfalardan çek
-      final page1 = await _repo.getFilteredProducts(page: 1);
-      final page2 = await _repo.getFilteredProducts(page: 2);
-      final page3 = await _repo.getFilteredProducts(page: 3);
+      final page1 = (await _repo.getFilteredProducts(page: 1)).items;
+      final page2 = (await _repo.getFilteredProducts(page: 2)).items;
+      final page3 = (await _repo.getFilteredProducts(page: 3)).items;
 
       final combined = [
         ...page1,
@@ -43,7 +41,7 @@ class _SearchPageState extends State<SearchPage> {
         ...page3,
       ];
 
-      combined.shuffle(); //  karıştır
+      combined.shuffle();
 
       setState(() {
         _products = combined.take(10).toList();
@@ -55,7 +53,6 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  ///  SEARCH LOGIC
   Future<void> _search(String query) async {
     if (query.trim().isEmpty) {
       _loadInitial();
@@ -65,12 +62,12 @@ class _SearchPageState extends State<SearchPage> {
     setState(() => _isLoading = true);
 
     try {
-      final result = await _repo.getFilteredProducts(
+      final response = await _repo.getFilteredProducts(
         searchTerm: query.trim(),
       );
 
       setState(() {
-        _products = result;
+        _products = response.items;
         _isLoading = false;
       });
     } catch (e) {
@@ -79,7 +76,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  ///  BRAND TEXT
+  /// BRAND TEXT
   String _brandToText(int? brand) {
     switch (brand) {
       case 1:
@@ -99,7 +96,7 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  ///  GENDER TEXT
+  /// GENDER TEXT
   String _genderToText(int? gender) {
     switch (gender) {
       case 1:
@@ -153,7 +150,7 @@ class _SearchPageState extends State<SearchPage> {
                   const SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
-                      FocusScope.of(context).unfocus(); // klavye kapanır
+                      FocusScope.of(context).unfocus();
                       _controller.clear();
                       _search("");
                     },

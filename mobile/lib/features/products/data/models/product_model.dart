@@ -14,27 +14,56 @@ class ProductModel extends Product {
     super.imageUrls,
   });
 
+  /// 🔥 STRING → INT MAP
+  static int _genderFromString(dynamic gender) {
+    if (gender is int) return gender;
+
+    switch (gender?.toString().toLowerCase()) {
+      case "male":
+      case "erkek":
+        return 1;
+      case "female":
+      case "kadın":
+        return 2;
+      case "unisex":
+        return 3;
+      default:
+        return 0;
+    }
+  }
+
+  static int _brandFromString(dynamic brand) {
+    if (brand is int) return brand;
+
+    switch (brand?.toString().toLowerCase()) {
+      case "adidas":
+        return 1;
+      case "converse":
+        return 2;
+      case "new balance":
+        return 3;
+      case "nike":
+        return 4;
+      case "puma":
+        return 5;
+      case "vans":
+        return 6;
+      default:
+        return 0;
+    }
+  }
+
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
-      // ✅ ID her zaman string'e çevrilmeli (backend Guid olabilir)
       id: json['id']?.toString() ?? '',
-
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-
-      // ✅ NULL SAFE + TYPE SAFE
       price: (json['price'] ?? 0).toDouble(),
-
       stockQuantity: json['stockQuantity'] ?? 0,
-
-      // ✅ önemli: backend Guid/string olabilir
       categoryId: json['categoryId']?.toString() ?? '',
-      brand: json['brand'] ?? 0,
-      gender: json['gender'] ?? 0,
-      // ✅ null gelebilir → güvenli bırak
+      brand: _brandFromString(json['brand']),
+      gender: _genderFromString(json['gender']),
       mainImageUrl: json['mainImageUrl'],
-
-      // ✅ liste null ise boş liste
       imageUrls:
           (json['imageUrls'] as List?)?.map((e) => e.toString()).toList() ?? [],
     );

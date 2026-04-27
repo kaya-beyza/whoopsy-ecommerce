@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:mobile/features/auth/presentation/pages/account_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/account_page.dart';
 import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';

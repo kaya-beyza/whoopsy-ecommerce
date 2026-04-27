@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
+import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
@@ -45,16 +47,19 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   Future<void> _loadSimilarProducts() async {
     try {
       final repo = ProductRepositoryImpl(ProductRemoteDataSource());
-      final data = await repo.getFilteredProducts(
+
+      final response = await repo.getFilteredProducts(
         categoryId: widget.product.categoryId,
         brand: widget.product.brand,
         gender: widget.product.gender,
+        page: 1,
       );
+
+      final items = response.items;
+
       setState(() {
-        similarProducts = data
-            .where((p) => p.id != widget.product.id) // listelenen ürünü çıkart.
-            .take(10)
-            .toList();
+        similarProducts =
+            items.where((p) => p.id != widget.product.id).take(10).toList();
 
         isLoadingSimilar = false;
       });
@@ -258,7 +263,74 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        try {
+                          await context
+                              .read<CartService>()
+                              .addToCart(widget.product.id);
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              backgroundColor: Colors.black,
+                              elevation: 0,
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    4), // çok yuvarlak değil
+                              ),
+                              duration: const Duration(seconds: 2),
+                              content: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  /// SOL TEXT
+                                  const Text(
+                                    "SEPETE EKLENDİ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+
+                                  /// SAĞ CTA
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => CartPage(),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text(
+                                      "SEPETE GİT →",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              backgroundColor: Colors.black,
+                              content: Text(
+                                "HATA OLUŞTU",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,

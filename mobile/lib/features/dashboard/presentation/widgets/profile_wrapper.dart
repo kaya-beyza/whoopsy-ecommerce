@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
-import 'package:mobile/features/auth/presentation/pages/account_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/account_page.dart';
 import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 
 class ProfileWrapper extends StatelessWidget {

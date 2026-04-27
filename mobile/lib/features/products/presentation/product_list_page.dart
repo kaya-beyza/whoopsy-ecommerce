@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/features/categories/data/datasources/category_remote_data_source.dart';
+import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
-import 'package:mobile/features/products/data/models/product_model.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/filter_page.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
 import 'package:provider/provider.dart';
+import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
 
 class ProductListPage extends StatefulWidget {
   final String? categoryId;
   final int? brandId;
   final int? genderId;
-  final String? mainCategoryName;
 
   const ProductListPage({
     super.key,
     this.categoryId,
     this.brandId,
     this.genderId,
-    this.mainCategoryName,
   });
 
   @override
@@ -38,118 +36,88 @@ class _ProductListPageState extends State<ProductListPage> {
   int? _selectedBrand;
   String? _selectedCategoryId;
 
-  bool _hasUserAppliedFilter = false;
+  ///  PAGINATION STATE
+  int _page = 1;
+  bool _hasMore = true;
+  bool _isFetchingMore = false;
+
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _setup();
+
+    _productRepo = ProductRepositoryImpl(ProductRemoteDataSource());
 
     _selectedGender = widget.genderId;
     _selectedBrand = widget.brandId;
     _selectedCategoryId = widget.categoryId;
 
+    _scrollController.addListener(_onScroll);
+
     _fetchProducts();
   }
 
-  void _setup() {
-    final dataSource = ProductRemoteDataSource();
-    _productRepo = ProductRepositoryImpl(dataSource);
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        !_isFetchingMore &&
+        _hasMore) {
+      _loadMore();
+    }
   }
 
+  ///  FIRST LOAD
   Future<void> _fetchProducts() async {
     try {
-      print("CATEGORY: $_selectedCategoryId");
-      print("BRAND: $_selectedBrand");
-      print("GENDER: $_selectedGender");
-      List<Product> result = [];
+      _page = 1;
+      _hasMore = true;
 
-      /// 1️⃣ GENDER + optional category
-      if (_selectedGender != null) {
-        result = await _productRepo.getProductsByGender(
-          _selectedGender!,
-          categoryId: _selectedCategoryId,
-        );
-      }
-
-      /// 2️⃣ CATEGORY
-      else if (_selectedCategoryId != null) {
-        final categoryDataSource = CategoryRemoteDataSource();
-        final categoryTree = await categoryDataSource.getCategoryTree();
-        final treeList = categoryTree.cast<Map<String, dynamic>>();
-
-        final selectedMainCategory = treeList.firstWhere(
-          (c) => c["id"] == _selectedCategoryId,
-          orElse: () => <String, dynamic>{},
-        );
-
-        if (selectedMainCategory.isNotEmpty) {
-          final subCategories =
-              (selectedMainCategory["subCategories"] as List? ?? [])
-                  .cast<Map<String, dynamic>>();
-
-          if (subCategories.isEmpty) {
-            result = [];
-          } else {
-            final futures = subCategories.map((sub) {
-              return _productRepo.getProductsByCategoryId(sub["id"]);
-            }).toList();
-
-            final results = await Future.wait(futures);
-
-            final temp = <Product>[];
-            for (final list in results) {
-              temp.addAll(list);
-            }
-
-            result = {
-              for (final p in temp) p.id: p,
-            }.values.toList();
-          }
-        } else {
-          // alt kategori ise direkt kendi ürünleri
-          result = await _productRepo.getProductsByCategoryId(
-            _selectedCategoryId!,
-          );
-        }
-      }
-
-      /// 3️⃣ BRAND ONLY
-      else if (_selectedBrand != null) {
-        print("SELECTED BRAND: $_selectedBrand");
-
-        final data = await _productRepo.getProductsByBrand(
-          _selectedBrand!,
-        );
-
-        result = data;
-
-        print("RESULT COUNT: ${result.length}");
-      }
-
-      /// 4️⃣ ALL
-      else {
-        result = await _productRepo.getAllProducts();
-      }
-
-      /// 5️⃣ FRONTEND BRAND FILTER
-      if (_selectedBrand != null) {
-        result = result.where((p) => p.brand == _selectedBrand).toList();
-      }
+      final response = await _productRepo.getFilteredProducts(
+        gender: _selectedGender,
+        brand: _selectedBrand,
+        categoryId: _selectedCategoryId,
+        page: _page,
+      );
 
       setState(() {
-        _products = result;
+        _products = response.items;
         _isLoading = false;
       });
-    } catch (e) {
-      print("ERROR: $e");
-      print("SELECTED BRAND: $_selectedBrand");
 
+      _hasMore = _products.length < response.totalCount;
+    } catch (e) {
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
       });
     }
+  }
+
+  ///  LOAD MORE
+  Future<void> _loadMore() async {
+    _isFetchingMore = true;
+
+    try {
+      _page++;
+
+      final response = await _productRepo.getFilteredProducts(
+        gender: _selectedGender,
+        brand: _selectedBrand,
+        categoryId: _selectedCategoryId,
+        page: _page,
+      );
+
+      setState(() {
+        _products.addAll(response.items);
+      });
+
+      _hasMore = _products.length < response.totalCount;
+    } catch (e) {
+      print("LOAD MORE ERROR: $e");
+    }
+
+    _isFetchingMore = false;
   }
 
   Future<void> _openFilter() async {
@@ -166,18 +134,14 @@ class _ProductListPageState extends State<ProductListPage> {
 
     if (result == null) return;
 
-    //  1. loading başlat
     setState(() {
       _isLoading = true;
     });
 
-    //  2. state güncelle
     _selectedGender = result["gender"];
     _selectedBrand = result["brand"];
     _selectedCategoryId = result["categoryId"];
-    _hasUserAppliedFilter = true;
 
-    //  3. fetch et
     await _fetchProducts();
   }
 
@@ -210,14 +174,28 @@ class _ProductListPageState extends State<ProductListPage> {
       return const Center(child: Text("Ürün bulunamadı"));
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(10),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.7,
-      ),
-      itemCount: _products.length,
-      itemBuilder: (_, i) => ProductCard(product: _products[i]),
+    return Column(
+      children: [
+        Expanded(
+          child: GridView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(10),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.7,
+            ),
+            itemCount: _products.length,
+            itemBuilder: (_, i) => ProductCard(product: _products[i]),
+          ),
+        ),
+
+        ///  ALT LOADING
+        if (_isFetchingMore)
+          const Padding(
+            padding: EdgeInsets.all(10),
+            child: CircularProgressIndicator(),
+          ),
+      ],
     );
   }
 }
@@ -230,8 +208,8 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favService = context.watch<FavoriteService>();
-
     final isFav = favService.isFavorite(product.id);
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -244,48 +222,98 @@ class ProductCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ///  IMAGE + ICONS
           Expanded(
             child: Stack(
               children: [
-                /// IMAGE
                 Positioned.fill(
                   child: Image.network(
                     product.mainImageUrl ?? "",
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: Colors.grey.shade200,
-                      child: const Icon(Icons.image_not_supported),
-                    ),
                   ),
                 ),
-
                 Positioned(
                   right: 4,
                   bottom: 4,
                   child: Column(
                     children: [
-                      /// 🛒 SEPET
                       _iconButton(
                         icon: Icons.shopping_bag_outlined,
-                        onTap: () {
-                          print("Sepete eklendi: ${product.name}");
-                        },
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      /// ❤️ FAVORİ
-                      _iconButton(
-                        icon: isFav ? Icons.favorite : Icons.favorite_border,
                         onTap: () async {
                           try {
                             await context
-                                .read<FavoriteService>()
-                                .toggleFavorite(product.id);
+                                .read<CartService>()
+                                .addToCart(product.id);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.black,
+                                elevation: 0,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      4), // çok yuvarlak değil
+                                ),
+                                duration: const Duration(seconds: 2),
+                                content: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    /// SOL TEXT
+                                    const Text(
+                                      "SEPETE EKLENDİ",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+
+                                    /// SAĞ CTA
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => CartPage(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        "SEPETE GİT →",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           } catch (e) {
-                            print(e);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                backgroundColor: Colors.black,
+                                content: Text(
+                                  "HATA OLUŞTU",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            );
                           }
+                        },
+                      ),
+                      const SizedBox(height: 4),
+                      _iconButton(
+                        icon: isFav ? Icons.favorite : Icons.favorite_border,
+                        onTap: () {
+                          context
+                              .read<FavoriteService>()
+                              .toggleFavorite(product.id);
                         },
                       ),
                     ],
@@ -294,33 +322,15 @@ class ProductCard extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 6),
-
-          /// NAME
-          Text(
-            product.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 13),
-          ),
-
+          Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
-
-          /// PRICE
-          Text(
-            "${product.price} ₺",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
+          Text("${product.price} ₺"),
         ],
       ),
     );
   }
 
-  ///  TRANSPARENT ICON BUTTON
   Widget _iconButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -331,14 +341,10 @@ class ProductCard extends StatelessWidget {
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.3), //  transparan
+          color: Colors.black.withOpacity(0.3),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          icon,
-          size: 18,
-          color: Colors.white,
-        ),
+        child: Icon(icon, size: 18, color: Colors.white),
       ),
     );
   }

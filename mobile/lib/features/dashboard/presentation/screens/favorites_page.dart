@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:mobile/features/dashboard/data/datasources/favorite_remote_data_source.dart';
 import 'package:mobile/features/dashboard/data/repositories/favorite_repository_impl.dart';
+import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
+import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
@@ -138,8 +140,76 @@ class FavoriteCard extends StatelessWidget {
                       /// 🛒 SEPET
                       _iconButton(
                         icon: Icons.shopping_bag_outlined,
-                        onTap: () {
-                          print("Sepete eklendi: ${product.name}");
+                        onTap: () async {
+                          try {
+                            await context
+                                .read<CartService>()
+                                .addToCart(product.id);
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                behavior: SnackBarBehavior
+                                    .floating, // 🔥 klasik bar değil
+                                backgroundColor:
+                                    Colors.black, // 🔥 siyah arka plan
+                                elevation: 0,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      4), // çok yuvarlak değil
+                                ),
+                                duration: const Duration(seconds: 2),
+
+                                content: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    /// SOL TEXT
+                                    const Text(
+                                      "SEPETE EKLENDİ",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700, // 🔥 kalın
+                                        fontSize: 13,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+
+                                    /// SAĞ CTA
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => CartPage(),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text(
+                                        "SEPETE GİT →",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                backgroundColor: Colors.black,
+                                content: Text(
+                                  "HATA OLUŞTU",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            );
+                          }
                         },
                       ),
 

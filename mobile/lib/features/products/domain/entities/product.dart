@@ -6,7 +6,7 @@ class Product {
   final int stockQuantity;
 
   final String categoryId; // backend Guid → String olarak tutuyoruz
-  final int brand; // 🔥 EKLENDİ (çok önemli)
+  final int brand;
   final int gender;
   final String? mainImageUrl;
   final List<String> imageUrls;
@@ -24,7 +24,7 @@ class Product {
     this.imageUrls = const [],
   });
 
-  // 🔥 JSON → Model
+  //  JSON → Model
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],

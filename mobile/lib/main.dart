@@ -5,6 +5,7 @@ import 'package:mobile/features/auth/data/datasources/auth_remote_data_source.da
 import 'package:mobile/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 import 'package:mobile/features/dashboard/presentation/screens/splash_screen.dart';
+import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
 import 'package:provider/provider.dart';
 
@@ -27,6 +28,7 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => FavoriteService(),
         ),
+        ChangeNotifierProvider(create: (_) => CartService()),
       ],
       child: const MyApp(),
     ),
