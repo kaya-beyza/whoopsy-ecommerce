@@ -1,29 +1,103 @@
-# Build results
+############################################
+# GENERAL
+############################################
+.DS_Store
+Thumbs.db
+*.log
+
+############################################
+# IDE
+############################################
+.vscode/
+.idea/
+*.iml
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+############################################
+# FLUTTER / DART
+############################################
+.dart_tool/
+.packages
+.pub/
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+############################################
+# FLUTTER GENERATED FILES (KRİTİK)
+############################################
+**/generated_plugin_registrant.*
+**/GeneratedPluginRegistrant.*
+**/generated_plugins.cmake
+
+############################################
+# ANDROID
+############################################
+android/.gradle/
+android/app/build/
+android/local.properties
+
+############################################
+# IOS
+############################################
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Runner.xcworkspace/
+
+############################################
+# MACOS / WINDOWS / LINUX (FLUTTER)
+############################################
+macos/Flutter/ephemeral/
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+
+############################################
+# .NET
+############################################
 [Bb]in/
 [Oo]bj/
 [Dd]ebug/
 [Rr]elease/
-
-# .NET
-*.user
-*.suo
-*.cache
 *.dll
-*.pdb
 *.exe
+*.pdb
 
-# NuGet
+############################################
+# NUGET
+############################################
 **/packages/*
 *.nupkg
 
-# IDE
-.vs/
-.vscode/
-*.idea/
-
-# OS
-Thumbs.db
-.DS_Store
-
-# User-specific files
+############################################
+# APP SETTINGS / SECRETS
+############################################
 appsettings.*.local.json
+.env
+.env.*
+
+############################################
+# DATABASE / LOCAL FILES
+############################################
+*.db
+*.sqlite
+
+############################################
+# COVERAGE / TEST
+############################################
+coverage/
+*.coverage
+*.trx
+
+############################################
+# MISC
+############################################
+*.tmp
+*.bak
+*.swp
