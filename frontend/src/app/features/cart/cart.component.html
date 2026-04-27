@@ -4,67 +4,69 @@
   </header>
 
   @if (cartItems().length > 0) {
-    <div class="cart-layout">
-      <div class="cart-items-section">
-        @for (item of cartItems(); track item.id) {
-          <div class="cart-item">
-            <div class="item-image-wrapper">
-              <img [src]="item.imageUrl" [alt]="item.name">
-            </div>
-            <div class="item-details">
-              <div class="item-header">
-                <h2>{{ item.name }}</h2>
-                <button class="btn-remove" (click)="removeItem(item.id)">✕</button>
-              </div>
-              <p class="item-meta">{{ item.color }} | {{ item.size }}</p>
-              <p class="item-price">{{ item.price | currency:'TRY':'symbol-narrow':'1.2-2' }}</p>
-              <div class="quantity-controls">
-                <button (click)="updateQuantity(item.id, -1)">-</button>
-                <span>{{ item.quantity }}</span>
-                <button (click)="updateQuantity(item.id, 1)">+</button>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-
-      <aside class="cart-summary-section">
-        <div class="summary-card">
-          <h2>SİPARİŞ ÖZETİ</h2>
-          <div class="summary-row"><span>Ara Toplam</span><span>{{ subTotal() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span></div>
-          <div class="summary-row"><span>Kargo</span><span>{{ shippingCost() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span></div>
-          <div class="summary-divider"></div>
-          <div class="summary-row total-row"><span>TOPLAM</span><span>{{ total() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span></div>
-          <button class="btn-checkout">SİPARİŞİ TAMAMLA</button>
-          <p class="summary-note">Vergiler dahildir.</p>
+  <div class="cart-layout">
+    <div class="cart-items-section">
+      @for (item of cartItems(); track item.id) {
+      <div class="cart-item">
+        <div class="item-image-wrapper">
+          <img [src]="item.imageUrl" [alt]="item.name">
         </div>
-      </aside>
-    </div>
-
-    <section class="recommendations-section">
-      <h2 class="recommendations-title">BUNLAR DA İLGİNİZİ ÇEKEBİLİR</h2>
-      
-      <div class="recommendations-grid">
-        @for (prod of recommendedProducts(); track prod.id) {
-          <div class="rec-card">
-            <div class="rec-image">
-              <img [src]="prod.imageUrl" [alt]="prod.name">
-              <button class="btn-quick-add" (click)="addRecommendedToCart(prod)">+ SEPETE EKLE</button>
-            </div>
-            <div class="rec-info">
-              <h3 class="rec-name">{{ prod.name }}</h3>
-              <p class="rec-price">{{ prod.price | currency:'TRY':'symbol-narrow':'1.2-2' }}</p>
-            </div>
+        <div class="item-details">
+          <div class="item-header">
+            <h2>{{ item.name }}</h2>
+            <button class="btn-remove" (click)="removeItem(item.id)">✕</button>
           </div>
-        }
+          <p class="item-meta">{{ item.color }} | {{ item.size }}</p>
+          <p class="item-price">{{ item.price | currency:'TRY':'symbol-narrow':'1.2-2' }}</p>
+          <div class="quantity-controls">
+            <button (click)="updateQuantity(item.id, -1)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button (click)="updateQuantity(item.id, 1)">+</button>
+          </div>
+        </div>
       </div>
-    </section>
-
-  } @else {
-    <div class="empty-cart">
-      <h2>SEPETİNİZ BOŞ</h2>
-      <p>Son trendleri keşfetmek için alışverişe devam edin.</p>
-      <button class="btn-continue">ALIŞVERİŞE BAŞLA</button>
+      }
     </div>
+
+    <aside class="cart-summary-section">
+      <div class="summary-card">
+        <h2>SİPARİŞ ÖZETİ</h2>
+        <div class="summary-row"><span>Ara Toplam</span><span>{{ subTotal() | currency:'TRY':'symbol-narrow':'1.2-2'
+            }}</span></div>
+        <div class="summary-row"><span>Kargo</span><span>{{ shippingCost() | currency:'TRY':'symbol-narrow':'1.2-2'
+            }}</span></div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total-row"><span>TOPLAM</span><span>{{ total() | currency:'TRY':'symbol-narrow':'1.2-2'
+            }}</span></div>
+        <button class="btn-checkout" (click)="goToCheckout()">SİPARİŞİ TAMAMLA</button>
+        <p class="summary-note">Vergiler dahildir.</p>
+      </div>
+    </aside>
+  </div>
+  } @else {
+  <div class="empty-cart">
+    <h2>SEPETİNİZ BOŞ</h2>
+    <p>Son trendleri keşfetmek için alışverişe devam edin.</p>
+    <button class="btn-continue">ALIŞVERİŞE BAŞLA</button>
+  </div>
   }
+
+  <section class="recommendations-section">
+    <h2 class="recommendations-title">BUNLAR DA İLGİNİZİ ÇEKEBİLİR</h2>
+
+    <div class="recommendations-grid">
+      @for (prod of recommendedProducts(); track prod.id) {
+      <div class="rec-card">
+        <div class="rec-image">
+          <img [src]="prod.imageUrl" [alt]="prod.name">
+          <button class="btn-quick-add" (click)="addRecommendedToCart(prod)">+ SEPETE EKLE</button>
+        </div>
+        <div class="rec-info">
+          <h3 class="rec-name">{{ prod.name }}</h3>
+          <p class="rec-price">{{ prod.price | currency:'TRY':'symbol-narrow':'1.2-2' }}</p>
+        </div>
+      </div>
+      }
+    </div>
+  </section>
 </div>

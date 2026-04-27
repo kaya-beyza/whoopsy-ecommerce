@@ -60,8 +60,15 @@ export const routes: Routes = [
       // ── SEPET SAYFASI (Senin dalından geldi) ──
       {
         path: 'cart',
-        // canActivate: [authGuard], 
+        // canActivate: [authGuard],
         loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
+      },
+
+      // ── ÖDEME / CHECKOUT ──
+      {
+        path: 'checkout',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/checkout/checkout.routes').then(m => m.checkoutRoutes)
       }
     ]
   },
