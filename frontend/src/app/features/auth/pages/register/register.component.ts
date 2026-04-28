@@ -70,10 +70,8 @@ export class RegisterComponent {
 
     const registerData = {
       fullName: `${this.firstName} ${this.lastName}`,
-      firstName: this.firstName,
-      lastName: this.lastName,
       email: this.email,
-      phone: this.phone,
+      phoneNumber: this.phone,
       password: this.password,
       gender: this.gender,
       birthDate: this.birthDate,
