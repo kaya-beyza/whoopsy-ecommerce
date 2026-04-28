@@ -57,9 +57,20 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("filter")]
-    public async Task<IActionResult> GetByFilter([FromQuery] Gender? gender, [FromQuery] Brand? brand, [FromQuery] Guid? categoryId, [FromQuery] string? searchTerm, [FromQuery] int page = 1, [FromQuery] int pageSize = 21)
+    public async Task<IActionResult> GetByFilter(
+        [FromQuery] List<string>? genders, 
+        [FromQuery] List<string>? brands, 
+        [FromQuery] List<string>? categoryIds, 
+        [FromQuery] string? searchTerm, 
+        [FromQuery] int page = 1, 
+        [FromQuery] int pageSize = 21)
     {
-        var result = await _mediator.Send(new GetProductsByFilterQuery(gender, brand, categoryId, searchTerm, page, pageSize));
+        // Pusuya karşı korunaklı ayrıştırma (Robust Parsing) 🛡️
+        var genderList = genders?.Select(g => int.TryParse(g, out var val) ? (Gender)val : (Gender?)null).Where(g => g != null).Select(g => g.Value).ToList();
+        var brandList = brands?.Select(b => Enum.TryParse<Brand>(b, true, out var val) ? val : (Brand?)null).Where(b => b != null).Select(b => b.Value).ToList();
+        var categoryIdList = categoryIds?.Select(c => Guid.TryParse(c, out var val) ? val : (Guid?)null).Where(c => c != null).Select(c => c.Value).ToList();
+
+        var result = await _mediator.Send(new GetProductsByFilterQuery(genderList, brandList, categoryIdList, searchTerm, page, pageSize));
         return Ok(result);
     }
     [HttpPut("{id}")]

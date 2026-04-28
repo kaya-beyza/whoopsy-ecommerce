@@ -24,7 +24,7 @@ public class GetCategoryTreeQueryHandler : IRequestHandler<GetCategoryTreeQuery,
             Description = c.Description,
             ParentId = null,
             ParentName = null,
-            ProductCount = c.Products.Count + c.SubCategories.Sum(sub => sub.Products.Count),
+            ProductCount = 0, // Simplified to avoid performance issues
             SubCategories = c.SubCategories.Select(sub => new CategoryDto
             {
                 Id = sub.Id,
@@ -32,7 +32,7 @@ public class GetCategoryTreeQueryHandler : IRequestHandler<GetCategoryTreeQuery,
                 Description = sub.Description,
                 ParentId = c.Id,
                 ParentName = c.Name,
-                ProductCount = sub.Products.Count,
+                ProductCount = 0,
                 SubCategories = new()
             }).ToList()
         }).ToList();
