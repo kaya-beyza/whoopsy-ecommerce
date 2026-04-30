@@ -133,7 +133,7 @@
   background: #ffffff;
   overflow-y: auto; 
   
-  /* --- Elite Scrollbar (Whoopsy Standard) --- */
+  /* --- Custom Scrollbar Styling --- */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -204,7 +204,7 @@
   }
 }
 
-/* --- Gender Selection (Elite Radios) --- */
+/* --- Gender Selection Radio Styles --- */
 .gender-selection {
   display: flex;
   gap: 20px;
@@ -256,7 +256,7 @@
   }
 }
 
-/* --- Textarea & Date (Whoopsy Styles) --- */
+/* --- Extended Form Controls --- */
 textarea {
   width: 100%;
   padding: 15px 20px 15px 55px;

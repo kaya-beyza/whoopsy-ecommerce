@@ -6,7 +6,7 @@
         <span class="eye-o">O</span>
         <span class="eye-o">O</span>
       </div>
-      <p class="boutique-message">Whoopsy Arşivleri bu eseri henüz mühürlememiş olabilir veya eser kısa bir süreliğine kilitli olabilir.</p>
+      <p class="boutique-message">Bu ürünün detayları şu anda teknik bir nedenden ötürü görüntülenemiyor. Lütfen daha sonra tekrar deneyiniz.</p>
       <a routerLink="/" class="btn-clean-link">Koleksiyona Dön</a>
     </div>
   </div>
@@ -40,31 +40,27 @@
       <div class="gallery-section">
         <div class="gal-sticky-wrapper">
           <div class="thumbnail-sidebar">
-            <div class="thumb" [class.active]="selectedImage() === p.imageUrl" (click)="selectImage(p.imageUrl)">
-              <img [src]="p.imageUrl" alt="Thumbnail">
-            </div>
-            <div class="thumb" *ngIf="p.hoverImageUrl" [class.active]="selectedImage() === p.hoverImageUrl" (click)="selectImage(p.hoverImageUrl)">
-              <img [src]="p.hoverImageUrl" alt="Thumbnail Hover">
-            </div>
-            <div class="thumb"><img [src]="p.imageUrl" style="filter: grayscale(100%); opacity: 0.5;"></div>
-            <div class="thumb" style="border: 1px dashed #ddd; display: flex; align-items: center; justify-content: center; background: #fafafa;">
-              <span class="material-symbols-sharp" style="font-size: 20px; color: #ccc;">play_circle</span>
-            </div>
+            @for (img of p.images; track img) {
+              <div class="thumb" [class.active]="selectedImage() === img" (click)="selectImage(img)">
+                <img [src]="img" alt="Thumbnail">
+              </div>
+            }
           </div>
 
           <div class="main-display">
-            <div class="badge-wrapper">
+            <div class="badge-container">
               <span class="badge new" *ngIf="p.isNew">YENİ</span>
-              <span class="badge best" *ngIf="p.isBestseller">POPÜLER</span>
+              <span class="badge bestseller" *ngIf="p.isBestseller">POPÜLER</span>
             </div>
             <img [src]="selectedImage()" [alt]="p.name" class="hero-image">
           </div>
         </div>
       </div>
 
-      <!-- ── RIGHT: INFO PANEL ── -->
+      <!-- RIGHT: INFO PANEL -->
       <div class="info-section">
         <div class="sticky-panel">
+          <!-- Product Header Section -->
           <header class="product-header-elite">
             <span class="brand-title-extra">{{ p.brand }}</span>
             <h1 class="product-subtitle-elite">{{ p.name.toLowerCase().startsWith(p.brand.toLowerCase()) ? p.name.slice(p.brand.length).trim() : p.name }}</h1>

@@ -90,7 +90,7 @@
             position: relative;
             z-index: 5;
             
-            // Whomopsy Soft Fade (Keskin Kenarı Yumuşatan Gradyan)
+            // Soft edge overlay gradient
             &::before {
                 content: '';
                 position: absolute;
@@ -108,7 +108,7 @@
         transform: scale(1.08); // Zarif ve az bir zoom
     }
 
-    // Whomopsy Soft Elite Content Block
+    // Editorial content overlay
     .hero-content-block {
         .hero-tag, .hero-title, .hero-desc, .hero-actions {
             opacity: 0;
@@ -128,7 +128,7 @@
 
         .hero-title {
             font-family: var(--font-nav);
-            font-size: clamp(32px, 3.5vw, 62px); // Daha zarif ve asil boyut
+            font-size: clamp(32px, 3.5vw, 62px);
             line-height: 1.1;
             font-weight: 800;
             margin-bottom: 25px;
@@ -137,7 +137,7 @@
             transition-delay: 0.4s;
 
             .highlight {
-                color: #e8000d; // Whomopsy Mat Kırmızı
+                color: #e8000d; // Primary Brand Red
                 font-weight: 900;
                 font-style: italic;
             }
@@ -157,14 +157,14 @@
             .btn-black-primary {
                 background: transparent;
                 color: #fff;
-                padding: 12px 40px; // Daha ince ve zarif bir dolgu
-                font-weight: 500;   // Daha asil ve az kaba duruş
+                padding: 12px 40px;
+                font-weight: 500;
                 text-decoration: none;
                 transition: all 0.3s cubic-bezier(0.2, 1, 0.2, 1);
                 font-size: 13px;
                 letter-spacing: 2px;
                 text-transform: uppercase;
-                border: 1px solid rgba(255, 255, 255, 0.6); // İnce ve asil çerçeve
+                border: 1px solid rgba(255, 255, 255, 0.6);
 
                 &:hover {
                     background: #fff;
@@ -261,6 +261,7 @@
     height: 600px;
     overflow: hidden;
     border-radius: 4px;
+    cursor: pointer;
 
     img {
       width: 100%;
@@ -306,7 +307,7 @@
   }
 }
 
-// ── ELITE+ VITRIN: HANDPICKED SECTION ───────────
+// ── HANDPICKED SHOWCASE SECTION ──────────────────
 .handpicked-section {
   padding: 60px 0 100px;
   background: #fff;
@@ -346,7 +347,7 @@
   }
 }
 
-// ── ELITE PRODUCT CARD ───────────
+// ── SHOWCASE PRODUCT CARD ────────────────────────
 .elite-product-card {
   cursor: pointer;
   
@@ -378,19 +379,23 @@
       left: 15px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      z-index: 2;
+      gap: 6px;
+      z-index: 10;
 
       span {
-        padding: 5px 12px;
-        font-size: 11px;
+        font-family: var(--font-nav);
+        font-size: 10px;
         font-weight: 800;
+        padding: 4px 10px;
         letter-spacing: 1px;
-        border-radius: 2px;
+        text-transform: uppercase;
+        border-radius: 1px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
       }
 
-      .badge-new { background: #000; color: #fff; }
-      .badge-best { background: var(--color-primary); color: #fff; }
+      .badge-new { background: #fff; color: #000; border: 1px solid #f0f0f0; }
+      .badge-best { background: #000; color: #fff; }
+      .badge-discount { background: var(--color-primary, #e8000d); color: #fff; }
     }
 
     .wishlist-btn {

@@ -2,10 +2,11 @@ using MediatR;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Application.Features.Products.DTOs;
 using MiniETicaret.Domain.Enums;
+using MiniETicaret.Application.DTOs;
 
 namespace MiniETicaret.Application.Features.Products.Queries.GetProductsByFilter;
 
-public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilterQuery, List<ProductDto>>
+public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilterQuery, PagedResultDto<ProductDto>>
 {
     private readonly IProductRepository _productRepository;
 
@@ -14,11 +15,11 @@ public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilt
         _productRepository = productRepository;
     }
 
-    public async Task<List<ProductDto>> Handle(GetProductsByFilterQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResultDto<ProductDto>> Handle(GetProductsByFilterQuery request, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetByFilterAsync(request.Gender, request.Brand, request.CategoryId, request.SearchTerm, cancellationToken, request.Page, request.PageSize);
+        var (products, totalCount) = await _productRepository.GetByFilterAsync(request.Genders, request.Brands, request.CategoryIds, request.SearchTerm, cancellationToken, request.Page, request.PageSize);
 
-        return products.Select(p => new ProductDto
+        var items = products.Select(p => new ProductDto
         {
             Id = p.Id,
             Name = p.Name,
@@ -32,5 +33,7 @@ public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilt
             MainImageUrl = p.Images?.FirstOrDefault(i => i.IsMain)?.Url,
             ImageUrls = p.Images?.Select(i => i.Url).ToList() ?? new()
         }).ToList();
+
+        return new PagedResultDto<ProductDto>(items, totalCount, request.Page, request.PageSize);
     }
 }

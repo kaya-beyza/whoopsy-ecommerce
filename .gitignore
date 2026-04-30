@@ -27,3 +27,7 @@ Thumbs.db
 
 # User-specific files
 appsettings.*.local.json
+
+# Seed data (büyük scraping çıktıları — repoda tutulmayacak)
+backend/src/Infrastructure/MiniETicaret.Persistence/Seeds/ProductSeedData.cs
+backend/src/Infrastructure/MiniETicaret.Persistence/Seeds/products.json

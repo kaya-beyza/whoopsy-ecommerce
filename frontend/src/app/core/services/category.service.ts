@@ -6,6 +6,7 @@ export interface NavCategory {
   id: string;
   label: string;
   highlight: boolean;
+  parentId?: string;
 }
 
 @Injectable({
@@ -17,38 +18,23 @@ export class CategoryService {
   constructor(private http: HttpClient) { }
 
   /**
-   * 🌟 Whoopsy Zekası: Backend'den kategorileri çeker ve 
-   * Navbar'ın anlayacağı asaletli formata (NavCategory) dönüştürür.
+   * Fetches categories from the backend and
+   * Maps API response to NavCategory model for navigation support.
    */
   getCategories(): Observable<NavCategory[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
       map(backendCaps => {
         // Backend'den gelenleri dönüştürüyoruz
-        const dynamicCats = backendCaps.map(c => ({
+        return backendCaps.map(c => ({
           id: c.id.toString(),
           label: c.name,
-          highlight: false
+          highlight: false,
+          parentId: c.parentId ? c.parentId.toString() : undefined
         }));
-
-        // 🛡️ Whoopsy Elite+ Öncelikli Menü Öğeleri
-        const priorityItems: NavCategory[] = [
-          { id: 'yeni', label: 'Yeni Gelenler', highlight: false }
-        ];
-
-        // 🛡️ Highlight (İndirim) Öğesi (En sona eklenebilir)
-        const highlightItems: NavCategory[] = [
-          { id: 'indirim', label: 'İndirim', highlight: true }
-        ];
-
-        return [...priorityItems, ...dynamicCats, ...highlightItems];
       }),
       catchError(err => {
-        console.error('Whoopsy Kategori Hatası! Veritabanı sessizliği:', err);
-        // Artık sahte departmanlara sığınmıyoruz, sadece marka sabitlerini bırakıyoruz.
-        return of([
-          { id: 'yeni', label: 'Yeni Gelenler', highlight: false },
-          { id: 'indirim', label: 'İndirim', highlight: true },
-        ]);
+        console.error('Category load error:', err);
+        return of([]);
       })
     );
   }

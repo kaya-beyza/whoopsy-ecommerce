@@ -135,7 +135,12 @@
 .social-icons {
     display: flex;
     gap: 15px;
+    margin-left: -2px; /* İkonların sol boşluğunu dengeleyip başlıkla hizalamak için */
     a { font-size: 1.2rem; color: #000; }
+}
+
+.contact-info {
+    margin-left: -2px; /* Mail ikonunun sol boşluğunu dengeleyip başlıkla hizalamak için */
 }
 
 // ── Alt Bar (İkon Düzeltmeleri Yapıldı) ──
@@ -160,7 +165,7 @@
         height: 16px; 
         opacity: 0.7; // Daha belirgin yaptık
         
-        &.troy-icon {
+        &.troy-icon, &.visa-icon {
             height: 12px;
         }
     }

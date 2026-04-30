@@ -22,7 +22,9 @@ public class UsersControllerTests : IClassFixture<CustomWebApplicationFactory>
         {
             FullName = "Test User",
             Email = email,
-            Password = "Test123!"
+            Password = "Test123!",
+            PhoneNumber = "05551234567",
+            BirthDate = new DateTime(1990, 1, 1)
         };
         await _client.PostAsJsonAsync("/api/Auth/register", register);
 

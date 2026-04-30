@@ -23,9 +23,23 @@ export interface Product {
     images?: string[]; // 👈 Çoklu resim galerisi desteği
 }
 
+export interface FilterOption {
+    label: string;
+    value: any;
+    subOptions?: FilterOption[];
+    isExpanded?: boolean;
+}
+
 export interface FilterGroup {
     name: string;
     key: string;
-    options: string[];
+    options: FilterOption[];
     isExpanded: boolean;
+}
+
+export interface PagedResult<T> {
+    items: T[];
+    totalCount: number;
+    page: number;
+    pageSize: number;
 }

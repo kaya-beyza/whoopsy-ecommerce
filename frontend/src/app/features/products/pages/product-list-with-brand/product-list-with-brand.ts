@@ -1,568 +1,286 @@
-import { Component, OnInit, signal, HostListener, inject } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
-import { Product, FilterGroup } from '../../models/product.model';
+import { Product } from '../../models/product.model';
+
+interface FilterOption {
+  label: string;
+  value: any;
+  isExpanded?: boolean;
+  subOptions?: FilterOption[];
+}
+
+interface FilterGroup {
+  name: string;
+  key: string;
+  isExpanded: boolean;
+  options: FilterOption[];
+}
 
 @Component({
   selector: 'app-product-list-with-brand',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
-    <div class="shop-container" [class.filter-open]="isFilterVisible()">
-        <!-- Top Breadcrumb: Elegant Top-Left -->
-        <div class="breadcrumb-container">
-            <ng-container *ngFor="let item of breadcrumbItems(); let last = last">
-                <span [class.active]="last">{{ item }}</span>
-                <span *ngIf="!last"> / </span>
-            </ng-container>
+    <div class="shop-container">
+      <!-- Breadcrumb -->
+      <div class="breadcrumb-container">
+        <a routerLink="/">ANA SAYFA</a> / <a routerLink="/products">ÜRÜNLER</a> / <span class="active">{{ brandName() | uppercase }}</span>
+      </div>
+
+      <!-- Header -->
+      <header class="shop-header">
+        <h1 class="category-name">{{ brandName() }} KOLEKSİYONU</h1>
+      </header>
+
+      <!-- Controls Bar -->
+      <div class="controls-bar">
+        <div class="left-controls">
+          <button class="filter-toggle-btn" (click)="toggleSidebar()">
+            <span class="material-symbols-sharp">tune</span>
+            FİLTRELE {{ isSidebarVisible() ? 'KAPAT' : 'AÇ' }}
+          </button>
+          <div class="v-divider"></div>
+          <span class="product-count">{{ totalCount() }} ÜRÜN</span>
         </div>
 
-        <!-- Main Header: Centered & Bold -->
-        <header class="shop-header">
-            <h1 class="category-name">{{ brandName() | uppercase }}</h1>
-        </header>
+        <div class="active-filters" *ngIf="selectedFilters().length > 0">
+          <div class="filter-chip" *ngFor="let filter of selectedFilters()">
+            {{ filter.option }}
+            <button class="remove-chip" (click)="removeFilter(filter)">
+              <span class="material-symbols-sharp">close</span>
+            </button>
+          </div>
+          <button class="clear-all-link" (click)="clearAllFilters()">TÜMÜNÜ TEMİZLE</button>
+        </div>
 
-        <!-- Controls Bar: Multi-Functional -->
-        <div class="controls-bar">
-            <div class="left-controls">
-                <button class="filter-toggle-btn" (click)="toggleFilter()">
-                    <span class="material-symbols-sharp">{{ isFilterVisible() ? 'filter_list_off' : 'filter_list' }}</span>
-                    <span>{{ isFilterVisible() ? 'Filtreleri Gizle' : 'Filtreleri Göster' }}</span>
+        <div class="right-controls">
+          <div class="custom-sort" [class.open]="isSortOpen()">
+            <div class="sort-trigger" (click)="toggleSort()">
+              <span class="sort-label">SIRALA:</span>
+              <span class="selected-value">{{ currentSortLabel() }}</span>
+              <span class="material-symbols-sharp sort-icon">expand_more</span>
+            </div>
+            <ul class="sort-dropdown" *ngIf="isSortOpen()">
+              <li (click)="applySort('recommended', 'Önerilen')">Önerilen</li>
+              <li (click)="applySort('newest', 'En Yeniler')">En Yeniler</li>
+              <li (click)="applySort('price-asc', 'Fiyat: Düşükten Yükseğe')">Fiyat: Düşükten Yükseğe</li>
+              <li (click)="applySort('price-desc', 'Fiyat: Yüksekten Düşüğe')">Fiyat: Yüksekten Düşüğe</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="products-layout" [class.sidebar-hidden]="!isSidebarVisible()">
+        <!-- Filter Sidebar -->
+        <aside class="filter-sidebar">
+          <div class="filter-group" *ngFor="let group of filterGroups()">
+            <div class="group-header" (click)="toggleFilterGroup(group)">
+              <span>{{ group.name }}</span>
+              <span class="material-symbols-sharp">{{ group.isExpanded ? 'remove' : 'add' }}</span>
+            </div>
+            <div class="group-options" [class.expanded]="group.isExpanded">
+              <!-- Special UI for Color Swatches -->
+              <div class="color-swatch-grid" *ngIf="group.key === 'color'; else standardOptions">
+                <button *ngFor="let opt of group.options" class="swatch-item"
+                  [class.active]="isSelected(group.name, opt.label)"
+                  [class.light]="opt.label === 'Beyaz' || opt.label === 'Kemik' || opt.label === 'Krem'" [title]="opt.label"
+                  (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt.label)">
                 </button>
-                <div class="v-divider"></div>
-                <span class="product-count">{{ products().length }} Ürün Listeleniyor</span>
-            </div>
+              </div>
 
-            <!-- Dynamic Filter Chips -->
-            <div class="active-filters" *ngIf="selectedFilters().length > 0">
-                <div class="filter-chip" *ngFor="let filter of selectedFilters()">
-                    <span class="chip-label">{{ filter.group }}:</span>
-                    <span class="chip-value">{{ filter.option }}</span>
-                    <button class="remove-chip" (click)="removeFilter(filter)">
-                        <span class="material-symbols-sharp">close</span>
-                    </button>
-                </div>
-                <button class="clear-all-link" (click)="clearFilters()">Filtreleri Temizle</button>
-            </div>
-
-            <div class="right-controls">
-                <div class="custom-sort" [class.open]="isSortOpen()" (click)="$event.stopPropagation()">
-                    <div class="sort-trigger" (click)="toggleSort()">
-                        <span class="sort-label">Sırala:</span>
-                        <span class="selected-value">{{ selectedSort().label }}</span>
-                        <span class="material-symbols-sharp sort-icon">expand_more</span>
+              <!-- Standard Checkbox Options -->
+              <ng-template #standardOptions>
+                <div class="standard-options">
+                  <ng-container *ngIf="group.key !== 'sub-category' || (group.key === 'sub-category' && group.options.length > 0)">
+                    <div class="option-row" *ngFor="let opt of group.options">
+                      <label class="option-item" [class.active]="isSelected(group.name, opt.label)">
+                        <input type="checkbox" [checked]="isSelected(group.name, opt.label)"
+                          (change)="onFilterToggle(group.name, opt)">
+                        <span class="custom-checkbox"></span>
+                        <span class="option-text">{{ opt.label }}</span>
+                      </label>
                     </div>
-
-                    <ul class="sort-dropdown" *ngIf="isSortOpen()">
-                        <li *ngFor="let option of sortOptions" [class.active]="selectedSort().value === option.value"
-                            (click)="selectSort(option)">
-                            {{ option.label }}
-                        </li>
-                    </ul>
+                  </ng-container>
+                  <div class="empty-sub-message" *ngIf="group.key === 'sub-category' && group.options.length === 0">
+                    <span class="info-text">Lütfen önce bir ana kategori seçiniz.</span>
+                  </div>
                 </div>
+              </ng-template>
             </div>
-        </div>
+          </div>
+        </aside>
 
-        <main class="products-layout" [class.sidebar-hidden]="!isFilterVisible()">
-            <!-- Sidebar -->
-            <aside class="filter-sidebar" [class.active]="isFilterVisible()">
-                <div class="filter-content">
-                    <div class="filter-group" *ngFor="let group of filterGroups()">
-                        <div class="group-header" (click)="toggleFilterGroup(group)">
-                            <span>{{ group.name }}</span>
-                            <span class="material-symbols-sharp">{{ group.isExpanded ? 'remove' : 'add' }}</span>
-                        </div>
-                        <div class="group-options" [class.expanded]="group.isExpanded">
-                            <!-- Special UI for Color Swatches -->
-                            <div class="color-swatch-grid" *ngIf="group.key === 'color'; else standardOptions">
-                                <button *ngFor="let opt of group.options" class="swatch-item"
-                                [class.active]="isSelected(group.name, opt)"
-                                [class.light]="opt === 'Beyaz' || opt === 'Kemik' || opt === 'Krem'" [title]="opt"
-                                (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt)">
-                            </button>
-                            </div>
-
-                            <!-- Standard Checkbox Options -->
-                        <ng-template #standardOptions>
-                            <label class="option-item" *ngFor="let opt of group.options">
-                                <input type="checkbox" [checked]="isSelected(group.name, opt)"
-                                    (change)="onFilterToggle(group.name, opt)">
-                                <span class="custom-checkbox"></span>
-                                <span class="option-text">{{ opt }}</span>
-                            </label>
-                        </ng-template>
-                        </div>
-                    </div>
+        <!-- Products Grid Area -->
+        <section class="products-grid-area">
+          <div class="products-grid">
+            <div class="product-card" *ngFor="let product of products()" [routerLink]="['/products', product.id]">
+              <div class="card-image-wrapper">
+                <img [src]="product.imageUrl || 'assets/placeholder.jpg'" [alt]="product.name">
+                <button class="wishlist-btn" (click)="$event.stopPropagation()">
+                  <span class="material-symbols-sharp">favorite</span>
+                </button>
+              </div>
+              <div class="card-info">
+                <span class="brand-name">{{ product.brand }}</span>
+                <h3 class="product-title">{{ product.name }}</h3>
+                <div class="price-row">
+                  <span class="current-price">{{ product.price | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
                 </div>
-            </aside>
-
-            <!-- Products Grid Area -->
-            <section class="products-grid-area">
-                <div class="products-grid">
-                    <!-- Loading Skeletons -->
-                    <ng-container *ngIf="isLoading()">
-                        <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]">
-                            <div class="skeleton-image"></div>
-                            <div class="skeleton-text short"></div>
-                            <div class="skeleton-text long"></div>
-                        </div>
-                    </ng-container>
-
-                    <!-- Actual Product Cards -->
-                    <ng-container *ngIf="!isLoading()">
-                        <div class="product-card" *ngFor="let product of products()"
-                            [routerLink]="['/urunler/detay', product.id]"
-                            (mouseleave)="setQuickAddProduct(null)">
-
-                            <div class="card-image-wrapper">
-                                <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
-                                <span class="badge new" *ngIf="product.isNew">YENİ</span>
-                                <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
-                                    }}</span>
-
-                                <button class="wishlist-btn" (click)="$event.stopPropagation()">
-                                    <span class="material-symbols-sharp">favorite</span>
-                                </button>
-
-                                <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                                <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
-                                    <span class="material-symbols-sharp">add</span>
-                                </div>
-
-                                <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
-                                    <p class="quick-add-title">HIZLI EKLE</p>
-                                    <div class="sizes-grid">
-                                        <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
-                                            class="size-btn">
-                                            {{ size }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card-info">
-                                <p class="brand-name">{{ product.brand }}</p>
-                                <h3 class="product-title">{{ product.name }}</h3>
-                                <div class="price-row">
-                                    <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice |
-                                        number:'1.0-0' }} TL</span>
-                                    <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price
-                                        |
-                                        number:'1.0-0' }} TL</span>
-                                </div>
-                            </div>
-                        </div>
-                    </ng-container>
-                </div>
-
-                <!-- Whomopsy Elite Paging: Load More Button 🏛️ -->
-                <div class="load-more-container" *ngIf="hasMore() && !isLoading()">
-                    <button class="load-more-btn" [class.loading]="isMoreLoading()" (click)="loadMore()" [disabled]="isMoreLoading()">
-                        <span class="btn-text">{{ isMoreLoading() ? 'YÜKLENİYOR...' : 'DAHA FAZLA KEŞFET' }}</span>
-                        <span class="btn-line"></span>
-                    </button>
-                </div>
-            </section>
-        </main>
+              </div>
+            </div>
+          </div>
+          
+          <div class="load-more-container" *ngIf="hasMore()">
+            <button class="load-more-btn" (click)="loadMore()">DAHA FAZLA GÖSTER</button>
+          </div>
+        </section>
+      </div>
     </div>
   `,
   styles: [`
     .shop-container {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 20px 4%;
-      background: #ffffff;
-      color: #000000;
-      font-family: var(--font-body);
-    }
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 20px 4%;
+        background: #ffffff;
+        color: #000000;
+        font-family: 'Outfit', 'Inter', sans-serif;
 
-    .breadcrumb-container {
-        font-size: 11px;
-        color: #888;
-        margin-bottom: 30px;
-        letter-spacing: 0.5px;
+        .breadcrumb-container {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            a { color: inherit; text-decoration: none; &:hover { color: #000; } }
+            .active { color: #000; font-weight: 700; }
+        }
 
-        span {
-            &.active {
+        .shop-header {
+            text-align: center;
+            margin-bottom: 50px;
+            .category-name {
+                font-size: 42px;
+                font-weight: 800;
                 color: #000;
-                font-weight: 700;
+                letter-spacing: -1px;
+                text-transform: uppercase;
             }
         }
-    }
 
-    .shop-header {
-      text-align: center;
-      margin-bottom: 40px;
-
-      .category-name {
-        font-family: var(--font-nav);
-        font-size: 32px;
-        font-weight: 700;
-        color: #000;
-        letter-spacing: 1px;
-      }
-    }
-
-    .controls-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #f2f2f2;
-      border-bottom: 1px solid #f2f2f2;
-      padding: 15px 0;
-      margin-bottom: 30px;
-      flex-wrap: wrap;
-      gap: 20px;
-
-      .left-controls {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        .filter-toggle-btn {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          font-family: var(--font-body);
-          font-size: 14px;
-          color: #555;
-          transition: color 0.2s;
-          .material-symbols-sharp { font-size: 20px !important; }
-          &:hover { color: #000; }
-        }
-        .v-divider { width: 1px; height: 20px; background: #eee; }
-        .product-count { font-size: 13px; font-weight: 600; color: #000; }
-      }
-
-      .active-filters {
-        flex: 1;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        padding: 0 40px;
-
-        .filter-chip {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: #f7f7f7;
-          padding: 6px 14px;
-          border-radius: 4px;
-          font-size: 12px;
-          .chip-label { color: #888; }
-          .chip-value { color: #000; font-weight: 600; }
-          .remove-chip {
-            background: transparent;
-            border: none;
-            cursor: pointer;
+        .controls-bar {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            color: #aaa;
-            transition: color 0.2s;
-            &:hover { color: #000; }
-            .material-symbols-sharp { font-size: 14px !important; }
-          }
-        }
-        .clear-all-link {
-          background: transparent;
-          border: none;
-          cursor: pointer;
-          font-size: 12px;
-          font-weight: 700;
-          text-decoration: underline;
-          color: #000;
-          padding: 6px 0;
-        }
-      }
-
-      .right-controls {
-        .custom-sort {
-          position: relative;
-          user-select: none;
-          .sort-trigger {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            .sort-label { font-size: 14px; color: #888; }
-            .selected-value { font-weight: 700; font-size: 14px; color: #000; }
-            .sort-icon { font-size: 18px !important; transition: transform 0.3s; }
-          }
-          &.open .sort-icon { transform: rotate(180deg); }
-          .sort-dropdown {
-            position: absolute;
-            top: calc(100% + 15px);
-            right: 0;
-            min-width: 180px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 20px 0;
+            margin-bottom: 40px;
+            position: sticky;
+            top: 0;
             background: #fff;
-            border: 1px solid #f0f0f0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             z-index: 100;
-            list-style: none;
-            padding: 8px 0;
-            li {
-              padding: 10px 20px;
-              font-size: 13px;
-              color: #666;
-              cursor: pointer;
-              transition: all 0.2s;
-              &:hover { background: #f9f9f9; color: #000; }
-              &.active { color: #000; font-weight: 700; }
-            }
-          }
-        }
-      }
-    }
 
-    .products-layout {
-      display: flex;
-      gap: 40px;
-      position: relative;
-      min-height: 800px;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-
-      &.sidebar-hidden {
-          .filter-sidebar {
-              width: 0;
-              opacity: 0;
-              margin-right: -40px;
-              pointer-events: none;
-          }
-      }
-
-      .filter-sidebar {
-        width: 250px;
-        flex-shrink: 0;
-        border-right: 1px solid #f2f2f2;
-        transition: inherit;
-        overflow-y: auto;
-        max-height: calc(100vh - 200px);
-        position: sticky;
-        top: 100px;
-
-        &::-webkit-scrollbar { width: 4px; }
-        &::-webkit-scrollbar-track { background: transparent; }
-        &::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
-        &:hover::-webkit-scrollbar-thumb { background: #ddd; }
-
-        .filter-content {
-          padding-right: 20px;
-          .filter-group {
-            border-bottom: 1px solid #f2f2f2;
-            &:last-child { border: none; }
-            .group-header {
-              padding: 20px 0;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              cursor: pointer;
-              font-weight: 700;
-              font-size: 15px;
-              color: #000;
-              .material-symbols-sharp { font-size: 20px; color: #888; }
-            }
-            .group-options {
-              max-height: 0;
-              overflow: hidden;
-              transition: 0.3s ease-out;
-              &.expanded {
-                  max-height: 2000px;
-                  padding-bottom: 30px;
-                  display: flex;
-                  flex-direction: column;
-                  gap: 12px;
-              }
-              .color-swatch-grid {
-                  display: grid;
-                  grid-template-columns: repeat(6, 1fr);
-                  gap: 10px;
-                  padding: 0 5px 10px;
-                  .swatch-item {
-                      width: 28px;
-                      height: 28px;
-                      border-radius: 50%;
-                      border: none;
-                      cursor: pointer;
-                      position: relative;
-                      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-                      &.light { border: 1px solid #f0f0f0; }
-                      &:hover { transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-                      &.active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #000; transform: scale(0.9); }
-                  }
-              }
-              .option-item {
+            .left-controls {
                 display: flex;
                 align-items: center;
-                gap: 12px;
-                font-size: 14px;
-                color: #555;
-                cursor: pointer;
-                &:hover { color: #000; }
-                
-                input[type="checkbox"] {
-                    display: none;
-                    &:checked+.custom-checkbox {
-                        background: #000;
-                        border-color: #000;
-                        position: relative;
-                        &::after {
-                            content: "";
-                            position: absolute;
-                            top: 50%; left: 50%;
-                            transform: translate(-50%, -50%);
-                            width: 8px; height: 8px;
-                            background: #fff;
-                            border-radius: 1px;
+                gap: 30px;
+                .filter-toggle-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 13px;
+                    text-transform: uppercase;
+                    transition: transform 0.2s;
+                    &:hover { transform: translateX(5px); }
+                }
+                .v-divider { width: 1px; height: 15px; background: #ddd; }
+                .product-count { font-size: 13px; font-weight: 700; color: #888; }
+            }
+
+            .active-filters {
+                flex: 1;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 0 30px;
+                .filter-chip {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: #000;
+                    color: #fff;
+                    padding: 4px 12px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    .remove-chip { background: transparent; border: none; color: #fff; cursor: pointer; padding: 0; }
+                }
+                .clear-all-link { background: transparent; border: none; font-size: 11px; font-weight: 700; text-decoration: underline; cursor: pointer; text-transform: uppercase; }
+            }
+
+            .right-controls {
+                .custom-sort {
+                    position: relative;
+                    .sort-trigger { display: flex; align-items: center; gap: 8px; cursor: pointer; .sort-label { font-size: 14px; color: #888; } .selected-value { font-weight: 700; font-size: 14px; color: #000; } }
+                    .sort-dropdown { position: absolute; top: calc(100% + 15px); right: 0; min-width: 180px; background: #fff; border: 1px solid #f0f0f0; box-shadow: 0 10px 30px rgba(0,0,0,0.08); z-index: 100; list-style: none; padding: 8px 0; li { padding: 10px 20px; font-size: 13px; color: #666; cursor: pointer; &:hover { background: #f9f9f9; color: #000; } } }
+                }
+            }
+        }
+
+        .products-layout {
+            display: flex;
+            gap: 60px;
+            &.sidebar-hidden .filter-sidebar { width: 0; opacity: 0; pointer-events: none; }
+            .filter-sidebar {
+                width: 240px;
+                flex-shrink: 0;
+                transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+                .filter-group {
+                    border-bottom: 1px solid #eee;
+                    margin-bottom: 5px;
+                    .group-header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; }
+                    .group-options {
+                        max-height: 0;
+                        overflow: hidden;
+                        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+                        &.expanded {
+                            max-height: 1000px;
+                            padding-bottom: 25px;
                         }
+
+                    .option-row { margin-bottom: 12px; }
+                    .option-item {
+                        display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 13px; color: #555; transition: all 0.2s;
+                        &:hover { color: #000; transform: translateX(3px); }
+                        input { display: none; }
+                        .custom-checkbox { width: 18px; height: 18px; border: 2px solid #ddd; position: relative; &::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; background: #000; opacity: 0; } }
+                        input:checked + .custom-checkbox { border-color: #000; &::after { opacity: 1; } }
+                    }
+                    .empty-sub-message { padding: 10px 0; .info-text { font-size: 12px; color: #aaa; font-style: italic; } }
+                        .color-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; .swatch-item { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #eee; cursor: pointer; &.active { border: 2px solid #000; transform: scale(1.1); } } }
                     }
                 }
-                .custom-checkbox {
-                    width: 20px; height: 20px;
-                    border: 1.5px solid #000;
-                    border-radius: 0;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-                    flex-shrink: 0;
+            }
+            .products-grid-area {
+                flex: 1;
+                .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 50px 30px; }
+                .product-card {
+                    cursor: pointer;
+                    .card-image-wrapper { aspect-ratio: 1/1.25; background: #fdfdfd; position: relative; overflow: hidden; img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.6s; } .wishlist-btn { position: absolute; top: 15px; right: 15px; background: #fff; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); } }
+                    &:hover img { transform: scale(1.05); }
+                    .card-info { padding: 15px 0; .brand-name { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; } .product-title { font-size: 14px; font-weight: 600; margin: 5px 0; } .current-price { font-weight: 700; font-size: 15px; } }
                 }
-              }
-            }
-          }
-        }
-      }
-
-      .products-grid-area {
-        flex: 1;
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 40px;
-        }
-      }
-    }
-
-    .product-card {
-        transition: transform 0.3s ease;
-        cursor: pointer;
-        .card-image-wrapper {
-            position: relative;
-            aspect-ratio: 1 / 1.25;
-            background: #fdfdfd;
-            overflow: hidden;
-            img {
-                width: 100%; height: 100%;
-                object-fit: contain;
-                transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-                cursor: pointer;
-            }
-            .badge {
-                position: absolute; top: 15px; left: 15px;
-                font-size: 9px; font-weight: 800; padding: 5px 10px;
-                border-radius: 2px; letter-spacing: 1px; z-index: 10;
-            }
-            .bestseller { background: #000; color: #fff; }
-            .new { background: #fff; color: #000; border: 1px solid #eee; }
-            .discount { background: #ff3b30; color: #fff; }
-
-            .wishlist-btn {
-                position: absolute; top: 15px; right: 15px;
-                background: #fff; border: none; width: 34px; height: 34px;
-                border-radius: 50%; display: flex; align-items: center; justify-content: center;
-                z-index: 5; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            }
-            .quick-plus-trigger {
-                position: absolute; bottom: 15px; right: 15px;
-                width: 34px; height: 34px; background: #fff; border-radius: 50%;
-                display: flex; align-items: center; justify-content: center;
-                z-index: 5; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             }
         }
-        &:hover img { transform: scale(1.05); }
-        .card-info {
-            padding: 15px 0;
-            .brand-name { font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; margin-bottom: 5px; cursor: pointer; display: inline-block; &:hover { color: #000; } }
-            .product-title { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: #000; cursor: pointer; &:hover { color: #666; } }
-            .price-row {
-                .current-price { font-weight: 700; font-size: 15px; &.discounted { color: #e8000d; } }
-                .original-price { font-size: 13px; color: #999; text-decoration: line-through; margin-right: 10px; }
-            }
-        }
-    }
-
-    .skeleton-card {
-      .skeleton-image { width: 100%; aspect-ratio: 4/5; background: #f5f5f5; border-radius: 4px; margin-bottom: 15px; }
-      .skeleton-text { height: 12px; background: #f5f5f5; border-radius: 2px; margin-bottom: 10px; }
-      .skeleton-text.short { width: 40%; }
-      .skeleton-text.long { width: 80%; }
-    }
-
-    /* Whomopsy Elite Paging: Load More Aesthetics 🏛️ */
-    .load-more-container {
-        display: flex;
-        justify-content: center;
-        margin-top: 80px;
-        padding-bottom: 60px;
-    }
-
-    .load-more-btn {
-        position: relative;
-        background: transparent;
-        border: none;
-        padding: 15px 40px;
-        cursor: pointer;
-        overflow: hidden;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-
-        .btn-text {
-            font-family: var(--font-nav);
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            color: #000;
-            position: relative;
-            z-index: 2;
-        }
-
-        .btn-line {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 60px;
-            height: 1px;
-            background: #000;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        &:hover:not(:disabled) {
-            .btn-line {
-                width: 100%;
-            }
-            transform: translateY(-2px);
-        }
-
-        &:disabled {
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        &.loading {
-            .btn-text {
-                color: #888;
-            }
-            .btn-line {
-                width: 100%;
-                background: #eee;
-                animation: pagingPulse 1.5s infinite ease-in-out;
-            }
-        }
-    }
-
-    @keyframes pagingPulse {
-        0% { transform: translateX(-100%) scaleX(0.1); left: 0; opacity: 0; }
-        50% { transform: translateX(0) scaleX(1); left: 0; opacity: 1; }
-        100% { transform: translateX(100%) scaleX(0.1); left: 0; opacity: 0; }
+        .load-more-container { display: flex; justify-content: center; margin: 80px 0; .load-more-btn { background: #000; color: #fff; border: none; padding: 18px 50px; font-weight: 800; cursor: pointer; transition: all 0.3s; &:hover { background: #333; letter-spacing: 2px; } } }
     }
   `]
 })
@@ -570,315 +288,244 @@ export class ProductListWithBrandComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private productService = inject(ProductService);
 
-  brandName = signal('');
+  brandName = signal<string>('');
   products = signal<Product[]>([]);
-  isLoading = signal(true);
-  isFilterVisible = signal(true);
-  quickAddProductId = signal<number | null>(null);
-
-  // Whomopsy Elite Paging Ritimleri 🏛️
-  currentPage = signal(1);
-  pageSize = 21;
-  hasMore = signal(true);
-  isMoreLoading = signal(false);
-
-  // Dinamik Breadcrumb
-  breadcrumbItems = signal(['Anasayfa', 'Markalar', '']);
-
-  // Filters
-  selectedFilters = signal<{ group: string, option: string }[]>([]);
-
-  // Whomopsy asaletindeki dinamik filtre grupları
+  selectedFilters = signal<{ group: string, option: string, value: any }[]>([]);
+  
   filterGroups = signal<FilterGroup[]>([
+    { name: 'Cinsiyet', key: 'gender', isExpanded: true, options: [
+      { label: 'Kadın', value: 2 },
+      { label: 'Erkek', value: 1 },
+      { label: 'Çocuk', value: 3 },
+      { label: 'Unisex', value: 0 }
+    ]},
     {
-      name: 'Cinsiyet', key: 'gender', isExpanded: true,
-      options: ['Kadın', 'Erkek', 'Çocuk', 'Unisex']
+      name: 'Ana Kategori', key: 'main-category', isExpanded: true,
+      options: [] 
     },
-    {
-      name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Backend'den dinamik akacak 🏛️
-    },
-    {
-      name: 'Marka', key: 'brand', isExpanded: true,
-      options: ['Adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
-    },
-    {
-      name: 'Beden', key: 'size', isExpanded: false,
-      options: ['36', '37', '38', '39', '40', '41', '42', '44']
-    },
-    {
-      name: 'Renk', key: 'color', isExpanded: false,
-      options: ['Siyah', 'Beyaz', 'Mavi', 'Kırmızı', 'Yeşil', 'Gri', 'Kemik', 'Krem', 'Pembe', 'Lila', 'Kahve', 'Sarı', 'Lacivert', 'Bordo']
-    },
-    {
-      name: 'Fiyat', key: 'price', isExpanded: false,
-      options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL']
-    }
+    { name: 'Alt Kategori', key: 'sub-category', isExpanded: true, options: [] },
+    { name: 'Marka', key: 'brand', isExpanded: true, options: [
+      { label: 'Adidas', value: 'Adidas' },
+      { label: 'Converse', value: 'Converse' },
+      { label: 'New Balance', value: 'NewBalance' },
+      { label: 'Nike', value: 'Nike' },
+      { label: 'Puma', value: 'Puma' },
+      { label: 'Vans', value: 'Vans' }
+    ]},
+    { name: 'Beden', key: 'size', isExpanded: false, options: [] },
+    { name: 'Renk', key: 'color', isExpanded: false, options: [
+      { label: 'Siyah', value: 'Siyah' },
+      { label: 'Beyaz', value: 'Beyaz' },
+      { label: 'Mavi', value: 'Mavi' },
+      { label: 'Kırmızı', value: 'Kırmızı' },
+      { label: 'Yeşil', value: 'Yeşil' },
+      { label: 'Gri', value: 'Gri' },
+      { label: 'Kemik', value: 'Kemik' },
+      { label: 'Krem', value: 'Krem' }
+    ]},
+    { name: 'Fiyat', key: 'price', isExpanded: false, options: [
+      { label: '0 - 2500 TL', value: '0-2500' },
+      { label: '2.500 - 5.500 TL', value: '2500-5500' },
+      { label: '+ 5.500 TL', value: '5500-up' }
+    ]}
   ]);
 
-  // Sort Menu
+  isSidebarVisible = signal(true);
   isSortOpen = signal(false);
-  sortOptions = [
-    { label: 'Önerilenler', value: 'recommended' },
-    { label: 'Artan Fiyat', value: 'price_asc' },
-    { label: 'Azalan Fiyat', value: 'price_desc' },
-    { label: 'Yeni Gelenler', value: 'newest' },
-    { label: 'Çok Satanlar', value: 'bestsellers' }
-  ];
-  selectedSort = signal(this.sortOptions[0]);
+  currentSortLabel = signal('Önerilen');
+  hasMore = signal(false);
+  isLoading = signal(false);
+  isMoreLoading = signal(false);
+  totalCount = signal(0);
+  currentPage = signal(1);
+  pageSize = 21;
+
+  private categoryTree: FilterOption[] = [];
+
+  // Akıllı Beden Setleri
+  private readonly sizeSets = {
+    shoes: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
+    clothing: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+    default: ['36', '37', '38', 'XS', 'S', 'M', 'Standart']
+  };
 
   ngOnInit(): void {
-    this.loadCategories();
     this.route.params.subscribe(params => {
-      const brand = params['brand'];
-      const formattedBrand = brand.toLowerCase();
-      this.brandName.set(brand);
-      this.breadcrumbItems.set(['Anasayfa', 'Markalar', brand]);
-      
-      this.loadProducts(brand);
-
-      const currentFilters = this.selectedFilters();
-      const brandOption = this.filterGroups().find(g => g.key === 'brand')?.options.find(o => o.toLowerCase() === formattedBrand);
-      const finalOption = brandOption || brand;
-
-      if (!currentFilters.some(f => f.group === 'Marka' && f.option === finalOption)) {
-          this.selectedFilters.set([...currentFilters, { group: 'Marka', option: finalOption }]);
-      }
+      this.brandName.set(params['brand']);
+      this.loadCategories();
+      this.updateDynamicSizes();
+      this.loadProducts(params['brand']);
     });
-
-    if (this.isFilterVisible()) {
-      document.body.style.overflow = 'hidden';
-    }
   }
 
   loadCategories(): void {
-    this.productService.getCategories().subscribe({
-        next: (categories) => {
-            const categoryNames = categories.map(c => c.name);
-            const updated = this.filterGroups().map(g => {
-                if (g.key === 'category') {
-                    return { ...g, options: categoryNames };
-                }
-                return g;
-            });
-            this.filterGroups.set(updated);
-        }
+    this.productService.getCategoryTree().subscribe({
+      next: (categories) => {
+        const order = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
+          this.categoryTree = categories
+            .filter(c => order.includes(c.name || c.Name))
+            .sort((a, b) => order.indexOf(a.name || a.Name) - order.indexOf(b.name || b.Name))
+            .map(c => ({
+              label: c.name || c.Name,
+              value: c.id || c.Id,
+              isExpanded: false,
+              subOptions: (c.subCategories || c.SubCategories)?.map((sub: any) => ({
+                label: sub.name || sub.Name,
+                value: sub.id || sub.Id
+              })) || []
+            }));
+
+        this.filterGroups.update(groups => groups.map(g => 
+          g.key === 'main-category' ? { ...g, options: this.categoryTree } : g
+        ));
+        this.updateSubCategories();
+      }
     });
   }
 
-  loadProducts(brand: string): void {
-    this.isLoading.set(true);
-    this.currentPage.set(1);
-    this.hasMore.set(true);
-
-    const filterParams = this.getUnifiedFilterParams();
-
-    // Marka bazlı sayfada her zaman en azından marka filtresi vardır 🏛️
-    this.productService.getProductsByFilter(filterParams.gender, brand, filterParams.categoryId, undefined, 1, this.pageSize).subscribe({
-      next: (data) => {
-        this.products.set(data);
-        this.isLoading.set(false);
-        if (data.length < this.pageSize) {
-            this.hasMore.set(false);
-        }
-      },
-      error: () => this.isLoading.set(false)
-    });
-    this.updateDynamicSizeSets();
-  }
-
-  /**
-   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 Marka Ürünü) Whosepsy standartlarında çeker.
-   */
-  loadMore(): void {
-    if (this.isMoreLoading() || !this.hasMore()) return;
-
-    this.isMoreLoading.set(true);
-    const nextPage = this.currentPage() + 1;
-    const currentBrand = this.brandName();
-    const filterParams = this.getUnifiedFilterParams();
-
-    this.productService.getProductsByFilter(filterParams.gender, currentBrand, filterParams.categoryId, undefined, nextPage, this.pageSize).subscribe({
-        next: (newData) => {
-            if (newData.length > 0) {
-                this.products.update(prev => [...prev, ...newData]);
-                this.currentPage.set(nextPage);
-                if (newData.length < this.pageSize) {
-                    this.hasMore.set(false);
-                }
-            } else {
-                this.hasMore.set(false);
-            }
-            this.isMoreLoading.set(false);
-        },
-        error: (err) => {
-            console.error('Daha fazla marka ürünü yüklenirken hata:', err);
-            this.isMoreLoading.set(false);
-        }
-    });
-  }
-
-  private getUnifiedFilterParams() {
+  updateDynamicSizes(): void {
     const selected = this.selectedFilters();
-    
-    // Gender mapping: Kadın=2, Erkek=1, Çocuk=3, Unisex=0
-    const genderStr = selected.find(f => f.group === 'Cinsiyet')?.option;
-    let gender: number | undefined = undefined;
-    if (genderStr === 'Erkek') gender = 1;
-    else if (genderStr === 'Kadın') gender = 2;
-    else if (genderStr === 'Çocuk') gender = 3;
-    else if (genderStr === 'Unisex') gender = 0;
-
-    // Marka zaten path'den geliyor ama filtrelerden de saptanabilir.
-    // CategoryId backend GUID bekliyor.
-    const categoryId = undefined;
-
-    return { gender, categoryId };
-  }
-
-  onFilterToggle(groupName: string, option: string): void {
-    const current = this.selectedFilters();
-    const index = current.findIndex(f => f.group === groupName && f.option === option);
-
-    if (index === -1) {
-      this.selectedFilters.set([...current, { group: groupName, option: option }]);
-    } else {
-      this.selectedFilters.set(current.filter((_, i) => i !== index));
-    }
-    this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Filtre değişince deryayı tazele 🏛️
-  }
-
-  private readonly sizeSets = {
-    shoesAdult: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
-    shoesChild: ['18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35'],
-    clothingAdult: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    clothingChild: ['2-3 Yaş', '4-5 Yaş', '6-7 Yaş', '8-9 Yaş', '10-11 Yaş', '12-13 Yaş'],
-    accessory: ['Standart'],
-    default: ['36', '37', '38', '39', '40', '41', 'XS', 'S', 'M', 'L', 'XL', 'Standart']
-  };
-
-  updateDynamicSizeSets(): void {
-    const selected = this.selectedFilters();
-    const groups = selected.filter(f => f.group === 'Ürün Grubu').map(f => f.option);
-    const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.option);
-    
-    const isAdultSelected = genders.some(g => g === 'Kadın' || g === 'Erkek');
-    const isChildSelected = genders.some(g => g === 'Çocuk');
-
+    const groups = selected.filter(f => f.group === 'Ana Kategori').map(f => f.option);
     let newSizes: string[] = [];
 
     if (groups.length === 0) {
       newSizes = this.sizeSets.default;
     } else {
-      if (groups.includes('Ayakkabı')) {
-        if (!isAdultSelected && !isChildSelected) {
-          newSizes.push(...this.sizeSets.shoesAdult);
-        } else {
-          if (isAdultSelected) newSizes.push(...this.sizeSets.shoesAdult);
-          if (isChildSelected) newSizes.push(...this.sizeSets.shoesChild);
-        }
-      }
-      
-      if (groups.includes('Giyim')) {
-        if (!isAdultSelected && !isChildSelected) {
-          newSizes.push(...this.sizeSets.clothingAdult);
-        } else {
-          if (isAdultSelected) newSizes.push(...this.sizeSets.clothingAdult);
-          if (isChildSelected) newSizes.push(...this.sizeSets.clothingChild);
-        }
-      }
-      
-      if (groups.includes('Aksesuar')) {
-        newSizes.push(...this.sizeSets.accessory);
-      }
+      if (groups.includes('Ayakkabı')) newSizes.push(...this.sizeSets.shoes);
+      if (groups.includes('Giyim')) newSizes.push(...this.sizeSets.clothing);
+      if (newSizes.length === 0) newSizes = ['Standart'];
     }
 
-    const uniqueSizes = [...new Set(newSizes)];
-    
-    const updated = this.filterGroups().map(g => {
-      if (g.key === 'size') {
-        return { ...g, options: uniqueSizes };
-      }
-      return g;
+    const sizeOptions = [...new Set(newSizes)].map(s => ({ label: s, value: s }));
+    this.filterGroups.update(groups => groups.map(g => 
+      g.key === 'size' ? { ...g, options: sizeOptions } : g
+    ));
+  }
+
+  loadProducts(brand: string): void {
+    this.isLoading.set(true);
+    this.currentPage.set(1);
+    const filters = this.selectedFilters();
+    const genders = filters.filter(f => f.group === 'Cinsiyet').map(f => f.value as number);
+    const categoryIds = filters.filter(f => f.group === 'Alt Kategori' || f.group === 'Ana Kategori').map(f => f.value.toString());
+
+    this.productService.getProductsByFilter(
+      genders.length > 0 ? genders : undefined,
+      [brand],
+      categoryIds,
+      undefined,
+      1,
+      this.pageSize
+    ).subscribe({
+      next: (res) => {
+        this.products.set(res.items);
+        this.totalCount.set(res.totalCount);
+        this.hasMore.set(res.totalCount > this.products().length);
+        this.isLoading.set(false);
+      },
+      error: () => this.isLoading.set(false)
     });
-    
-    this.filterGroups.set(updated);
   }
 
-  removeFilter(filter: { group: string, option: string }): void {
+  onFilterToggle(groupName: string, option: FilterOption): void {
     const current = this.selectedFilters();
-    this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
-    this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Filtre kalkınca deryayı tazele 🏛️
-  }
+    const index = current.findIndex(f => f.group === groupName && f.option === option.label);
 
-  clearFilters(): void {
-    this.selectedFilters.set([{ group: 'Marka', option: this.brandName() }]);
-    this.updateDynamicSizeSets();
-    this.loadProducts(this.brandName()); // Deryayı aslına döndür 🏛️
-  }
-
-  isSelected(groupName: string, option: string): boolean {
-    return this.selectedFilters().some(f => f.group === groupName && f.option.toLowerCase() === option.toLowerCase());
-  }
-
-  toggleFilter(): void {
-    this.isFilterVisible.set(!this.isFilterVisible());
-    if (this.isFilterVisible()) {
-      document.body.style.overflow = 'hidden';
+    if (index === -1) {
+      if (groupName === 'Ana Kategori') {
+        this.selectedFilters.set([...current.filter(f => f.group !== 'Ana Kategori' && f.group !== 'Alt Kategori'), { group: groupName, option: option.label, value: option.value }]);
+      } else {
+        this.selectedFilters.set([...current, { group: groupName, option: option.label, value: option.value }]);
+      }
     } else {
-      document.body.style.overflow = 'auto';
+      this.selectedFilters.set(current.filter((_, i) => i !== index));
     }
+
+    if (groupName === 'Ana Kategori') {
+      this.updateSubCategories();
+      this.updateDynamicSizes();
+    }
+    this.loadProducts(this.brandName());
   }
 
-  toggleFilterGroup(group: FilterGroup): void {
-    const updated = this.filterGroups().map(g =>
-      g.key === group.key ? { ...g, isExpanded: !g.isExpanded } : g
-    );
-    this.filterGroups.set(updated);
+  updateSubCategories(): void {
+    const selectedMain = this.selectedFilters().find(f => f.group === 'Ana Kategori');
+    let subOptions: FilterOption[] = [];
+    
+    if (selectedMain) {
+      const parent = this.categoryTree.find(c => c.label === selectedMain.option);
+      if (parent) subOptions = parent.subOptions || [];
+    }
+
+    this.filterGroups.update(groups => groups.map(g => 
+      g.key === 'sub-category' ? { ...g, options: subOptions } : g
+    ));
   }
 
-  setQuickAddProduct(productId: number | null): void {
-    this.quickAddProductId.set(productId);
+  isSelected(groupName: string, optionLabel: string): boolean {
+    return this.selectedFilters().some(f => f.group === groupName && f.option === optionLabel);
   }
 
-  addToCart(product: Product, size: string | number): void {
-    console.log(`Sepete eklendi: ${product.name} - Beden: ${size}`);
-    this.quickAddProductId.set(null);
-  }
+  toggleSidebar(): void { this.isSidebarVisible.update(v => !v); }
+  toggleSort(): void { this.isSortOpen.update(v => !v); }
+  toggleFilterGroup(group: FilterGroup): void { group.isExpanded = !group.isExpanded; }
 
-  @HostListener('window:click')
-  closeSort(): void {
+  applySort(id: string, label: string): void {
+    this.currentSortLabel.set(label);
     this.isSortOpen.set(false);
   }
 
-  toggleSort(): void {
-    this.isSortOpen.set(!this.isSortOpen());
+  removeFilter(filter: any): void {
+    this.selectedFilters.update(current => current.filter(f => !(f.group === filter.group && f.option === filter.option)));
+    if (filter.group === 'Ana Kategori') {
+      this.updateSubCategories();
+      this.updateDynamicSizes();
+    }
+    this.loadProducts(this.brandName());
   }
 
-  selectSort(option: any): void {
-    this.selectedSort.set(option);
-    this.isSortOpen.set(false);
+  clearAllFilters(): void {
+    this.selectedFilters.set([]);
+    this.updateSubCategories();
+    this.updateDynamicSizes();
+    this.loadProducts(this.brandName());
   }
 
-  getColorHex(color: string): string {
-    const colors: { [key: string]: string } = {
-      'Siyah': '#000000',
-      'Kemik': '#F9F6EE',
-      'Krem': '#FFF9E0',
-      'Pembe': '#F8B4E5',
-      'Lila': '#B392D4',
-      'Kahve': '#8B5A2B',
-      'Yeşil': '#769E49',
-      'Sarı': '#FFEC33',
-      'Mavi': '#4A90E2',
-      'Beyaz': '#FFFFFF',
-      'Gri': '#B0B0B0',
-      'Kırmızı': '#D0021B',
-      'Lacivert': '#000080',
-      'Bordo': '#800000'
-    };
-    return colors[color] || '#ccc';
+  loadMore(): void {
+    if (this.isMoreLoading() || !this.hasMore()) return;
+
+    this.isMoreLoading.set(true);
+    const nextPage = this.currentPage() + 1;
+    const brand = this.brandName();
+    const filters = this.selectedFilters();
+    const genders = filters.filter(f => f.group === 'Cinsiyet').map(f => f.value as number);
+    const categoryIds = filters.filter(f => f.group === 'Alt Kategori' || f.group === 'Ana Kategori').map(f => f.value.toString());
+
+    this.productService.getProductsByFilter(
+      genders.length > 0 ? genders : undefined,
+      [brand],
+      categoryIds,
+      undefined,
+      nextPage,
+      this.pageSize
+    ).subscribe({
+      next: (res) => {
+        if (res.items.length > 0) {
+          this.products.update(prev => [...prev, ...res.items]);
+          this.totalCount.set(res.totalCount);
+          this.currentPage.set(nextPage);
+          this.hasMore.set(res.totalCount > this.products().length);
+        } else {
+          this.hasMore.set(false);
+        }
+        this.isMoreLoading.set(false);
+      },
+      error: () => this.isMoreLoading.set(false)
+    });
+  }
+
+  getColorHex(label: string): string {
+    const colors: any = { 'Siyah': '#000', 'Beyaz': '#fff', 'Mavi': '#0000ff', 'Kırmızı': '#ff0000', 'Yeşil': '#008000', 'Gri': '#808080', 'Kemik': '#f5f5dc', 'Krem': '#fffdd0' };
+    return colors[label] || '#ccc';
   }
 }

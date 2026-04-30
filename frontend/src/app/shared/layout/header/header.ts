@@ -3,6 +3,9 @@ import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Navbar } from '../navbar/navbar';
+import { SearchService } from '../../../core/services/search.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-header',
@@ -13,14 +16,16 @@ import { Navbar } from '../navbar/navbar';
 })
 export class Header {
   private router = inject(Router);
+  public searchService = inject(SearchService);
+  private cartService = inject(CartService);
+  public authService = inject(AuthService);
   
-  cartCount = signal(0);
-  isSearchOpen = signal(false);
+  cartCount = this.cartService.cartCount;
   searchQuery = '';
 
   toggleSearch(): void {
-    this.isSearchOpen.set(!this.isSearchOpen());
-    if (!this.isSearchOpen()) {
+    this.searchService.toggle();
+    if (!this.searchService.isOpen()) {
         this.searchQuery = '';
     }
   }
@@ -28,9 +33,14 @@ export class Header {
   onSearchSubmit(): void {
     const query = this.searchQuery.trim();
     if (query) {
-      this.isSearchOpen.set(false);
+      this.searchService.close();
       this.router.navigate(['/urunler'], { queryParams: { search: query } });
       this.searchQuery = '';
     }
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

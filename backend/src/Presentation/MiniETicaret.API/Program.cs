@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MiniETicaret.Infrastructure;
@@ -6,6 +7,7 @@ using MiniETicaret.Persistence;
 using MiniETicaret.Persistence.Context;
 using MiniETicaret.Persistence.Seeds;
 using MiniETicaret.API.Middlewares;
+using MiniETicaret.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +18,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddPersistenceServices(connectionString);
 builder.Services.AddInfrastructureServices();
 
-// MediatR
-/*"Application katmanındaki tüm Command/Query Handler'ları otomatik bul ve kaydet." Bu sayede 
-LoginCommandHandler, GetUsersQueryHandler vs. hepsi otomatir*/
-builder.Services.AddMediatR(cfg =>
-    cfg.RegisterServicesFromAssembly(typeof(MiniETicaret.Application.Interfaces.IUnitOfWork).Assembly));
+builder.Services.AddApplicationServices();
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -58,7 +56,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        // Enum'ları sayı yerine isim olarak serialize et: status=1 → status="Success"
+        // Hem input'ta string ("Male") hem sayı (0) kabul edilir, output her zaman string.
+        opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 

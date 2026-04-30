@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { inject } from '@angular/core';
 import { environment } from '../../../../../environments/environment';
 
 @Component({
@@ -34,6 +36,8 @@ export class RegisterComponent {
     private authService: AuthService
   ) { }
 
+  private notificationService = inject(NotificationService);
+
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent): void {
     const x = (e.clientX / window.innerWidth) * 100;
@@ -51,7 +55,11 @@ export class RegisterComponent {
       this.errorMessage = 'Lütfen zorunlu alanları doldurun.';
       return;
     }
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.errorMessage = 'Geçerli bir email adresi giriniz.';
+      return;
+    }
     if (this.password !== this.confirmPassword) {
       this.errorMessage = 'Şifreler eşleşmiyor.';
       return;
@@ -62,17 +70,15 @@ export class RegisterComponent {
 
     const registerData = {
       fullName: `${this.firstName} ${this.lastName}`,
-      firstName: this.firstName,
-      lastName: this.lastName,
       email: this.email,
-      phone: this.phone,
+      phoneNumber: this.phone,
       password: this.password,
       gender: this.gender,
       birthDate: this.birthDate,
       address: this.address
     };
 
-    console.log('Whoopsy Kayıt Verisi:', registerData);
+    console.log('Register Data:', registerData);
 
     this.authService.register(registerData).subscribe({
       next: (response) => {
@@ -85,5 +91,16 @@ export class RegisterComponent {
         this.errorMessage = err.error?.message || 'Kayıt sırasında bir hata oluştu.';
       }
     });
+  }
+
+  onSocialLogin(provider: string): void {
+    this.notificationService.show(`${provider} servisi üzerinden işlem başlatılıyor...`, 'info');
+    
+    setTimeout(() => {
+      // Simulate social registration session activation
+      this.authService.setSession('social-demo-token', 'social-refresh-token');
+      this.notificationService.show(`${provider} ile hesap oluşturuldu ve giriş yapıldı!`, 'success');
+      this.router.navigate(['/']);
+    }, 2000);
   }
 }

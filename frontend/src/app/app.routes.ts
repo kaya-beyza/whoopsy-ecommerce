@@ -6,19 +6,19 @@ import { Home } from './features/home/home';
 import { MainLayoutComponent } from './core/layout/main-layout/main-layout';
 
 export const routes: Routes = [
-  // 1. GİRİŞ SAYFASI (Layout Dışında - Sade Sayfa)
+  // 1. GİRİŞ SAYFASI (Layout Dışında)
   {
     path: 'login',
     component: LoginComponent
   },
 
-  // 2. KAYIT SAYFASI (Layout Dışında - Sade Sayfa)
+  // 2. KAYIT SAYFASI (Layout Dışında)
   {
     path: 'register',
     component: RegisterComponent
   },
 
-  // 3. ANA ŞABLON (Tüm iç sayfalar bunun içinde derlenecek)
+  // 3. ANA ŞABLON (Tüm iç sayfalar MainLayout içinde)
   {
     path: '',
     component: MainLayoutComponent,
@@ -40,7 +40,6 @@ export const routes: Routes = [
       // ── SİPARİŞLER ──
       {
         path: 'orders',
-        // canActivate: [authGuard],
         loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
       },
 
@@ -50,30 +49,30 @@ export const routes: Routes = [
         loadChildren: () => import('./features/products/products.routes').then(m => m.routes)
       },
 
-      // ── ÜRÜN EKLEME SAYFASI (Senin dalından geldi) ──
+      // ── ÜRÜN EKLEME SAYFASI ──
       {
         path: 'products/create',
-        // canActivate: [authGuard], 
         loadComponent: () => import('./features/products/pages/product-create/product-create.component').then(m => m.ProductCreateComponent)
       },
 
-      // ── SEPET SAYFASI (Senin dalından geldi) ──
+      // ── SEPET SAYFASI ──
       {
         path: 'cart',
-        // canActivate: [authGuard], 
         loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
       },
 
-      // ── ÖDEME SAYFASI (Checkout) ──
+      // ── ÖDEME / CHECKOUT (Birleştirilmiş Karar) ──
       {
         path: 'checkout',
-        // canActivate: [authGuard], // Kullanıcıların sadece giriş yaparak ödeme yapmasını istersen bunu aktif edebilirsin
-        loadComponent: () => import('./features/checkout/checkout.component').then(m => m.CheckoutComponent)
+        // canActivate: [authGuard], // Ödeme için login zorunluysa aktif et
+        // Eğer tek bir component ise loadComponent, alt rotaların varsa loadChildren kullanmalısın.
+        // Projenin yapısına göre main dalındaki loadChildren genelde daha doğrudur:
+        loadChildren: () => import('./features/checkout/checkout.routes').then(m => m.checkoutRoutes)
       }
     ]
   },
 
-  // 4. HATALI ROTA KONTROLÜ (Bilinmeyen bir URL girilirse anasayfaya atar)
+  // 4. HATALI ROTA KONTROLÜ
   {
     path: '**',
     redirectTo: '',

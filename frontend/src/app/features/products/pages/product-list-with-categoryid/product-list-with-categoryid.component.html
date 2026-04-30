@@ -17,11 +17,11 @@
         <!-- ... existing content ... -->
         <div class="left-controls">
             <button class="filter-toggle-btn" (click)="toggleFilter()">
-                <span class="material-symbols-sharp">{{ isFilterVisible() ? 'filter_list_off' : 'filter_list' }}</span>
-                <span>{{ isFilterVisible() ? 'Filtreleri Gizle' : 'Filtreleri Göster' }}</span>
+                <span class="material-symbols-sharp">tune</span>
+                FİLTRELE {{ isFilterVisible() ? 'KAPAT' : 'AÇ' }}
             </button>
             <div class="v-divider"></div>
-            <span class="product-count">{{ products().length }} Ürün Listeleniyor</span>
+            <span class="product-count">{{ totalCount() }} ÜRÜN</span>
         </div>
 
         <!-- Dynamic Filter Chips -->
@@ -67,20 +67,29 @@
                         <!-- Special UI for Color Swatches -->
                         <div class="color-swatch-grid" *ngIf="group.key === 'color'; else standardOptions">
                             <button *ngFor="let opt of group.options" class="swatch-item"
-                                [class.active]="isSelected(group.name, opt)"
-                                [class.light]="opt === 'Beyaz' || opt === 'Kemik' || opt === 'Krem'" [title]="opt"
-                                (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt)">
+                                [class.active]="isSelected(group.name, opt.label)"
+                                [class.light]="opt.label === 'Beyaz' || opt.label === 'Kemik' || opt.label === 'Krem'" [title]="opt.label"
+                                (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt.label)">
                             </button>
                         </div>
 
                         <!-- Standard Checkbox Options -->
                         <ng-template #standardOptions>
-                            <label class="option-item" *ngFor="let opt of group.options">
-                                <input type="checkbox" [checked]="isSelected(group.name, opt)"
-                                    (change)="onFilterToggle(group.name, opt)">
-                                <span class="custom-checkbox"></span>
-                                <span class="option-text">{{ opt }}</span>
-                            </label>
+                            <div class="standard-options">
+                                <ng-container *ngIf="group.key !== 'sub-category' || (group.key === 'sub-category' && group.options.length > 0)">
+                                    <div class="option-row" *ngFor="let opt of group.options">
+                                        <label class="option-item" [class.active]="isSelected(group.name, opt.label)">
+                                            <input type="checkbox" [checked]="isSelected(group.name, opt.label)"
+                                                (change)="onFilterToggle(group.name, opt)">
+                                            <span class="custom-checkbox"></span>
+                                            <span class="option-text">{{ opt.label }}</span>
+                                        </label>
+                                    </div>
+                                </ng-container>
+                                <div class="empty-sub-message" *ngIf="group.key === 'sub-category' && group.options.length === 0">
+                                    <span class="info-text">Lütfen önce bir ana kategori seçiniz.</span>
+                                </div>
+                            </div>
                         </ng-template>
                     </div>
                 </div>
@@ -101,52 +110,13 @@
 
                 <!-- Actual Product Cards -->
                 <ng-container *ngIf="!isLoading()">
-                    <div class="product-card" *ngFor="let product of products()"
-                        [routerLink]="['/urunler/detay', product.id]"
-                        (mouseleave)="setQuickAddProduct(null)">
-
-                        <div class="card-image-wrapper">
-                            <span class="badge bestseller" *ngIf="product.isBestseller">BESTSELLER</span>
-                            <span class="badge new" *ngIf="product.isNew">YENİ</span>
-                            <span class="badge discount" *ngIf="product.discountLabel">{{ product.discountLabel
-                                }}</span>
-
-                            <button class="wishlist-btn" (click)="$event.stopPropagation()">
-                                <span class="material-symbols-sharp">favorite</span>
-                            </button>
-
-                            <img [src]="product.imageUrl" [alt]="product.name" class="main-img">
-                            <div class="quick-plus-trigger" (click)="setQuickAddProduct(product.id); $event.stopPropagation()">
-                                <span class="material-symbols-sharp">add</span>
-                            </div>
-
-                            <div class="quick-size-selector" [class.active]="quickAddProductId() === product.id" (click)="$event.stopPropagation()">
-                                <p class="quick-add-title">HIZLI EKLE</p>
-                                <div class="sizes-grid">
-                                    <button *ngFor="let size of product.sizes" (click)="addToCart(product, size)"
-                                        class="size-btn">
-                                        {{ size }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card-info">
-                            <p class="brand-name">{{ product.brand }}</p>
-                            <h3 class="product-title">{{ product.name }}</h3>
-                            <div class="price-row">
-                                <span class="original-price" *ngIf="product.originalPrice">{{ product.originalPrice |
-                                    number:'1.0-0' }} TL</span>
-                                <span class="current-price" [class.discounted]="product.originalPrice">{{ product.price
-                                    |
-                                    number:'1.0-0' }} TL</span>
-                            </div>
-                        </div>
-                    </div>
+                  @for (product of products(); track product.id) {
+                    <app-product-card [product]="product" />
+                  }
                 </ng-container>
             </div>
 
-            <!-- Whomopsy Elite Paging: Load More Button 🏛️ -->
+            <!-- Load More Implementation -->
             <div class="load-more-container" *ngIf="hasMore() && !isLoading()">
                 <button class="load-more-btn" [class.loading]="isMoreLoading()" (click)="loadMore()" [disabled]="isMoreLoading()">
                     <span class="btn-text">{{ isMoreLoading() ? 'YÜKLENİYOR...' : 'DAHA FAZLA KEŞFET' }}</span>

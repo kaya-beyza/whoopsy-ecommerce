@@ -26,15 +26,14 @@
         <div class="footer-middle">
             <div class="footer-col">
                 <h3>Kategoriler</h3>
-                <a href="#">Kadın</a>
-                <a href="#">Erkek</a>
-                <a href="#">Çocuk</a>
-                <a href="#">Koleksiyon</a>
-                <a href="#">İndirim</a>
+                <a [routerLink]="['/urunler/kategori', 'a5e8fbef-1e30-4c30-b33e-3085e5bd13b6']">Ayakkabı</a>
+                <a [routerLink]="['/urunler/kategori', '34a4f1f4-5a50-44ef-ab7c-fd7753c0cdfd']">Giyim</a>
+                <a [routerLink]="['/urunler/kategori', 'fb59ff4e-c92d-4c1f-8c34-34373e1badba']">Aksesuar</a>
+                <a [routerLink]="['/urunler/kategori', '485762be-7130-485e-984c-fa34cd90b87b']">Diğer</a>
             </div>
             <div class="footer-col">
                 <h3>Hızlı Erişim</h3>
-                <a routerLink="/urunler" class="footer-link-with-icon">
+                <a href="#" class="footer-link-with-icon" (click)="openSearch($event)">
                     <span class="material-symbols-sharp">search</span>
                     Ara
                 </a>
@@ -51,18 +50,26 @@
 
         <div class="footer-right">
             <h3>Bize Ulaşın</h3>
+            <div class="contact-info" style="margin-bottom: 20px;">
+                <a href="mailto:hello@whoopsy.com" class="footer-link-with-icon">
+                    <span class="material-symbols-sharp">mail</span>
+                    hello@whoopsy.com
+                </a>
+            </div>
             <div class="social-icons">
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
-                <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
             </div>
         </div>
     </div>
     <div class="footer-bottom">
         <p>&copy; 2026 whOOPSy. Tüm hakları saklıdır.</p>
         <div class="payment-methods">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg" alt="Visa">
+            <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 50'%3E%3Ctext font-family='Arial, Helvetica, sans-serif' font-weight='900' font-style='italic' font-size='46' fill='%231A1F71' x='0' y='38' letter-spacing='-2'%3EVISA%3C/text%3E%3C/svg%3E" alt="Visa" class="visa-icon">
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1d/Troy_logo_troy_odeme_logo.svg" alt="Troy"
+            <img src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 50'%3E%3Ctext font-family='Arial, Helvetica, sans-serif' font-weight='900' font-style='italic' font-size='46' fill='%2300A2D0' x='0' y='38' letter-spacing='-1.5'%3ETROY%3C/text%3E%3C/svg%3E" alt="Troy"
                 class="troy-icon">
         </div>
     </div>

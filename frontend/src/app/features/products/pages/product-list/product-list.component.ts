@@ -2,12 +2,13 @@ import { Component, OnInit, signal, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
-import { Product, FilterGroup } from '../../models/product.model';
+import { Product, FilterGroup, FilterOption } from '../../models/product.model';
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
@@ -20,14 +21,15 @@ export class ProductListComponent implements OnInit {
   isFilterVisible = signal(true);
   quickAddProductId = signal<number | null>(null);
   searchTerm = signal<string | undefined>(undefined);
+  totalCount = signal(0);
 
-  // Whomopsy Elite Paging Ritimleri 🏛️
+  // Pagination state management
   currentPage = signal(1);
   pageSize = 21;
   hasMore = signal(true);
   isMoreLoading = signal(false);
   
-  // Whomopsy Category Mapping: İsimlerden GUID'lere Whosepsy asaletinde köprü kurar. 🏛️
+  // Category mapping: translates display names to unique GUIDs
   private categoryMap = new Map<string, string>();
 
   // Dinamik Başlık ve Breadcrumb
@@ -35,29 +37,36 @@ export class ProductListComponent implements OnInit {
   breadcrumbItems = signal(['Anasayfa', 'Kadın', 'Ayakkabı', 'Tüm Ayakkabılar']);
 
   // Filtreleme (Grup: Seçenek formatı için)
-  selectedFilters = signal<{ group: string, option: string }[]>([]);
+  selectedFilters = signal<{ group: string, option: string, value: any }[]>([]);
 
-  onFilterToggle(groupName: string, option: string): void {
+  onFilterToggle(groupName: string, option: FilterOption): void {
     const current = this.selectedFilters();
-    const index = current.findIndex(f => f.group === groupName && f.option === option);
+    const index = current.findIndex(f => f.group === groupName && f.option === option.label);
 
     if (index === -1) {
-      this.selectedFilters.set([...current, { group: groupName, option: option }]);
+      this.selectedFilters.set([...current, { group: groupName, option: option.label, value: option.value }]);
     } else {
       this.selectedFilters.set(current.filter((_, i) => i !== index));
     }
 
-    this.updateDynamicSizes();
+    // Synchronize categories: If a parent category is toggled, update subcategories
+    if (groupName === 'Ana Kategori') {
+        this.updateSubCategories();
+    }
+
+    if (groupName === 'Cinsiyet' || groupName === 'Ana Kategori' || groupName === 'Alt Kategori') {
+        this.updateDynamicSizes();
+    }
     this.updateHeader();
-    this.loadProducts(); // Whomopsy deryasını filtreye göre canlandır 🏛️
+    this.loadProducts(); 
   }
 
-  removeFilter(filter: { group: string, option: string }): void {
+  removeFilter(filter: { group: string, option: string, value?: any }): void {
     const current = this.selectedFilters();
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Whomopsy deryasını sadeleştir 🏛️
+    this.loadProducts(); 
   }
 
   updateHeader(): void {
@@ -76,11 +85,11 @@ export class ProductListComponent implements OnInit {
     this.selectedFilters.set([]);
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Deryayı aslına döndür 🏛️
+    this.loadProducts(); // Reset to default product list
   }
 
-  isSelected(groupName: string, option: string): boolean {
-    return this.selectedFilters().some(f => f.group === groupName && f.option === option);
+  isSelected(groupName: string, optionLabel: string): boolean {
+    return this.selectedFilters().some(f => f.group === groupName && f.option === optionLabel);
   }
 
   // Sıralama Menüsü
@@ -106,7 +115,7 @@ export class ProductListComponent implements OnInit {
 
   updateDynamicSizes(): void {
     const selected = this.selectedFilters();
-    const groups = selected.filter(f => f.group === 'Ürün Grubu').map(f => f.option);
+    const groups = selected.filter(f => f.group === 'Ana Kategori').map(f => f.option);
     const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.option);
     
     const isAdultSelected = genders.some(g => g === 'Kadın' || g === 'Erkek');
@@ -146,7 +155,8 @@ export class ProductListComponent implements OnInit {
     
     const updated = this.filterGroups().map(g => {
       if (g.key === 'size') {
-        return { ...g, options: uniqueSizes };
+        const sizeOptions: FilterOption[] = uniqueSizes.map(s => ({ label: s, value: s }));
+        return { ...g, options: sizeOptions };
       }
       return g;
     });
@@ -154,31 +164,66 @@ export class ProductListComponent implements OnInit {
     this.filterGroups.set(updated);
   }
 
-  // Whomopsy asaletindeki dinamik filtre grupları
+  // Dynamic sidebar filter configuration
   filterGroups = signal<FilterGroup[]>([
     {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
-      options: ['Kadın', 'Erkek', 'Çocuk', 'Unisex']
+      options: [
+        { label: 'Kadın', value: 2 },
+        { label: 'Erkek', value: 1 },
+        { label: 'Çocuk', value: 3 },
+        { label: 'Unisex', value: 0 }
+      ]
     },
     {
-      name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Backend'den dinamik akacak 🏛️
+      name: 'Ana Kategori', key: 'main-category', isExpanded: true,
+      options: [] 
+    },
+    {
+      name: 'Alt Kategori', key: 'sub-category', isExpanded: true,
+      options: [] 
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
-      options: ['Adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
+      options: [
+        { label: 'Adidas', value: 'Adidas' },
+        { label: 'Converse', value: 'Converse' },
+        { label: 'New Balance', value: 'NewBalance' },
+        { label: 'Nike', value: 'Nike' },
+        { label: 'Puma', value: 'Puma' },
+        { label: 'Vans', value: 'Vans' }
+      ]
     },
     {
       name: 'Beden', key: 'size', isExpanded: false,
-      options: ['36', '37', '38', '39', '40', '41', '42', '44']
+      options: []
     },
     {
       name: 'Renk', key: 'color', isExpanded: false,
-      options: ['Siyah', 'Beyaz', 'Mavi', 'Kırmızı', 'Yeşil', 'Gri', 'Kemik', 'Krem', 'Pembe', 'Lila', 'Kahve', 'Sarı', 'Lacivert', 'Bordo']
+      options: [
+        { label: 'Siyah', value: 'Siyah' },
+        { label: 'Beyaz', value: 'Beyaz' },
+        { label: 'Mavi', value: 'Mavi' },
+        { label: 'Kırmızı', value: 'Kırmızı' },
+        { label: 'Yeşil', value: 'Yeşil' },
+        { label: 'Gri', value: 'Gri' },
+        { label: 'Kemik', value: 'Kemik' },
+        { label: 'Krem', value: 'Krem' },
+        { label: 'Pembe', value: 'Pembe' },
+        { label: 'Lila', value: 'Lila' },
+        { label: 'Kahve', value: 'Kahve' },
+        { label: 'Sarı', value: 'Sarı' },
+        { label: 'Lacivert', value: 'Lacivert' },
+        { label: 'Bordo', value: 'Bordo' }
+      ]
     },
     {
       name: 'Fiyat', key: 'price', isExpanded: false,
-      options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL']
+      options: [
+        { label: '0 - 2500 TL', value: '0-2500' },
+        { label: '2.500 - 5.500 TL', value: '2500-5500' },
+        { label: '+ 5.500 TL', value: '5500-up' }
+      ]
     }
   ]);
 
@@ -187,7 +232,7 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategories();
     
-    // Whomopsy Route Listener: URL deryasındaki arama ve cinsiyet kilitlerini Whosepsy asaletinde dinler 🏛️
+    // Route Listener: updates state based on search query or gender parameters
     this.route.queryParams.subscribe(params => {
       const query = params['search'];
       const gender = params['gender'];
@@ -197,7 +242,9 @@ export class ProductListComponent implements OnInit {
       if (gender) {
         const genderName = this.getGenderNameById(Number(gender));
         if (genderName && !this.isSelected('Cinsiyet', genderName)) {
-          this.selectedFilters.set([{ group: 'Cinsiyet', option: genderName }]);
+          this.selectedFilters.set([{ group: 'Cinsiyet', option: genderName, value: Number(gender) }]);
+          this.updateDynamicSizes();
+          this.updateHeader();
         }
       }
 
@@ -209,19 +256,65 @@ export class ProductListComponent implements OnInit {
     }
   }
 
+  private categoryTree: FilterOption[] = [];
+  private readonly ALLOWED_MAIN_CATEGORIES = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
+
   loadCategories(): void {
-    this.productService.getCategories().subscribe({
+    this.productService.getCategoryTree().subscribe({
         next: (categories) => {
-            const categoryNames = categories.map(c => c.name);
+            // STRICT FILTERING and ORDERING: Ayakkabı - Giyim - Aksesuar - Diğer
+            const order = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
+            this.categoryTree = categories
+                .filter(c => order.includes(c.name || c.Name))
+                .sort((a, b) => order.indexOf(a.name || a.Name) - order.indexOf(b.name || b.Name))
+                .map(c => ({
+                    label: c.name || c.Name,
+                    value: c.id || c.Id,
+                    isExpanded: false,
+                    subOptions: (c.subCategories || c.SubCategories)?.map((sub: any) => ({
+                        label: sub.name || sub.Name,
+                        value: sub.id || sub.Id
+                    })) || []
+                }));
+
+            // Initial fill for Ana Kategori
             const updated = this.filterGroups().map(g => {
-                if (g.key === 'category') {
-                    return { ...g, options: categoryNames };
+                if (g.key === 'main-category') {
+                    return { ...g, options: this.categoryTree };
                 }
                 return g;
             });
             this.filterGroups.set(updated);
+            
+            // Trigger subcategories if any main category is pre-selected
+            this.updateSubCategories();
         }
     });
+  }
+
+  updateSubCategories(): void {
+    const selectedMain = this.selectedFilters()
+        .filter(f => f.group === 'Ana Kategori')
+        .map(f => f.option);
+    
+    let subOptions: FilterOption[] = [];
+    
+    if (selectedMain.length > 0) {
+        selectedMain.forEach(mainName => {
+            const parent = this.categoryTree.find(c => c.label === mainName);
+            if (parent && parent.subOptions) {
+                subOptions.push(...parent.subOptions);
+            }
+        });
+    }
+
+    const updated = this.filterGroups().map(g => {
+        if (g.key === 'sub-category') {
+            return { ...g, options: subOptions };
+        }
+        return g;
+    });
+    this.filterGroups.set(updated);
   }
 
   loadProducts(): void {
@@ -232,17 +325,16 @@ export class ProductListComponent implements OnInit {
     const filterParams = this.getUnifiedFilterParams();
     
     // Eğer filtre veya arama varsa filter API'sini, yoksa standart API'yi kullan
-    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
-        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, 1, this.pageSize)
+    const productStream = (filterParams.genders?.length || filterParams.brands?.length || filterParams.categoryIds?.length || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.genders, filterParams.brands, filterParams.categoryIds, filterParams.searchTerm, 1, this.pageSize)
         : this.productService.getProducts(1, this.pageSize);
 
     productStream.subscribe({
       next: (data) => {
-        this.products.set(data);
+        this.products.set(data.items);
+        this.totalCount.set(data.totalCount);
         this.isLoading.set(false);
-        if (data.length < this.pageSize) {
-            this.hasMore.set(false);
-        }
+        this.hasMore.set(data.items.length < data.totalCount);
       },
       error: (err) => {
         console.error('Ürünler yüklenirken hata oluştu:', err);
@@ -252,7 +344,7 @@ export class ProductListComponent implements OnInit {
   }
 
   /**
-   * Whomopsy asaletinde bir sonraki Whomopsy deryasını (21 ürün) Whosepsy standartlarında çeker.
+   * Fetches the next set of items while maintaining current filter state.
    */
   loadMore(): void {
     if (this.isMoreLoading() || !this.hasMore()) return;
@@ -261,24 +353,23 @@ export class ProductListComponent implements OnInit {
     const nextPage = this.currentPage() + 1;
     const filterParams = this.getUnifiedFilterParams();
 
-    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
-        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, nextPage, this.pageSize)
+    const productStream = (filterParams.genders?.length || filterParams.brands?.length || filterParams.categoryIds?.length || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.genders, filterParams.brands, filterParams.categoryIds, filterParams.searchTerm, nextPage, this.pageSize)
         : this.productService.getProducts(nextPage, this.pageSize);
 
     productStream.subscribe({
-        next: (newData) => {
-            if (newData.length > 0) {
-                this.products.update(prev => [...prev, ...newData]);
+        next: (responseData) => {
+            if (responseData.items.length > 0) {
+                this.products.update(prev => [...prev, ...responseData.items]);
+                this.totalCount.set(responseData.totalCount);
                 this.currentPage.set(nextPage);
-                if (newData.length < this.pageSize) {
-                    this.hasMore.set(false);
-                }
+                this.hasMore.set(this.products().length < responseData.totalCount);
             } else {
                 this.hasMore.set(false);
             }
             this.isMoreLoading.set(false);
         },
-        error: (err) => {
+        error: (err: any) => {
             console.error('Daha fazla ürün yüklenirken hata:', err);
             this.isMoreLoading.set(false);
         }
@@ -288,23 +379,14 @@ export class ProductListComponent implements OnInit {
   private getUnifiedFilterParams() {
     const selected = this.selectedFilters();
     
-    // Gender mapping: Kadın=2, Erkek=1, Çocuk=3, Unisex=0
-    const genderStr = selected.find(f => f.group === 'Cinsiyet')?.option;
-    let gender: number | undefined = undefined;
-    if (genderStr === 'Erkek') gender = 1;
-    else if (genderStr === 'Kadın') gender = 2;
-    else if (genderStr === 'Çocuk') gender = 3;
-    else if (genderStr === 'Unisex') gender = 0;
-
-    const brand = selected.find(f => f.group === 'Marka')?.option;
-    
-    // Kategori mapping: Seçilen isim Whosepsy GUID'ine tercüme edilir. 🏛️
-    const categoryName = selected.find(f => f.group === 'Ürün Grubu')?.option;
-    const categoryId = categoryName ? this.categoryMap.get(categoryName) : undefined;
-
+    const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.value as number);
+    const brands = selected.filter(f => f.group === 'Marka').map(f => f.value as string);
+    const categoryIds = selected
+        .filter(f => f.group === 'Ana Kategori' || f.group === 'Alt Kategori')
+        .map(f => f.value as string);
     const searchTerm = this.searchTerm();
 
-    return { gender, brand, categoryId, searchTerm };
+    return { genders, brands, categoryIds, searchTerm };
   }
 
   toggleFilter(): void {

@@ -1,0 +1,58 @@
+<div class="elite-card" [routerLink]="['/urunler/detay', product.id]" (mousemove)="onMouseMove($event)"
+  (mouseleave)="onMouseLeave()">
+
+  <!-- ── MEDIA AREA ────────────────────────── -->
+  <div class="card-media">
+    <!-- Indicators: SuperStep Style Gallery Segments -->
+    @if (displayImages().length > 1) {
+    <div class="gallery-indicators">
+      @for (img of displayImages(); track $index) {
+      <div class="indicator-segment" [class.active]="activeImageIndex() === $index"></div>
+      }
+    </div>
+    }
+
+    <!-- Badges -->
+    <div class="card-badges">
+      <span class="badge-best" *ngIf="product.isBestseller">POPÜLER</span>
+      <span class="badge-new" *ngIf="product.isNew">YENİ</span>
+      <span class="badge-discount" *ngIf="product.discountLabel">{{ product.discountLabel }}</span>
+    </div>
+
+    <!-- Wishlist -->
+    <button class="wishlist-btn" (click)="$event.stopPropagation()">
+      <span class="material-symbols-sharp">favorite</span>
+    </button>
+
+    <!-- Images -->
+    <div class="image-stack">
+      <img [src]="displayImages()[activeImageIndex()]" [alt]="product.name" class="main-image">
+    </div>
+
+    <!-- Quick Add Overlay -->
+    <div class="quick-add-trigger" (click)="toggleQuickAdd($event)">
+      <span class="material-symbols-sharp">add</span>
+    </div>
+
+    <div class="quick-size-overlay" [class.active]="isQuickAddVisible()">
+      <p class="quick-title">HIZLI EKLE</p>
+      <div class="size-grid">
+        @for (size of product.sizes; track size) {
+        <button class="size-btn" (click)="addToCart(size, $event)">{{ size }}</button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- ── INFO AREA ─────────────────────────── -->
+  <div class="card-info">
+    <div class="info-top">
+      <span class="p-brand">{{ product.brand }}</span>
+    </div>
+    <h3 class="p-name">{{ product.name }}</h3>
+    <div class="p-price-row">
+      <span class="p-original" *ngIf="product.originalPrice">{{ product.originalPrice | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+      <span class="p-price" [class.discounted]="product.originalPrice">{{ product.price | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+    </div>
+  </div>
+</div>

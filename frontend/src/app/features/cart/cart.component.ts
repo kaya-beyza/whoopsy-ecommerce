@@ -24,13 +24,6 @@ interface CartItem {
 })
 export class CartComponent implements OnInit {
   private router = inject(Router);
-
-  // 3. Yönlendirme fonksiyonunu ekle
-  goToCheckout() {
-    // İleride buraya "sepet boş mu?" kontrolü ekleyebiliriz
-    this.router.navigate(['/checkout']); 
-  }
-  
   private productService = inject(ProductService);
   private cartService = inject(CartService);
 
@@ -42,99 +35,79 @@ export class CartComponent implements OnInit {
   total = computed(() => this.subTotal() > 0 ? this.subTotal() + this.shippingCost() : 0);
 
   ngOnInit(): void {
-    // 1. Sayfa açıldığında sepeti getir
     this.loadMyCart();
-
-    // 2. Önerilen ürünleri getir
-    this.productService.getCartRecommendations().subscribe({
-      next: (products: Product[]) => {
-        this.recommendedProducts.set(products);
-      },
-      error: (err: any) => { 
-        console.error('Önerilen ürünler çekilirken hata oluştu:', err);
-      }
-    });
+    this.loadRecommendations();
   }
 
-  // ───── SEPETİ GETİRME VE TEŞHİS FONKSİYONU ─────
   loadMyCart() {
     this.cartService.getCartItems().subscribe({
       next: (backendItems) => {
-        // DİKKAT: Sorunu bulacağımız satır burası!
-        console.log("Backend'den gelen ham veri:", backendItems);
+        if (!backendItems || backendItems.length === 0) return;
 
-        if (!backendItems || backendItems.length === 0) {
-          console.warn("Backend boş dizi döndürdü. Sepet gerçekten boş veya userId eşleşmiyor.");
-          return;
-        }
+        const mappedItems: CartItem[] = backendItems.map((item: any) => ({
+          id: item.productId || item.ProductId, 
+          name: item.productName || item.ProductName,
+          price: item.price || item.Price,
+          quantity: item.quantity || item.Quantity,
+          imageUrl: item.mainImageUrl || item.MainImageUrl,
+          size: item.size || 'Standart',
+          color: item.color || 'Standart'
+        }));
 
-        const mappedItems: CartItem[] = backendItems.map((item: any) => {
-          // Gelen verinin özelliklerini konsola yazdırıyoruz
-          console.log("İşlenen ürünün özellikleri:", Object.keys(item));
-
-          return {
-            id: item.productId || item.ProductId, 
-            name: item.productName || item.ProductName,
-            price: item.price || item.Price,
-            quantity: item.quantity || item.Quantity,
-            imageUrl: item.mainImageUrl || item.MainImageUrl,
-            size: 'Standart',
-            color: 'Standart'
-          };
-        });
-
-        // Verileri Angular'ın sinyaline yüklüyoruz ki HTML bunu görüp tabloyu çizsin
         this.cartItems.set(mappedItems);
       },
-      error: (err) => {
-        console.error('Sepet çekilirken hata:', err);
-      }
+      error: (err) => console.error('Sepet çekilirken hata:', err)
+    });
+  }
+
+  loadRecommendations() {
+    this.productService.getCartRecommendations().subscribe({
+      next: (products) => this.recommendedProducts.set(products),
+      error: (err) => console.error('Öneriler yüklenemedi:', err)
     });
   }
 
   updateQuantity(id: string, delta: number) {
     const currentItems = this.cartItems();
     const itemToUpdate = currentItems.find(i => i.id === id);
-    
     if (!itemToUpdate) return;
 
     const newQuantity = itemToUpdate.quantity + delta;
-    
-    // Miktar 1'den az olamaz (Silmek için çarpı butonunu kullanmalı)
     if (newQuantity < 1) return; 
 
-    // 1. Kullanıcıyı bekletmemek için anında ekrandaki sayıyı güncelliyoruz
+    // Optimistik güncelleme
     this.cartItems.update(items =>
       items.map(item => item.id === id ? { ...item, quantity: newQuantity } : item)
     );
 
-    // 2. Yeni miktarı veritabanına kaydediyoruz
     this.cartService.updateCartItem(id, newQuantity).subscribe({
-      next: () => {
-        console.log(`Ürün miktarı veritabanında başarıyla ${newQuantity} yapıldı.`);
-      },
       error: (err) => {
-        console.error('Miktar güncellenirken hata oluştu:', err);
-        // Backend'de hata olursa, sayıyı ekranda da gizlice eski haline (orijinaline) geri çeviriyoruz
+        console.error('Miktar güncellenemedi:', err);
+        // Hata durumunda geri al
         this.cartItems.update(items =>
           items.map(item => item.id === id ? { ...item, quantity: itemToUpdate.quantity } : item)
         );
-        alert('Stok miktarı güncellenemedi.');
       }
     });
   }
 
   removeItem(id: string) {
+    // Burada cartService.removeItem(...) çağrısı da eklenmeli
     this.cartItems.update(items => items.filter(item => item.id !== id));
+  }
+
+  goToCheckout() {
+    if (this.cartItems().length === 0) return;
+    this.router.navigate(['/checkout'], {
+      state: { cartItems: this.cartItems(), total: this.total() }
+    });
   }
 
   addRecommendedToCart(product: Product) {
     const productIdStr = product.id.toString(); 
 
     this.cartService.addToCart(productIdStr, 1).subscribe({
-      next: (response) => {
-        console.log('Ürün backend sepetine eklendi!', response);
-
+      next: () => {
         this.cartItems.update(items => {
           const existingItem = items.find(i => i.id === productIdStr);
           if (existingItem) {
@@ -148,14 +121,11 @@ export class CartComponent implements OnInit {
             quantity: 1,
             imageUrl: product.imageUrl,
             size: 'Standart',
-            color: product.colors && product.colors.length > 0 ? product.colors[0] : 'Standart' 
+            color: product.colors?.[0] || 'Standart'
           }];
         });
       },
-      error: (err) => {
-        console.error('Sepete eklenirken backend hatası:', err);
-        alert(err.message || 'Ürünü sepete eklerken bir sorun oluştu.');
-      }
+      error: (err) => alert(err.message || 'Ürün sepete eklenemedi.')
     });
   }
 }

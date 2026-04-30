@@ -2,7 +2,7 @@
     <!-- Left Panel: Premium Lifestyle Asset (Consistent Brand Branding) -->
     <div class="brand-panel">
         <div class="asset-overlay"></div>
-        <img [src]="cdnUrl + '/f_auto,q_auto/log-in.jpg'" alt="Whoopsy Brand Image" class="brand-asset">
+        <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1777374553/log-in_lprtkj.jpg" alt="Whoopsy Brand Image" class="brand-asset">
         <div class="brand-tagline">
             <a class="logo-light" routerLink="/">
                 <span class="logo-w">w</span>
@@ -36,7 +36,7 @@
 
                 <div class="header-titles">
                     <h1 class="welcome-title">Hesap Oluştur</h1>
-                    <p class="subtitle">Whoopsy dünyasına ilk adımını at.</p>
+                    <p class="subtitle">Yeni sezonun en özel parçalarına ilk siz ulaşın.</p>
                 </div>
             </header>
 
@@ -107,17 +107,17 @@
                     <label>CİNSİYET</label>
                     <div class="gender-selection">
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Erkek">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="0">
                             <span class="radio-custom"></span>
                             Erkek
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Kadın">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="1">
                             <span class="radio-custom"></span>
                             Kadın
                         </label>
                         <label class="radio-label">
-                            <input type="radio" name="gender" [(ngModel)]="gender" value="Belirtmek istemiyorum">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="2">
                             <span class="radio-custom"></span>
                             Belirtmek istemiyorum
                         </label>
@@ -158,11 +158,11 @@
                 </div>
 
                 <div class="social-login">
-                    <button type="button" class="google-btn">
+                    <button type="button" class="google-btn" (click)="onSocialLogin('Google')">
                         <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google Logo">
                         Google ile Devam Et
                     </button>
-                    <button type="button" class="apple-btn">
+                    <button type="button" class="apple-btn" (click)="onSocialLogin('Apple')">
                         <span class="material-icons">apple</span>
                         Apple ile Devam Et
                     </button>

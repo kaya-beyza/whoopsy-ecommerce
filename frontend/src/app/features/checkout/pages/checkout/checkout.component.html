@@ -1,0 +1,286 @@
+@if (cartItems().length > 0) {
+  <div class="checkout-page">
+    <div class="checkout-grid">
+
+      <section class="checkout-left">
+        <header class="page-header">
+          <nav class="stepper" aria-label="Checkout adımları">
+            <div class="step done">
+              <span class="step-num">01</span>
+              <span class="step-label">Sepet</span>
+            </div>
+            <div class="step-line done"></div>
+            <div class="step active">
+              <span class="step-num">02</span>
+              <span class="step-label">Ödeme</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+              <span class="step-num">03</span>
+              <span class="step-label">Onay</span>
+            </div>
+          </nav>
+
+          <h1 class="page-title">Ödeme</h1>
+          <p class="page-subtitle">
+            Son adım. Bilgilerinizi kontrol edin ve siparişinizi tamamlayın —
+            ödemeniz iyzico altyapısı ile korunur.
+          </p>
+        </header>
+
+        @if (errorMessage()) {
+          <div class="error-banner" role="alert">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 3L2 21H22L12 3Z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/>
+              <path d="M12 10V14 M12 17V17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <form #checkoutForm="ngForm" (ngSubmit)="onSubmit()" class="checkout-form" novalidate>
+
+          <section class="form-section">
+            <header class="section-head">
+              <span class="section-num">01</span>
+              <div class="section-head-text">
+                <h2>Teslimat Bilgileri</h2>
+                <p>Siparişiniz bu adrese gönderilecek.</p>
+              </div>
+            </header>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="buyerName">Ad</label>
+                <input id="buyerName" name="buyerName" type="text"
+                       [(ngModel)]="buyerName" autocomplete="given-name" required>
+              </div>
+              <div class="field">
+                <label for="buyerSurname">Soyad</label>
+                <input id="buyerSurname" name="buyerSurname" type="text"
+                       [(ngModel)]="buyerSurname" autocomplete="family-name" required>
+              </div>
+              <div class="field">
+                <label for="buyerEmail">E-posta</label>
+                <input id="buyerEmail" name="buyerEmail" type="email"
+                       [(ngModel)]="buyerEmail" autocomplete="email" required>
+              </div>
+              <div class="field">
+                <label for="buyerPhone">Telefon</label>
+                <input id="buyerPhone" name="buyerPhone" type="tel"
+                       [(ngModel)]="buyerPhone" autocomplete="tel"
+                       placeholder="+90 5XX XXX XX XX" required>
+              </div>
+              <div class="field field-wide">
+                <label for="buyerAddress">Adres</label>
+                <textarea id="buyerAddress" name="buyerAddress" rows="3"
+                          [(ngModel)]="buyerAddress" autocomplete="street-address"
+                          placeholder="Mahalle, sokak, bina no, daire no" required></textarea>
+              </div>
+              <div class="field field-wide">
+                <label for="buyerCity">Şehir</label>
+                <input id="buyerCity" name="buyerCity" type="text"
+                       [(ngModel)]="buyerCity" autocomplete="address-level2" required>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <header class="section-head">
+              <span class="section-num">02</span>
+              <div class="section-head-text">
+                <h2>Ödeme Yöntemi</h2>
+                <p>Kart bilgileriniz iyzico altyapısı ile şifrelenerek iletilir.</p>
+              </div>
+            </header>
+
+            <div class="sandbox-hint" role="note">
+              <span class="sandbox-hint-title">Sandbox Test Kartları · Tıkla otomatik doldur</span>
+              <button type="button" class="test-card test-card-success"
+                      (click)="fillTestCard('5528790000000008')">
+                <span class="test-card-num">5528 7900 0000 0008</span>
+                <span class="test-card-label">Başarılı ödeme</span>
+              </button>
+              <button type="button" class="test-card test-card-fail"
+                      (click)="fillTestCard('4111111111111129')">
+                <span class="test-card-num">4111 1111 1111 1129</span>
+                <span class="test-card-label">Yetersiz bakiye</span>
+              </button>
+              <button type="button" class="test-card test-card-fail"
+                      (click)="fillTestCard('4125000000000010')">
+                <span class="test-card-num">4125 0000 0000 0010</span>
+                <span class="test-card-label">Geçersiz kart</span>
+              </button>
+            </div>
+
+            <div class="card-preview" [class.flipped]="cardFlipped()">
+              <div class="card-inner">
+                <div class="card-face card-front">
+                  <div class="card-mesh"></div>
+                  <div class="card-top">
+                    <span class="wordmark">whoopsy</span>
+                    <span class="chip" aria-hidden="true"></span>
+                  </div>
+                  <div class="card-number">{{ cardNumberMasked }}</div>
+                  <div class="card-bottom">
+                    <div class="card-col">
+                      <span class="card-caption">Kart Sahibi</span>
+                      <span class="card-value">{{ cardHolderName || 'AD SOYAD' }}</span>
+                    </div>
+                    <div class="card-col">
+                      <span class="card-caption">Son Kull.</span>
+                      <span class="card-value">{{ expireMonth || 'AA' }} / {{ expireYear || 'YY' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card-face card-back">
+                  <div class="card-stripe"></div>
+                  <div class="card-cvc-row">
+                    <span class="card-caption">Güvenlik Kodu</span>
+                    <div class="cvc-box">{{ cvc || '•••' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field field-wide">
+                <label for="cardHolderName">Kart Üzerindeki İsim</label>
+                <input id="cardHolderName" name="cardHolderName" type="text"
+                       [(ngModel)]="cardHolderName" autocomplete="cc-name" required>
+              </div>
+              <div class="field field-wide">
+                <label for="cardNumber">Kart Numarası</label>
+                <input id="cardNumber" name="cardNumber" type="text" inputmode="numeric"
+                       [ngModel]="cardNumberDisplay"
+                       (input)="onCardNumberInput($event)"
+                       name="cardNumberField"
+                       autocomplete="cc-number"
+                       placeholder="0000 0000 0000 0000" required>
+              </div>
+              <div class="field field-third">
+                <label for="expireMonth">Ay</label>
+                <input id="expireMonth" name="expireMonth" type="text" inputmode="numeric"
+                       maxlength="2"
+                       [ngModel]="expireMonth"
+                       (input)="onExpireMonthInput($event)"
+                       autocomplete="cc-exp-month" placeholder="AA" required>
+              </div>
+              <div class="field field-third">
+                <label for="expireYear">Yıl</label>
+                <input id="expireYear" name="expireYear" type="text" inputmode="numeric"
+                       maxlength="2"
+                       [ngModel]="expireYear"
+                       (input)="onExpireYearInput($event)"
+                       autocomplete="cc-exp-year" placeholder="YY" required>
+              </div>
+              <div class="field field-third">
+                <label for="cvc">CVC</label>
+                <input id="cvc" name="cvc" type="text" inputmode="numeric"
+                       maxlength="3"
+                       [ngModel]="cvc"
+                       (input)="onCvcInput($event)"
+                       (focus)="onCvcFocus()" (blur)="onCvcBlur()"
+                       autocomplete="cc-csc" placeholder="•••" required>
+              </div>
+            </div>
+          </section>
+
+          <section class="form-section terms-section">
+            <label class="terms-label">
+              <input type="checkbox" name="termsAccepted" [(ngModel)]="termsAccepted">
+              <span class="checkmark" aria-hidden="true"></span>
+              <span class="terms-text">
+                <strong>Satış sözleşmesini</strong> ve
+                <strong>mesafeli satış koşullarını</strong> okudum, kabul ediyorum.
+              </span>
+            </label>
+          </section>
+
+          <button type="submit" class="submit-btn"
+                  [disabled]="!isFormValid || isSubmitting()">
+            @if (!isSubmitting()) {
+              <span>Ödemeyi Tamamla</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12H19 M13 6L19 12L13 18"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            } @else {
+              <span class="spinner" aria-hidden="true"></span>
+              <span>İşleniyor...</span>
+            }
+          </button>
+
+          @if (isSubmitting()) {
+            <p class="submit-status" role="status">
+              Ödemeniz iyzico üzerinden alınıyor, lütfen bekleyin…
+            </p>
+          } @else if (errorMessage()) {
+            <p class="submit-error" role="alert">
+              ⚠ {{ errorMessage() }}
+            </p>
+          }
+        </form>
+      </section>
+
+      <aside class="checkout-right" aria-label="Sipariş özeti">
+        <div class="summary-card">
+          <h3 class="summary-title">Sipariş Özeti</h3>
+
+          <div class="summary-items">
+            @for (item of cartItems(); track item.id) {
+              <div class="summary-item">
+                <div class="item-thumb">
+                  <img [src]="item.imageUrl" [alt]="item.name" loading="lazy">
+                  <span class="item-qty">{{ item.quantity }}</span>
+                </div>
+                <div class="item-info">
+                  <div class="item-name">{{ item.name }}</div>
+                  <div class="item-meta">{{ item.color }} · {{ item.size }}</div>
+                </div>
+                <div class="item-price">
+                  {{ item.price * item.quantity | currency:'TRY':'symbol-narrow':'1.2-2' }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="summary-calc">
+            <div class="calc-row">
+              <span>Ara Toplam</span>
+              <span>{{ subTotal | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+            <div class="calc-row">
+              <span>Kargo</span>
+              <span>{{ shippingCost() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="calc-divider"></div>
+
+          <div class="calc-total">
+            <span class="total-label">Toplam</span>
+            <span class="total-value">{{ total | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+          </div>
+
+          <div class="trust-badge">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 10V7A6 6 0 0 1 18 7V10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/>
+            </svg>
+            <span>Güvenli ödeme · iyzico altyapısı</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+} @else {
+  <div class="empty-state">
+    <div class="empty-mark">⌀</div>
+    <h2>Sepetiniz Boş</h2>
+    <p>Ödeme yapmak için önce sepetinize ürün eklemelisiniz.</p>
+    <button class="empty-btn" (click)="goShopping()">Alışverişe Başla</button>
+  </div>
+}
