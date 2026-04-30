@@ -35,7 +35,8 @@
           <div class="summary-row"><span>Kargo</span><span>{{ shippingCost() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span></div>
           <div class="summary-divider"></div>
           <div class="summary-row total-row"><span>TOPLAM</span><span>{{ total() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span></div>
-          <button class="btn-checkout">SİPARİŞİ TAMAMLA</button>
+          
+          <button class="btn-checkout" (click)="goToCheckout()">SİPARİŞİ TAMAMLA</button>
           <p class="summary-note">Vergiler dahildir.</p>
         </div>
       </aside>
@@ -64,7 +65,9 @@
     <div class="empty-cart">
       <h2>SEPETİNİZ BOŞ</h2>
       <p>Son trendleri keşfetmek için alışverişe devam edin.</p>
-      <button class="btn-continue">ALIŞVERİŞE BAŞLA</button>
+      
+      <button class="btn-continue" routerLink="/urunler">ALIŞVERİŞE BAŞLA</button>
+      
     </div>
   }
 </div>

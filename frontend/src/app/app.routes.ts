@@ -62,6 +62,13 @@ export const routes: Routes = [
         path: 'cart',
         // canActivate: [authGuard], 
         loadComponent: () => import('./features/cart/cart.component').then(m => m.CartComponent)
+      },
+
+      // ── ÖDEME SAYFASI (Checkout) ──
+      {
+        path: 'checkout',
+        // canActivate: [authGuard], // Kullanıcıların sadece giriş yaparak ödeme yapmasını istersen bunu aktif edebilirsin
+        loadComponent: () => import('./features/checkout/checkout.component').then(m => m.CheckoutComponent)
       }
     ]
   },

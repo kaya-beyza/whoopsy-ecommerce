@@ -9,7 +9,6 @@ import { Product, CreateProduct } from '../models/product.model';
   providedIn: 'root'
 })
 export class ProductService {
-  // Arkadaşının belirlediği API adresi (Gerekirse güncelleyin)
   private apiUrl = `${environment.apiUrl}/Products`; 
 
   constructor(private http: HttpClient) { }
