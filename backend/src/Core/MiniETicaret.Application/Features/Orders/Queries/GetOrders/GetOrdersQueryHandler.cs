@@ -33,6 +33,11 @@ public class GetOrdersQueryHandler : IRequestHandler<GetOrdersQuery, PaginatedRe
             {
                 ProductId = item.ProductId,
                 ProductName = item.Product?.Name ?? string.Empty,
+                ImageUrl = item.Product?.Images
+                    .OrderByDescending(i => i.IsMain)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault() ?? string.Empty,
                 Quantity = item.Quantity,
                 UnitPrice = item.UnitPrice,
                 TotalPrice = item.TotalPrice
