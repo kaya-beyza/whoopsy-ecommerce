@@ -27,7 +27,8 @@ public class OrderRepository : IOrderRepository
             .Include(o => o.User)
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .Include(o=>o.Payment)
+                    .ThenInclude(p => p.Images)
+                .Include(o => o.Payment)
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 
@@ -35,6 +36,8 @@ public class OrderRepository : IOrderRepository
     {
         var query = _context.Orders
             .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.Images)
             .AsQueryable();
 
         if (status.HasValue)
