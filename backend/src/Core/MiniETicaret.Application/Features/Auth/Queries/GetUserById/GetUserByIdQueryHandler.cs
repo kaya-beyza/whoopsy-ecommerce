@@ -24,7 +24,11 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDto
             Email = user.Email,
             IsActive = user.IsActive,
             RoleName = user.Role?.Name ?? "Unknown",
-            CreatedDate = user.CreatedDate
+            CreatedDate = user.CreatedDate,
+            PhoneNumber = user.PhoneNumber,
+            Address = user.Address,
+            Gender = user.Gender,
+            BirthDate = user.BirthDate
         };
     }
 }
