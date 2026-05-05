@@ -37,4 +37,26 @@ import { Injectable } from '@angular/core';
     isLoggedIn(): boolean {
       return !!this.getAccessToken();
     }
+    // ───── TOKEN'DAN KULLANICI ID OKUMA ─────
+  getUserIdFromToken(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      // Token'ın orta kısmını (payload) alıyoruz
+      const payload = token.split('.')[1];
+      // Şifreyi çözüp JSON objesine çeviriyoruz
+      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Backend .NET (C#) ise genelde ID şu uzun key içinde gelir:
+      const nameIdentifier = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
+      
+      // ID'yi dondur (Backend'in ID'yi 'id', 'sub' veya nameidentifier olarak göndermesine göre yakalar)
+      return decodedPayload[nameIdentifier] || decodedPayload['id'] || decodedPayload['sub'] || null;
+      
+    } catch (e) {
+      console.error('Token çözülürken hata oluştu', e);
+      return null;
+    }
+  }
   }

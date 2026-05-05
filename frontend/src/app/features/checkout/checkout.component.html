@@ -1,0 +1,106 @@
+<div class="checkout-wrapper">
+  <div class="checkout-main">
+    
+    <section class="checkout-step" [class.active-step]="currentStep() === 1" [class.completed-step]="currentStep() > 1">
+      <div class="step-header">
+        <h2>1. TESLİMAT ADRESİ</h2>
+        @if (currentStep() > 1) {
+          <button class="btn-edit" (click)="currentStep.set(1)">DÜZENLE</button>
+        }
+      </div>
+
+      @if (currentStep() === 1) {
+        <div class="form-grid">
+          <div class="input-group">
+            <input type="text" placeholder=" " id="firstName" required>
+            <label for="firstName">Ad</label>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder=" " id="lastName" required>
+            <label for="lastName">Soyad</label>
+          </div>
+          <div class="input-group full-width">
+            <input type="text" placeholder=" " id="address" required>
+            <label for="address">Açık Adres</label>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder=" " id="city" required>
+            <label for="city">İl</label>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder=" " id="district" required>
+            <label for="district">İlçe</label>
+          </div>
+          <div class="input-group full-width">
+            <input type="tel" placeholder=" " id="phone" required>
+            <label for="phone">Cep Telefonu</label>
+          </div>
+        </div>
+        <button class="btn-primary" (click)="goToPayment()">ÖDEMEYE GEÇ</button>
+      }
+    </section>
+
+    <section class="checkout-step" [class.active-step]="currentStep() === 2">
+      <div class="step-header">
+        <h2>2. ÖDEME YÖNTEMİ</h2>
+      </div>
+
+      @if (currentStep() === 2) {
+        <div class="payment-methods">
+          <label class="radio-container">
+            <input type="radio" name="payment" checked>
+            <span class="checkmark"></span>
+            Kredi / Banka Kartı
+          </label>
+        </div>
+
+        <div class="form-grid card-form">
+          <div class="input-group full-width">
+            <input type="text" placeholder=" " id="cardName" required>
+            <label for="cardName">Kart Üzerindeki İsim</label>
+          </div>
+          <div class="input-group full-width">
+            <input type="text" placeholder=" " id="cardNumber" maxlength="16" required>
+            <label for="cardNumber">Kart Numarası</label>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder=" " id="expiry" maxlength="5" required>
+            <label for="expiry">SKT (AA/YY)</label>
+          </div>
+          <div class="input-group">
+            <input type="text" placeholder=" " id="cvv" maxlength="3" required>
+            <label for="cvv">CVV</label>
+          </div>
+        </div>
+        
+        <div class="terms">
+          <input type="checkbox" id="terms">
+          <label for="terms">Mesafeli Satış Sözleşmesi'ni okudum ve onaylıyorum.</label>
+        </div>
+
+        <button class="btn-primary" (click)="completeOrder()">SİPARİŞİ ONAYLA VE ÖDE</button>
+      }
+    </section>
+
+  </div>
+
+  <aside class="checkout-sidebar">
+    <div class="summary-card">
+      <h2>SİPARİŞ ÖZETİ</h2>
+      
+      <div class="summary-row">
+        <span>Ara Toplam</span>
+        <span>{{ subTotal() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Kargo</span>
+        <span>{{ shippingCost() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row total-row">
+        <span>TOPLAM</span>
+        <span>{{ total() | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+      </div>
+    </div>
+  </aside>
+</div>

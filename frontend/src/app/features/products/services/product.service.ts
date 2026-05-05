@@ -132,7 +132,7 @@ export class ProductService {
   getCartRecommendations(): Observable<Product[]> {
     return this.http.get<any[]>(this.apiUrl).pipe(
       // Sadece ilk 4 ürünü alıp mapliyoruz
-      map(products => products.slice(0, 4).map(bp => {
+      map(products => products.slice(0, 10).map(bp => {
         // 1. Adım: Önce takım arkadaşının kullandığı orijinal mapping'i alıyoruz (Fiyatlar, hover vb. bozulmasın diye)
         const baseProduct = this.mapToEliteProduct(bp); 
         
