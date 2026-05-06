@@ -159,10 +159,18 @@ class _OrdersPageState extends State<OrdersPage> {
                       (item) => Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: Container(
-                          width: 60,
-                          height: 70,
+                          width: 100,
+                          height: 90,
                           color: Colors.grey.shade100,
-                          child: const Icon(Icons.image),
+                          child: (item.mainImageUrl != null &&
+                                  item.mainImageUrl!.isNotEmpty)
+                              ? Image.network(
+                                  item.mainImageUrl!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) =>
+                                      const Icon(Icons.image),
+                                )
+                              : const Icon(Icons.image),
                         ),
                       ),
                     ),

@@ -210,123 +210,125 @@ class ProductCard extends StatelessWidget {
     final favService = context.watch<FavoriteService>();
     final isFav = favService.isFavorite(product.id);
 
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => ProductDetailPage(product: product),
-          ),
-        );
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Image.network(
-                    product.mainImageUrl ?? "",
-                    fit: BoxFit.cover,
+    return SafeArea(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ProductDetailPage(product: product),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: Image.network(
+                      product.mainImageUrl ?? "",
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-                Positioned(
-                  right: 4,
-                  bottom: 4,
-                  child: Column(
-                    children: [
-                      _iconButton(
-                        icon: Icons.shopping_bag_outlined,
-                        onTap: () async {
-                          try {
-                            await context
-                                .read<CartService>()
-                                .addToCart(product.id);
+                  Positioned(
+                    right: 4,
+                    bottom: 4,
+                    child: Column(
+                      children: [
+                        _iconButton(
+                          icon: Icons.shopping_bag_outlined,
+                          onTap: () async {
+                            try {
+                              await context
+                                  .read<CartService>()
+                                  .addToCart(product.id);
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                behavior: SnackBarBehavior.floating,
-                                backgroundColor: Colors.black,
-                                elevation: 0,
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 12),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      4), // çok yuvarlak değil
-                                ),
-                                duration: const Duration(seconds: 2),
-                                content: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    /// SOL TEXT
-                                    const Text(
-                                      "SEPETE EKLENDİ",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-
-                                    /// SAĞ CTA
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => CartPage(),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text(
-                                        "SEPETE GİT →",
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.black,
+                                  elevation: 0,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        4), // çok yuvarlak değil
+                                  ),
+                                  duration: const Duration(seconds: 2),
+                                  content: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      /// SOL TEXT
+                                      const Text(
+                                        "SEPETE EKLENDİ",
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w700,
                                           fontSize: 13,
+                                          letterSpacing: 0.5,
                                         ),
                                       ),
-                                    ),
-                                  ],
+
+                                      /// SAĞ CTA
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => CartPage(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text(
+                                          "SEPETE GİT →",
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                backgroundColor: Colors.black,
-                                content: Text(
-                                  "HATA OLUŞTU",
-                                  style: TextStyle(color: Colors.white),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  backgroundColor: Colors.black,
+                                  content: Text(
+                                    "HATA OLUŞTU",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 4),
-                      _iconButton(
-                        icon: isFav ? Icons.favorite : Icons.favorite_border,
-                        onTap: () {
-                          context
-                              .read<FavoriteService>()
-                              .toggleFavorite(product.id);
-                        },
-                      ),
-                    ],
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 4),
+                        _iconButton(
+                          icon: isFav ? Icons.favorite : Icons.favorite_border,
+                          onTap: () {
+                            context
+                                .read<FavoriteService>()
+                                .toggleFavorite(product.id);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text("${product.price} ₺"),
-        ],
+            const SizedBox(height: 6),
+            Text(product.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+            const SizedBox(height: 4),
+            Text("${product.price} ₺"),
+          ],
+        ),
       ),
     );
   }

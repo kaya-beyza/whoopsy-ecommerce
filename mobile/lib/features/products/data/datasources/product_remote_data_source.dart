@@ -40,10 +40,25 @@ class ProductRemoteDataSource {
   }) async {
     final query = <String, String>{};
 
-    if (gender != null) query["gender"] = gender.toString();
-    if (brand != null) query["brand"] = brand.toString();
+    const brandMap = {
+      1: "Adidas",
+      2: "Converse",
+      3: "New Balance",
+      4: "Nike",
+      5: "Puma",
+      6: "Vans",
+    };
+
+    if (gender != null) {
+      query["genders"] = gender.toString();
+    }
+
+    if (brand != null) {
+      query["brands"] = brandMap[brand]!;
+    }
+
     if (categoryId != null && categoryId.isNotEmpty) {
-      query["categoryId"] = categoryId;
+      query["categoryIds"] = categoryId;
     }
     if (searchTerm != null && searchTerm.isNotEmpty) {
       query["searchTerm"] = searchTerm;

@@ -62,11 +62,13 @@ public class UserRepository : IUserRepository
     }
 
     public async Task<AppUser?> GetByIdWithOrdersAsync(Guid id)
-    {
-        return await _context.Users
-            .Include(u => u.Orders)
-                .ThenInclude(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product).FirstOrDefaultAsync(u => u.Id == id); // Her ürün kaleminin ürün bilgisini getir
-    }
+{
+    return await _context.Users
+        .Include(u => u.Orders)
+            .ThenInclude(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.Images)
+        .FirstOrDefaultAsync(u => u.Id == id);
+}
 
 }

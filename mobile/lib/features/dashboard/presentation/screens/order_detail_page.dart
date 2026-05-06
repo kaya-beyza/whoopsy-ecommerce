@@ -48,8 +48,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         _order = data;
       });
 
-      await _loadProductImages();
-
       if (!mounted) return;
 
       setState(() {
@@ -60,34 +58,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
-    }
-  }
-
-  Future<void> _loadProductImages() async {
-    final productRepo = ProductRepositoryImpl(ProductRemoteDataSource());
-
-    if (_order == null) return;
-
-    final uniqueIds = _order!.items.map((e) => e.productId).toSet().toList();
-
-    try {
-      final products = await Future.wait(
-        uniqueIds.map((id) => productRepo.getProductById(id)).toList(),
-      );
-
-      final tempImages = <String, String>{};
-
-      for (var p in products) {
-        tempImages[p.id] = p.mainImageUrl ?? "";
-      }
-
-      if (!mounted) return;
-
-      setState(() {
-        _images = tempImages;
-      });
-    } catch (e) {
-      print("IMAGE LOAD ERROR: $e");
     }
   }
 
@@ -171,10 +141,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     width: 80,
                     height: 100,
                     color: Colors.grey.shade100,
-                    child: (_images[item.productId] ?? "").isNotEmpty
+                    child: (item.mainImageUrl != null &&
+                            item.mainImageUrl!.isNotEmpty)
                         ? Image.network(
-                            _images[item.productId]!,
+                            item.mainImageUrl!,
                             fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.image),
                           )
                         : const Icon(Icons.image),
                   ),

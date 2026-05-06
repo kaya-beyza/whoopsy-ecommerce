@@ -1,5 +1,5 @@
 class Brand {
-  final int id; // 🔥 int yaptık
+  final int id;
   final String name;
   final String image;
 
