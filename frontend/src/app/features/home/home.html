@@ -39,22 +39,22 @@
     <div class="container">
       <h2 class="section-title">Kategoriler</h2>
       <div class="category-grid">
-        <div class="cat-card">
-          <img src="assets/images/cat-woman.jpg" alt="Kadın Koleksiyonu">
+        <div class="cat-card" [routerLink]="['/urunler']" [queryParams]="{ gender: 2 }">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776068589/cat-women_hpv95x.avif" alt="Kadın Koleksiyonu">
           <div class="cat-info">
-            <a [routerLink]="['/urunler/kategori', '019d433e-9c19-771a-aee0-08812c0b5562']" class="cat-btn">→ KADIN KOLEKSİYONU</a>
+            <span class="cat-btn">→ KADIN KOLEKSİYONU</span>
           </div>
         </div>
-        <div class="cat-card">
-          <img src="assets/images/cat-man.jpg" alt="Erkek Koleksiyonu">
+        <div class="cat-card" [routerLink]="['/urunler']" [queryParams]="{ gender: 1 }">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776068593/cat-men_myzpec.avif" alt="Erkek Koleksiyonu">
           <div class="cat-info">
-            <a [routerLink]="['/urunler/kategori', '019d53b6-10cf-78cd-97f1-99f5330f56db']" class="cat-btn">→ ERKEK KOLEKSİYONU</a>
+            <span class="cat-btn">→ ERKEK KOLEKSİYONU</span>
           </div>
         </div>
-        <div class="cat-card">
-          <img src="assets/images/cat-child.jpg" alt="Çocuk Koleksiyonu">
+        <div class="cat-card" [routerLink]="['/urunler']" [queryParams]="{ gender: 3 }">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776068596/cat-kids_kcgghn.webp" alt="Çocuk Koleksiyonu">
           <div class="cat-info">
-            <a [routerLink]="['/urunler/kategori', '019d53b6-4407-71e7-9b93-958477fe69d1']" class="cat-btn">→ ÇOCUK KOLEKSİYONU</a>
+            <span class="cat-btn">→ ÇOCUK KOLEKSİYONU</span>
           </div>
         </div>
       </div>
@@ -98,27 +98,27 @@
       <div class="style-grid">
         <div class="style-card" [routerLink]="['/urunler/marka', 'Adidas']">
           <span class="style-label">ADİDAS</span>
-          <img src="assets/images/adidas.jpg" alt="Adidas">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069380/adidas_nialqf.jpg" alt="Adidas">
         </div>
         <div class="style-card" [routerLink]="['/urunler/marka', 'Converse']">
           <span class="style-label">CONVERSE</span>
-          <img src="assets/images/converse.jpg" alt="Converse">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069503/converse_ec4ikg.jpg" alt="Converse">
         </div>
         <div class="style-card" [routerLink]="['/urunler/marka', 'New Balance']">
           <span class="style-label">NEW BALANCE</span>
-          <img src="assets/images/new-balance.jpg" alt="New Balance">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069524/new-balance_xlqkey.jpg" alt="New Balance">
         </div>
         <div class="style-card" [routerLink]="['/urunler/marka', 'Nike']">
           <span class="style-label">NIKE</span>
-          <img src="assets/images/nike.jpg" alt="Nike">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069545/nike_pnsil9.jpg" alt="Nike">
         </div>
         <div class="style-card" [routerLink]="['/urunler/marka', 'Puma']">
           <span class="style-label">PUMA</span>
-          <img src="assets/images/puma.jpg" alt="Puma">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069566/puma_oopmjh.jpg" alt="Puma">
         </div>
         <div class="style-card" [routerLink]="['/urunler/marka', 'Vans']">
           <span class="style-label">VANS</span>
-          <img src="assets/images/vans.jpg" alt="Vans">
+          <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1776069572/vans_gihzji.jpg" alt="Vans">
         </div>
       </div>
     </div>

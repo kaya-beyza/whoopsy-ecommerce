@@ -2,7 +2,7 @@ import { Component, OnInit, signal, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
-import { Product, FilterGroup } from '../../models/product.model';
+import { Product, FilterGroup, FilterOption } from '../../models/product.model';
 import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 @Component({
@@ -37,29 +37,36 @@ export class ProductListComponent implements OnInit {
   breadcrumbItems = signal(['Anasayfa', 'Kadın', 'Ayakkabı', 'Tüm Ayakkabılar']);
 
   // Filtreleme (Grup: Seçenek formatı için)
-  selectedFilters = signal<{ group: string, option: string }[]>([]);
+  selectedFilters = signal<{ group: string, option: string, value: any }[]>([]);
 
-  onFilterToggle(groupName: string, option: string): void {
+  onFilterToggle(groupName: string, option: FilterOption): void {
     const current = this.selectedFilters();
-    const index = current.findIndex(f => f.group === groupName && f.option === option);
+    const index = current.findIndex(f => f.group === groupName && f.option === option.label);
 
     if (index === -1) {
-      this.selectedFilters.set([...current, { group: groupName, option: option }]);
+      this.selectedFilters.set([...current, { group: groupName, option: option.label, value: option.value }]);
     } else {
       this.selectedFilters.set(current.filter((_, i) => i !== index));
     }
 
-    this.updateDynamicSizes();
+    // Synchronize categories: If a parent category is toggled, update subcategories
+    if (groupName === 'Ana Kategori') {
+        this.updateSubCategories();
+    }
+
+    if (groupName === 'Cinsiyet' || groupName === 'Ana Kategori' || groupName === 'Alt Kategori') {
+        this.updateDynamicSizes();
+    }
     this.updateHeader();
-    this.loadProducts(); // Refresh view based on selected filters
+    this.loadProducts(); 
   }
 
-  removeFilter(filter: { group: string, option: string }): void {
+  removeFilter(filter: { group: string, option: string, value?: any }): void {
     const current = this.selectedFilters();
     this.selectedFilters.set(current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     this.updateDynamicSizes();
     this.updateHeader();
-    this.loadProducts(); // Re-load products after filter removal
+    this.loadProducts(); 
   }
 
   updateHeader(): void {
@@ -81,8 +88,8 @@ export class ProductListComponent implements OnInit {
     this.loadProducts(); // Reset to default product list
   }
 
-  isSelected(groupName: string, option: string): boolean {
-    return this.selectedFilters().some(f => f.group === groupName && f.option === option);
+  isSelected(groupName: string, optionLabel: string): boolean {
+    return this.selectedFilters().some(f => f.group === groupName && f.option === optionLabel);
   }
 
   // Sıralama Menüsü
@@ -108,7 +115,7 @@ export class ProductListComponent implements OnInit {
 
   updateDynamicSizes(): void {
     const selected = this.selectedFilters();
-    const groups = selected.filter(f => f.group === 'Ürün Grubu').map(f => f.option);
+    const groups = selected.filter(f => f.group === 'Ana Kategori').map(f => f.option);
     const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.option);
     
     const isAdultSelected = genders.some(g => g === 'Kadın' || g === 'Erkek');
@@ -148,7 +155,8 @@ export class ProductListComponent implements OnInit {
     
     const updated = this.filterGroups().map(g => {
       if (g.key === 'size') {
-        return { ...g, options: uniqueSizes };
+        const sizeOptions: FilterOption[] = uniqueSizes.map(s => ({ label: s, value: s }));
+        return { ...g, options: sizeOptions };
       }
       return g;
     });
@@ -160,27 +168,62 @@ export class ProductListComponent implements OnInit {
   filterGroups = signal<FilterGroup[]>([
     {
       name: 'Cinsiyet', key: 'gender', isExpanded: true,
-      options: ['Kadın', 'Erkek', 'Çocuk', 'Unisex']
+      options: [
+        { label: 'Kadın', value: 2 },
+        { label: 'Erkek', value: 1 },
+        { label: 'Çocuk', value: 3 },
+        { label: 'Unisex', value: 0 }
+      ]
     },
     {
-      name: 'Kategori', key: 'category', isExpanded: true,
-      options: [] // Loaded dynamically from backend
+      name: 'Ana Kategori', key: 'main-category', isExpanded: true,
+      options: [] 
+    },
+    {
+      name: 'Alt Kategori', key: 'sub-category', isExpanded: true,
+      options: [] 
     },
     {
       name: 'Marka', key: 'brand', isExpanded: true,
-      options: ['Adidas', 'Converse', 'New Balance', 'Nike', 'Puma', 'Vans']
+      options: [
+        { label: 'Adidas', value: 'Adidas' },
+        { label: 'Converse', value: 'Converse' },
+        { label: 'New Balance', value: 'NewBalance' },
+        { label: 'Nike', value: 'Nike' },
+        { label: 'Puma', value: 'Puma' },
+        { label: 'Vans', value: 'Vans' }
+      ]
     },
     {
       name: 'Beden', key: 'size', isExpanded: false,
-      options: ['36', '37', '38', '39', '40', '41', '42', '44']
+      options: []
     },
     {
       name: 'Renk', key: 'color', isExpanded: false,
-      options: ['Siyah', 'Beyaz', 'Mavi', 'Kırmızı', 'Yeşil', 'Gri', 'Kemik', 'Krem', 'Pembe', 'Lila', 'Kahve', 'Sarı', 'Lacivert', 'Bordo']
+      options: [
+        { label: 'Siyah', value: 'Siyah' },
+        { label: 'Beyaz', value: 'Beyaz' },
+        { label: 'Mavi', value: 'Mavi' },
+        { label: 'Kırmızı', value: 'Kırmızı' },
+        { label: 'Yeşil', value: 'Yeşil' },
+        { label: 'Gri', value: 'Gri' },
+        { label: 'Kemik', value: 'Kemik' },
+        { label: 'Krem', value: 'Krem' },
+        { label: 'Pembe', value: 'Pembe' },
+        { label: 'Lila', value: 'Lila' },
+        { label: 'Kahve', value: 'Kahve' },
+        { label: 'Sarı', value: 'Sarı' },
+        { label: 'Lacivert', value: 'Lacivert' },
+        { label: 'Bordo', value: 'Bordo' }
+      ]
     },
     {
       name: 'Fiyat', key: 'price', isExpanded: false,
-      options: ['0 - 2500 TL', '2.500 - 5.500 TL', '+ 5.500 TL']
+      options: [
+        { label: '0 - 2500 TL', value: '0-2500' },
+        { label: '2.500 - 5.500 TL', value: '2500-5500' },
+        { label: '+ 5.500 TL', value: '5500-up' }
+      ]
     }
   ]);
 
@@ -199,7 +242,9 @@ export class ProductListComponent implements OnInit {
       if (gender) {
         const genderName = this.getGenderNameById(Number(gender));
         if (genderName && !this.isSelected('Cinsiyet', genderName)) {
-          this.selectedFilters.set([{ group: 'Cinsiyet', option: genderName }]);
+          this.selectedFilters.set([{ group: 'Cinsiyet', option: genderName, value: Number(gender) }]);
+          this.updateDynamicSizes();
+          this.updateHeader();
         }
       }
 
@@ -211,19 +256,65 @@ export class ProductListComponent implements OnInit {
     }
   }
 
+  private categoryTree: FilterOption[] = [];
+  private readonly ALLOWED_MAIN_CATEGORIES = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
+
   loadCategories(): void {
-    this.productService.getCategories().subscribe({
+    this.productService.getCategoryTree().subscribe({
         next: (categories) => {
-            const categoryNames = categories.map(c => c.name);
+            // STRICT FILTERING and ORDERING: Ayakkabı - Giyim - Aksesuar - Diğer
+            const order = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
+            this.categoryTree = categories
+                .filter(c => order.includes(c.name || c.Name))
+                .sort((a, b) => order.indexOf(a.name || a.Name) - order.indexOf(b.name || b.Name))
+                .map(c => ({
+                    label: c.name || c.Name,
+                    value: c.id || c.Id,
+                    isExpanded: false,
+                    subOptions: (c.subCategories || c.SubCategories)?.map((sub: any) => ({
+                        label: sub.name || sub.Name,
+                        value: sub.id || sub.Id
+                    })) || []
+                }));
+
+            // Initial fill for Ana Kategori
             const updated = this.filterGroups().map(g => {
-                if (g.key === 'category') {
-                    return { ...g, options: categoryNames };
+                if (g.key === 'main-category') {
+                    return { ...g, options: this.categoryTree };
                 }
                 return g;
             });
             this.filterGroups.set(updated);
+            
+            // Trigger subcategories if any main category is pre-selected
+            this.updateSubCategories();
         }
     });
+  }
+
+  updateSubCategories(): void {
+    const selectedMain = this.selectedFilters()
+        .filter(f => f.group === 'Ana Kategori')
+        .map(f => f.option);
+    
+    let subOptions: FilterOption[] = [];
+    
+    if (selectedMain.length > 0) {
+        selectedMain.forEach(mainName => {
+            const parent = this.categoryTree.find(c => c.label === mainName);
+            if (parent && parent.subOptions) {
+                subOptions.push(...parent.subOptions);
+            }
+        });
+    }
+
+    const updated = this.filterGroups().map(g => {
+        if (g.key === 'sub-category') {
+            return { ...g, options: subOptions };
+        }
+        return g;
+    });
+    this.filterGroups.set(updated);
   }
 
   loadProducts(): void {
@@ -234,8 +325,8 @@ export class ProductListComponent implements OnInit {
     const filterParams = this.getUnifiedFilterParams();
     
     // Eğer filtre veya arama varsa filter API'sini, yoksa standart API'yi kullan
-    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
-        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, 1, this.pageSize)
+    const productStream = (filterParams.genders?.length || filterParams.brands?.length || filterParams.categoryIds?.length || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.genders, filterParams.brands, filterParams.categoryIds, filterParams.searchTerm, 1, this.pageSize)
         : this.productService.getProducts(1, this.pageSize);
 
     productStream.subscribe({
@@ -262,8 +353,8 @@ export class ProductListComponent implements OnInit {
     const nextPage = this.currentPage() + 1;
     const filterParams = this.getUnifiedFilterParams();
 
-    const productStream = (filterParams.gender !== undefined || filterParams.brand || filterParams.categoryId || filterParams.searchTerm)
-        ? this.productService.getProductsByFilter(filterParams.gender, filterParams.brand, filterParams.categoryId, filterParams.searchTerm, nextPage, this.pageSize)
+    const productStream = (filterParams.genders?.length || filterParams.brands?.length || filterParams.categoryIds?.length || filterParams.searchTerm)
+        ? this.productService.getProductsByFilter(filterParams.genders, filterParams.brands, filterParams.categoryIds, filterParams.searchTerm, nextPage, this.pageSize)
         : this.productService.getProducts(nextPage, this.pageSize);
 
     productStream.subscribe({
@@ -288,23 +379,14 @@ export class ProductListComponent implements OnInit {
   private getUnifiedFilterParams() {
     const selected = this.selectedFilters();
     
-    // Gender mapping: Kadın=2, Erkek=1, Çocuk=3, Unisex=0
-    const genderStr = selected.find(f => f.group === 'Cinsiyet')?.option;
-    let gender: number | undefined = undefined;
-    if (genderStr === 'Erkek') gender = 1;
-    else if (genderStr === 'Kadın') gender = 2;
-    else if (genderStr === 'Çocuk') gender = 3;
-    else if (genderStr === 'Unisex') gender = 0;
-
-    const brand = selected.find(f => f.group === 'Marka')?.option;
-    
-    // Category mapping: translate label to identifier for API consumption
-    const categoryName = selected.find(f => f.group === 'Ürün Grubu')?.option;
-    const categoryId = categoryName ? this.categoryMap.get(categoryName) : undefined;
-
+    const genders = selected.filter(f => f.group === 'Cinsiyet').map(f => f.value as number);
+    const brands = selected.filter(f => f.group === 'Marka').map(f => f.value as string);
+    const categoryIds = selected
+        .filter(f => f.group === 'Ana Kategori' || f.group === 'Alt Kategori')
+        .map(f => f.value as string);
     const searchTerm = this.searchTerm();
 
-    return { gender, brand, categoryId, searchTerm };
+    return { genders, brands, categoryIds, searchTerm };
   }
 
   toggleFilter(): void {

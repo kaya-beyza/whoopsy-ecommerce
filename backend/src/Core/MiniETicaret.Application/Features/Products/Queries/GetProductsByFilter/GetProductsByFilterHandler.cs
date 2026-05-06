@@ -17,7 +17,7 @@ public class GetProductsByFilterQueryHandler : IRequestHandler<GetProductsByFilt
 
     public async Task<PagedResultDto<ProductDto>> Handle(GetProductsByFilterQuery request, CancellationToken cancellationToken)
     {
-        var (products, totalCount) = await _productRepository.GetByFilterAsync(request.Gender, request.Brand, request.CategoryId, request.SearchTerm, cancellationToken, request.Page, request.PageSize);
+        var (products, totalCount) = await _productRepository.GetByFilterAsync(request.Genders, request.Brands, request.CategoryIds, request.SearchTerm, cancellationToken, request.Page, request.PageSize);
 
         var items = products.Select(p => new ProductDto
         {

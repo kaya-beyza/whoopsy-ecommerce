@@ -21,11 +21,12 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<List<Category>> GetCategoryTreeAsync(CancellationToken cancellationToken)
     {
+        // Don't include Products directly here to avoid loading thousands of items 🚀
+        // We'll handle counts more efficiently in the application layer or via projection
         return await _context.Categories
             .Where(c => c.ParentId == null)
             .Include(c => c.SubCategories)
-                .ThenInclude(sub => sub.Products)
-            .Include(c => c.Products)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
     }
 

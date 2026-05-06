@@ -33,13 +33,13 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, TokenDto>
         // 1. Email ile Kullanıcıyı bul
         var user = await _userRepository.GetByEmailAsync(request.Email);
         if (user is null || !user.IsActive)
-            throw new UnauthorizedAccessException("Geçersiz Email veya Şifre");
+            throw new UnauthorizedAccessException("E-posta veya şifre hatalı.");
 
         // 2. Şifre Kontrolü (Bcraypt hash karşılaştırması)
         bool isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
 
         if (!isPasswordValid)
-            throw new UnauthorizedAccessException("Geçersiz email veya Şifre");
+            throw new UnauthorizedAccessException("E-posta veya şifre hatalı.");
 
         // 3.Token Üret
         var accessToken = _tokenService.GenerateAccessToken(user);

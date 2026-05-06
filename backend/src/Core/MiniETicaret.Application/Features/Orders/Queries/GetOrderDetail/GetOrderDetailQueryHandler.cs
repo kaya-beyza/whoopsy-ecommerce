@@ -38,6 +38,11 @@ public class GetOrderDetailQueryHandler : IRequestHandler<GetOrderDetailQuery, O
             {
                 ProductId = item.ProductId,
                 ProductName = item.Product?.Name ?? string.Empty,
+                ImageUrl = item.Product?.Images
+                    .OrderByDescending(i => i.IsMain)
+                    .ThenBy(i => i.DisplayOrder)
+                    .Select(i => i.Url)
+                    .FirstOrDefault() ?? string.Empty,
                 Quantity = item.Quantity,
                 UnitPrice = item.UnitPrice,
                 TotalPrice = item.TotalPrice

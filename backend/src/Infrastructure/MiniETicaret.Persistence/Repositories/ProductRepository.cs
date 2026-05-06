@@ -147,25 +147,40 @@ public class ProductRepository : IProductRepository
         return (items, totalCount);
     }
 
-    public async Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(Gender? gender, Brand? brand, Guid? categoryId, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(List<Gender>? genders, List<Brand>? brands, List<Guid>? categoryIds, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.AsQueryable();
 
-        if (gender.HasValue)
-            query = query.Where(p => p.Gender == gender.Value);
+        if (genders != null && genders.Any())
+            query = query.Where(p => genders.Contains(p.Gender));
 
-        if (brand.HasValue)
-            query = query.Where(p => p.Brand == brand.Value);
+        if (brands != null && brands.Any())
+            query = query.Where(p => brands.Contains(p.Brand));
 
-        if (categoryId.HasValue)
+        if (categoryIds != null && categoryIds.Any())
         {
-            // Whomopsy Elite Hierarchy: Alt kategorileri de deryaya dahil ediyoruz 🏛️
-            var categoryIds = await _context.Categories
-                .Where(c => c.Id == categoryId.Value || c.ParentId == categoryId.Value)
-                .Select(c => c.Id)
-                .ToListAsync(cancellationToken);
+            // Whomopsy Elite: Akıllı Kategori Budama Mührü (Smart Pruning) 🛡️
+            var allCats = await _context.Categories.AsNoTracking().ToListAsync(cancellationToken);
+            var selectedCats = allCats.Where(c => categoryIds.Contains(c.Id)).ToList();
+            
+            // Eğer bir kategorinin çocuğu da listedeyse, o kategoriyi (Parent) listeden çıkarıyoruz. 
+            // Bu sayede "Ayakkabı + Sneaker" seçildiğinde sistem sadece "Sneaker"ı baz alıp daraltma yapar.
+            var parentIdsToRemove = selectedCats
+                .Where(c => c.ParentId != null && categoryIds.Contains(c.ParentId.Value))
+                .Select(c => c.ParentId.Value)
+                .Distinct()
+                .ToList();
 
-            query = query.Where(p => categoryIds.Contains(p.CategoryId));
+            var prunedIds = categoryIds.Where(id => !parentIdsToRemove.Contains(id)).ToList();
+
+            // Budanmış liste üzerinden hiyerarşik kapsama (Tüm altları dahil et)
+            var finalCategoryIds = allCats
+                .Where(c => prunedIds.Contains(c.Id) || (c.ParentId != null && prunedIds.Contains(c.ParentId.Value)))
+                .Select(c => c.Id)
+                .Distinct()
+                .ToList();
+
+            query = query.Where(p => finalCategoryIds.Contains(p.CategoryId));
         }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
