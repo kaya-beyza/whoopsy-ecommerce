@@ -148,10 +148,8 @@ class FavoriteCard extends StatelessWidget {
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                behavior: SnackBarBehavior
-                                    .floating, // 🔥 klasik bar değil
-                                backgroundColor:
-                                    Colors.black, // 🔥 siyah arka plan
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.black,
                                 elevation: 0,
                                 margin: const EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 12),
@@ -160,7 +158,6 @@ class FavoriteCard extends StatelessWidget {
                                       4), // çok yuvarlak değil
                                 ),
                                 duration: const Duration(seconds: 2),
-
                                 content: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -170,7 +167,7 @@ class FavoriteCard extends StatelessWidget {
                                       "SEPETE EKLENDİ",
                                       style: TextStyle(
                                         color: Colors.white,
-                                        fontWeight: FontWeight.w700, // 🔥 kalın
+                                        fontWeight: FontWeight.w700,
                                         fontSize: 13,
                                         letterSpacing: 0.5,
                                       ),

@@ -7,6 +7,9 @@ import '../datasources/product_remote_data_source.dart';
 class ProductRepositoryImpl implements IProductRepository {
   final ProductRemoteDataSource remoteDataSource;
 
+  ///  CACHE (çok kritik performans)
+  final Map<String, Product> _cache = {};
+
   ProductRepositoryImpl(this.remoteDataSource);
 
   ///  PAGINATION ANA METHOD
@@ -26,40 +29,60 @@ class ProductRepositoryImpl implements IProductRepository {
       page: page,
     );
 
+    final products =
+        response.items.map((e) => ProductModel.fromJson(e)).toList();
+
+    ///  CACHE doldur
+    for (var p in products) {
+      _cache[p.id] = p;
+    }
+
     return PagedResponse<Product>(
-      items: response.items.map((e) => ProductModel.fromJson(e)).toList(),
+      items: products,
       page: response.page,
       pageSize: response.pageSize,
       totalCount: response.totalCount,
     );
   }
 
-  ///  LEGACY DESTEK (UI bozulmasın diye)
+  ///  TEK ÜRÜN (CACHE + API)
+  Future<Product> getProductById(String id) async {
+    /// ✅ önce cache kontrol
+    if (_cache.containsKey(id)) {
+      return _cache[id]!;
+    }
+
+    final json = await remoteDataSource.getProductById(id);
+    final product = ProductModel.fromJson(json);
+
+    _cache[id] = product;
+
+    return product;
+  }
+
+  ///  LEGACY METHODLAR (UI kırılmasın diye)
   @override
   Future<List<Product>> getAllProducts() async {
-    final response = await remoteDataSource.getFilteredProducts(page: 1);
-
-    return response.items.map((e) => ProductModel.fromJson(e)).toList();
+    final response = await getFilteredProducts(page: 1);
+    return response.items;
   }
 
   @override
   Future<List<Product>> getProductsByCategoryId(String id) async {
-    final response = await remoteDataSource.getFilteredProducts(
+    final response = await getFilteredProducts(
       categoryId: id,
       page: 1,
     );
-
-    return response.items.map((e) => ProductModel.fromJson(e)).toList();
+    return response.items;
   }
 
   @override
   Future<List<Product>> getProductsByBrand(int brand) async {
-    final response = await remoteDataSource.getFilteredProducts(
+    final response = await getFilteredProducts(
       brand: brand,
       page: 1,
     );
-
-    return response.items.map((e) => ProductModel.fromJson(e)).toList();
+    return response.items;
   }
 
   @override
@@ -67,12 +90,11 @@ class ProductRepositoryImpl implements IProductRepository {
     int gender, {
     String? categoryId,
   }) async {
-    final response = await remoteDataSource.getFilteredProducts(
+    final response = await getFilteredProducts(
       gender: gender,
       categoryId: categoryId,
       page: 1,
     );
-
-    return response.items.map((e) => ProductModel.fromJson(e)).toList();
+    return response.items;
   }
 }

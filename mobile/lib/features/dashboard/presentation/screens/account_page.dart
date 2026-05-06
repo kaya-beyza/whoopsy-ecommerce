@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
+import 'package:mobile/features/dashboard/presentation/screens/orders_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
@@ -30,10 +32,32 @@ class AccountPage extends StatelessWidget {
             const SizedBox(height: 30),
 
             /// 📦 MENU
-            _buildMenuItem(Icons.shopping_bag, "SİPARİŞLERİM"),
+            _buildMenuItem(
+              Icons.shopping_bag,
+              "SİPARİŞLERİM",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const OrdersPage(),
+                  ),
+                );
+              },
+            ),
             _buildMenuItem(Icons.assignment_return, "İADELER"),
             _buildMenuItem(Icons.credit_card, "ÖDEME YÖNTEMLERİ"),
-            _buildMenuItem(Icons.person, "BİLGİLERİM"),
+            _buildMenuItem(
+              Icons.person,
+              "BİLGİLERİM",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProfilePage(),
+                  ),
+                );
+              },
+            ),
 
             const Spacer(),
 
@@ -65,7 +89,11 @@ class AccountPage extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title) {
+  Widget _buildMenuItem(
+    IconData icon,
+    String title, {
+    VoidCallback? onTap,
+  }) {
     return Column(
       children: [
         ListTile(
@@ -76,11 +104,9 @@ class AccountPage extends StatelessWidget {
             style: const TextStyle(fontSize: 14),
           ),
           trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-          onTap: () {},
+          onTap: onTap,
         ),
-        const Divider(
-          height: 1,
-        )
+        const Divider(height: 1),
       ],
     );
   }

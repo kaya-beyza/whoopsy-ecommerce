@@ -8,7 +8,7 @@ using MiniETicaret.Persistence.Context;
 using MiniETicaret.Persistence.Seeds;
 using MiniETicaret.API.Middlewares;
 using MiniETicaret.Application;
-
+using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 // Service Registrations
@@ -39,7 +39,9 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!))
+            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
+        
+        NameClaimType = ClaimTypes.NameIdentifier
     };
 });
 
