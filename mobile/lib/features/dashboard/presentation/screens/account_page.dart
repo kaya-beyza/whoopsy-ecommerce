@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 import 'package:mobile/features/dashboard/presentation/screens/orders_page.dart';
-import 'package:mobile/features/dashboard/presentation/screens/profile_page.dart';
+import 'package:mobile/features/users/presentation/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatelessWidget {
