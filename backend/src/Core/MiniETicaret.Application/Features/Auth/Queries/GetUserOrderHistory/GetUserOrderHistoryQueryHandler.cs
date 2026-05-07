@@ -22,14 +22,21 @@ public class GetUserOrderHistoryQueryHandler : IRequestHandler<GetUserOrderHisto
             Status = order.Status,
             ShippingAddress = order.ShippingAddress,
             CreatedDate = order.CreatedDate,
-            OrderItems = order.OrderItems.Select(item => new OrderItemDto
-            {
-                ProductId = item.ProductId,
-                ProductName = item.Product?.Name ?? "Unknown",
-                Quantity = item.Quantity,
-                UnitPrice = item.UnitPrice,
-                TotalPrice = item.TotalPrice
-            }).ToList()
+           OrderItems = order.OrderItems.Select(item => new OrderItemDto
+{
+    ProductId = item.ProductId,
+    ProductName = item.Product?.Name ?? "Unknown",
+
+    ImageUrl = item.Product?.Images
+        ?.OrderByDescending(i => i.IsMain)
+        .ThenBy(i => i.DisplayOrder)
+        .Select(i => i.Url)
+        .FirstOrDefault() ?? string.Empty,
+
+    Quantity = item.Quantity,
+    UnitPrice = item.UnitPrice,
+    TotalPrice = item.TotalPrice
+}).ToList()
         }).ToList();
     }
 }
