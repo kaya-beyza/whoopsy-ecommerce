@@ -9,6 +9,9 @@ using MiniETicaret.Persistence.Seeds;
 using MiniETicaret.API.Middlewares;
 using MiniETicaret.Application;
 using System.Security.Claims;
+
+DotNetEnv.Env.TraversePath().Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Service Registrations
