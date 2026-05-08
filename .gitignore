@@ -82,6 +82,7 @@ linux/flutter/ephemeral/
 appsettings.*.local.json
 .env
 .env.*
+!.env.example
 
 ############################################
 # DATABASE / LOCAL FILES
