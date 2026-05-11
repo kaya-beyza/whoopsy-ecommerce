@@ -1,0 +1,43 @@
+<div class="profile-container">
+    <!-- SOL SIDEBAR -->
+    <aside class="sidebar">
+        <div class="user-card">
+            <div class="avatar">{{ (user()?.fullName || 'K')[0] }}</div>
+            <div class="user-info">
+                <div class="user-name">{{ user()?.fullName || 'Kullanıcı' }}</div>
+                <div class="user-email">{{ user()?.email }}</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a routerLink="/profile/me" routerLinkActive="active" class="nav-link">
+                <span class="nav-icon">👤</span>
+                <span>Profilim</span>
+            </a>
+
+            <a routerLink="/profile/orders" routerLinkActive="active" class="nav-link">
+                <span class="nav-icon">📦</span>
+                <span>Siparişlerim</span>
+            </a>
+
+            <a routerLink="/profile/favorites" routerLinkActive="active" class="nav-link">
+                <span class="nav-icon">❤</span>
+                <span>Favorilerim</span>
+            </a>
+
+            <a routerLink="/profile/change-password" routerLinkActive="active" class="nav-link">
+                <span class="nav-icon">🔒</span>
+                <span>Şifre Değiştir</span>
+            </a>
+        </nav>
+
+        <button class="logout-btn" (click)="logout()">
+            Çıkış Yap
+        </button>
+    </aside>
+
+    <!-- SAĞ İÇERİK ALANI -->
+    <main class="content">
+        <router-outlet></router-outlet>
+    </main>
+</div>
