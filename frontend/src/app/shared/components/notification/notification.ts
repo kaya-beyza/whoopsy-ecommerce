@@ -40,7 +40,7 @@ import { NotificationService } from '../../../core/services/notification.service
     .toast-elite {
       pointer-events: auto;
       max-width: 380px;
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(250, 246, 240, 0.96);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(0, 0, 0, 0.05);

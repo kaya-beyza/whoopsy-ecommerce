@@ -1,0 +1,55 @@
+<section>
+  <a routerLink="/profile/orders" class="back-link">← Siparişlerime dön</a>
+
+  @if (loading()) {
+    <div class="loading">Yükleniyor...</div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  } @else if (order(); as ord) {
+
+    <header class="detail-header">
+      <div>
+        <h2 class="page-title">Sipariş #{{ ord.id.substring(0, 8).toUpperCase() }}</h2>
+        <p class="page-subtitle">{{ ord.createdDate | date:'dd MMMM yyyy, HH:mm' }}</p>
+      </div>
+      <span class="badge" [ngClass]="statusClass(ord.status)">
+        {{ statusLabel(ord.status) }}
+      </span>
+    </header>
+
+    <div class="detail-grid">
+      <!-- Sol: Ürün listesi -->
+      <div class="card">
+        <h3 class="card-title">Ürünler</h3>
+        <ul class="item-list">
+          @for (item of ord.orderItems; track item.productId) {
+            <li class="item">
+              <img [src]="imageOrPlaceholder(item.imageUrl)" [alt]="item.productName" class="item-img">
+              <div class="item-info">
+                <div class="item-name">{{ item.productName }}</div>
+                <div class="item-meta">
+                  {{ item.quantity }} adet × {{ item.unitPrice | number:'1.2-2' }} ₺
+                </div>
+              </div>
+              <div class="item-total">{{ item.totalPrice | number:'1.2-2' }} ₺</div>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <!-- Sağ: Adres + Toplam -->
+      <aside class="card aside">
+        <h3 class="card-title">Teslimat Adresi</h3>
+        <p class="address">{{ ord.shippingAddress }}</p>
+
+        <div class="divider"></div>
+
+        <h3 class="card-title">Özet</h3>
+        <div class="summary-row total">
+          <span>Toplam</span>
+          <strong>{{ ord.totalAmount | number:'1.2-2' }} ₺</strong>
+        </div>
+      </aside>
+    </div>
+  }
+</section>

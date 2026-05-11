@@ -362,19 +362,32 @@
       cursor: pointer;
       transition: 0.3s;
 
-      span {
-        font-size: 24px;
-        color: #000;
-        transition: color 0.3s;
+      // SVG kalp — product-card'la aynı pattern. Font axis bağımlılığı yok.
+      .heart-icon {
+        width: 24px;
+        height: 24px;
+        fill: none;
+        stroke: #000;
+        stroke-width: 2px;
+        transition: fill 0.2s ease, stroke 0.2s ease;
       }
 
       &:hover {
         border-color: #000;
+        .heart-icon { stroke: var(--color-primary); }
+      }
 
-        span {
-          color: var(--color-primary);
-          font-variation-settings: 'FILL' 1;
+      &.is-favorite {
+        border-color: var(--color-primary);
+        .heart-icon {
+          fill: var(--color-primary);
+          stroke: var(--color-primary);
         }
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: wait;
       }
     }
   }
