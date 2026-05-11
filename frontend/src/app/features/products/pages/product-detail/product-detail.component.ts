@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router'; // <-- Router eklendi
 import { ProductService } from '../../services/product.service';
@@ -6,7 +6,9 @@ import { Product } from '../../models/product.model';
 
 // DİKKAT: CartService'in yolunu kendi klasör yapına göre düzeltmen gerekebilir.
 // Eğer bu sayfa products/pages içindeyse yol muhtemelen şöyledir:
-import { CartService } from '../../../cart/services/cart.service'; 
+import { CartService } from '../../../cart/services/cart.service';
+import { FavoritesService } from '../../../profile/services/favorites.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -22,6 +24,8 @@ export class ProductDetailComponent implements OnInit {
   // YENİ EKLENEN SERVİSLER
   private cartService = inject(CartService);
   private router = inject(Router);
+  private favoritesService = inject(FavoritesService);
+  private authService = inject(AuthService);
 
   product = signal<Product | null>(null);
   isLoading = signal(true);
@@ -30,6 +34,14 @@ export class ProductDetailComponent implements OnInit {
   // Görsel ve Beden Seçimi
   selectedImage = signal<string>('');
   selectedSize = signal<string | number | null>(null);
+
+  // Favori durumu — product-card'la aynı global Set'i okur, tüm sayfalar senkron.
+  // Not: Product.id model'da number ama backend Guid string döndürüyor (pre-existing model bug).
+  isFavoriteBusy = signal(false);
+  isFavorite = computed(() => {
+    const p = this.product();
+    return p ? this.favoritesService.favoriteIds().has(String(p.id)) : false;
+  });
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -86,5 +98,26 @@ export class ProductDetailComponent implements OnInit {
         alert(err.message || 'Ürünü sepete eklerken bir sorun oluştu. Lütfen giriş yaptığınızdan emin olun.');
       }
     });
+  }
+
+  toggleFavorite(): void {
+    const user = this.authService.currentUser();
+    if (!user?.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const p = this.product();
+    if (!p || this.isFavoriteBusy()) return;
+
+    this.isFavoriteBusy.set(true);
+    const productId = String(p.id);
+    const done = () => this.isFavoriteBusy.set(false);
+
+    if (this.isFavorite()) {
+      this.favoritesService.remove(user.id, productId).subscribe({ next: done, error: done });
+    } else {
+      this.favoritesService.add(user.id, productId).subscribe({ next: done, error: done });
+    }
   }
 }
