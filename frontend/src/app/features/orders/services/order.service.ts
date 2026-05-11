@@ -1,38 +1,47 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-// Eğer order.model.ts içinde OrderResponse arayüzü tanımlıysa bu import kalabilir.
-import { OrderResponse } from '../models/order.model';
+import { OrderResponse, MyOrder, MyOrderDetail } from '../models/order.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
   private http = inject(HttpClient);
-  
-  // DÜZELTME 1: Endpoint adresinin sonuna '/Orders' eklendi.
+
+  // Admin: GET /api/Orders (hardcoded URL — mevcut admin /orders sayfası kullanıyor)
   private apiUrl = 'http://localhost:5277/api/Orders';
 
+  // Kullanıcı tarafı: environment.apiUrl üzerinden
+  private baseUrl = environment.apiUrl;
+
   getOrders(
-    pageIndex: number, 
-    pageSize: number, 
-    status?: string, 
-    startDate?: string, 
+    pageIndex: number,
+    pageSize: number,
+    status?: string,
+    startDate?: string,
     endDate?: string
-  ): Observable<any> { // UYARI: Backend direkt veri dönüyorsa <any> yapmak daha güvenlidir
-    
-    // DÜZELTME 2: Backend 'page' ve 'size' bekliyor, 'pageIndex' ve 'pageSize' değil.
+  ): Observable<any> {
     let params = new HttpParams()
       .set('page', pageIndex.toString())
       .set('size', pageSize.toString());
 
     if (status) params = params.set('status', status);
-    
-    // Not: Backend controller'ında şu an startDate ve endDate yok. 
-    // Buradan göndersin bile backend bunları şimdilik yok sayacaktır.
     if (startDate) params = params.set('startDate', startDate);
     if (endDate) params = params.set('endDate', endDate);
 
     return this.http.get<any>(this.apiUrl, { params });
+  }
+
+  // ─── Profil → Siparişlerim ────────────────────────────────
+  // GET /api/users/{userId}/orders → giriş yapan kullanıcının sipariş geçmişi
+  getMyOrders(userId: string): Observable<MyOrder[]> {
+    return this.http.get<MyOrder[]>(`${this.baseUrl}/users/${userId}/orders`);
+  }
+
+  // GET /api/orders/{id} → tek sipariş detayı
+  getById(orderId: string): Observable<MyOrderDetail> {
+    return this.http.get<MyOrderDetail>(`${this.baseUrl}/orders/${orderId}`);
   }
 }
