@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -53,19 +53,33 @@ export class FavoritesService {
     );
   }
 
+  // Optimistic update: kullanıcı tıkladığı an signal güncellenir → kalp anında doluyor/boşalıyor.
+  // Backend hata dönerse rollback yapıp eski hâline getiriyoruz.
   add(userId: string, productId: string): Observable<string> {
+    this.favoriteIdsSignal.update(ids => new Set(ids).add(productId));
     return this.http.post<string>(this.baseUrl, { userId, productId }).pipe(
-      tap(() => this.favoriteIdsSignal.update(ids => new Set(ids).add(productId)))
+      catchError(err => {
+        this.favoriteIdsSignal.update(ids => {
+          const next = new Set(ids);
+          next.delete(productId);
+          return next;
+        });
+        return throwError(() => err);
+      })
     );
   }
 
   remove(userId: string, productId: string): Observable<void> {
+    this.favoriteIdsSignal.update(ids => {
+      const next = new Set(ids);
+      next.delete(productId);
+      return next;
+    });
     return this.http.delete<void>(this.baseUrl, { body: { userId, productId } }).pipe(
-      tap(() => this.favoriteIdsSignal.update(ids => {
-        const next = new Set(ids);
-        next.delete(productId);
-        return next;
-      }))
+      catchError(err => {
+        this.favoriteIdsSignal.update(ids => new Set(ids).add(productId));
+        return throwError(() => err);
+      })
     );
   }
 }
