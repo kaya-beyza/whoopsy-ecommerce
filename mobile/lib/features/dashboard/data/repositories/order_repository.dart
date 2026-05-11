@@ -21,4 +21,14 @@ class OrderRepository {
     final json = await remote.getOrderDetail(id);
     return OrderModel.fromJson(json);
   }
+
+  Future<void> updateOrderStatus({
+    required String orderId,
+    required String status,
+  }) async {
+    await remote.updateOrderStatus(
+      orderId: orderId,
+      status: status,
+    );
+  }
 }

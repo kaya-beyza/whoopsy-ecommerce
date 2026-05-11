@@ -75,4 +75,26 @@ class OrderRemoteDataSource {
 
     throw Exception("Detail alınamadı (${response.statusCode})");
   }
+
+  Future<void> updateOrderStatus({
+    required String orderId,
+    required String status,
+  }) async {
+    final headers = await _getHeaders();
+
+    final response = await http.put(
+      Uri.parse("$baseUrl/orders/$orderId/status"),
+      headers: headers,
+      body: jsonEncode({
+        "newStatus": status,
+      }),
+    );
+
+    print("UPDATE STATUS: ${response.statusCode}");
+    print("UPDATE BODY: ${response.body}");
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw Exception("Status update failed");
+    }
+  }
 }

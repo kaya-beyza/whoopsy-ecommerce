@@ -187,12 +187,18 @@ class _OrdersPageState extends State<OrdersPage> {
   ///  STATUS MAP (backend enum → UI)
   String _mapStatus(String status) {
     switch (status.toLowerCase()) {
+      case "confirmed":
+        return "ONAYLANDI";
       case "pending":
         return "HAZIRLANIYOR";
-      case "completed":
+      case "shipped":
+        return "GÖNDERİLDİ";
+      case "delivered":
         return "TESLİM EDİLDİ";
       case "cancelled":
         return "İPTAL EDİLDİ";
+      case "returned":
+        return "İADE TALEBİ OLUŞTURULDU";
       default:
         return status.toUpperCase();
     }
