@@ -5,6 +5,8 @@ using System.Security.Claims;
 using MiniETicaret.Application.Features.Auth.Queries.GetUsers;
 using MiniETicaret.Application.Features.Auth.Queries.GetUserById;
 using MiniETicaret.Application.Features.Auth.Queries.GetUserOrderHistory;
+using MiniETicaret.Application.Features.Users.Commands.UpdateUserProfile;
+
 namespace MiniETicaret.API.Controllers;
 
 [ApiController]
@@ -24,7 +26,7 @@ public class UsersController : ControllerBase
         var result = await _mediator.Send(query);
         return Ok(result);
     }
-    
+
     // GET api/users/me — token sahibi kullanıcının kendi profilini döner
     [HttpGet("me")]
     [Authorize]
@@ -37,7 +39,21 @@ public class UsersController : ControllerBase
         var query = new GetUserByIdQuery { Id = userId };
         var result = await _mediator.Send(query);
         return Ok(result);
-    } 
+    }
+
+    // PUT api/users/me — token sahibi kullanıcının kendi profilini günceller
+    [HttpPut("me")]
+    [Authorize]
+    public async Task<IActionResult> UpdateMe([FromBody] UpdateUserProfileCommand command)
+    {
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Unauthorized();
+
+        command.UserId = userId;
+        var result = await _mediator.Send(command);
+        return Ok(result);
+    }
 
     // GET api/users/3fa85f64-5717-4562-b3fc-2c963f66afa6                                                                                                    
     [HttpGet("{id}")]
