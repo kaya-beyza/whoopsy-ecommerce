@@ -113,6 +113,16 @@
     background: #fff;
     span { color: #e63946; font-variation-settings: 'FILL' 1; }
   }
+
+  &.is-favorite {
+    background: #fff;
+    span { color: #e63946; font-variation-settings: 'FILL' 1; }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
 }
 
 // Quick Add Trigger
