@@ -43,6 +43,13 @@ export const routes: Routes = [
         loadComponent: () => import('./features/orders/pages/order-list/order-list.component').then(m => m.OrderListComponent)
       },
 
+      // ── PROFİL (Sekmeli sayfa: Profilim / Siparişlerim / Favorilerim / Şifre) ──
+      {
+        path: 'profile',
+        canActivate: [authGuard],
+        loadChildren: () => import('./features/profile/profile.routes').then(m => m.profileRoutes)
+      },
+
       // ── ÜRÜNLER LİSTESİ ──
       {
         path: 'urunler',
