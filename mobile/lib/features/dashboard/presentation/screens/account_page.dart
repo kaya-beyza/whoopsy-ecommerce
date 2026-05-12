@@ -45,7 +45,7 @@ class AccountPage extends StatelessWidget {
               },
             ),
             _buildMenuItem(Icons.assignment_return, "İADELER"),
-            _buildMenuItem(Icons.home_filled, "ADRES"),
+
             _buildMenuItem(
               Icons.person,
               "BİLGİLERİM",

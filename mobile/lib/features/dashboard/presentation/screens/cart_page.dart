@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/dashboard/data/datasources/cart_remote_data_source.dart';
 import 'package:mobile/features/dashboard/presentation/screens/favorites_page.dart';
+import 'package:mobile/features/dashboard/presentation/widgets/auth_required_view.dart';
 import 'package:mobile/features/products/data/models/product_model.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
+import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -27,8 +31,12 @@ class _CartPageState extends State<CartPage> {
 
   Future<void> _loadCart() async {
     final userId = await _local.getUserId();
-
-    if (userId == null) return;
+    if (userId == null) {
+      setState(() {
+        _loading = false;
+      });
+      return;
+    }
 
     final data = await _remote.getUserCart(userId);
 
@@ -94,6 +102,33 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
+    if (!auth.isAuthenticated) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text("Sepetim"),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
+        ),
+        body: AuthRequiredView(
+          title: "Sepetinizi görüntülemek için giriş yapın",
+          description:
+              "Sepetinizdeki ürünleri kaybetmemek ve sipariş oluşturabilmek için giriş yapın.",
+          onLogin: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const LoginPage(),
+              ),
+            );
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -106,11 +141,11 @@ class _CartPageState extends State<CartPage> {
         child: _loading
             ? const Center(child: CircularProgressIndicator())
 
-            ///  EMPTY
+            /// EMPTY
             : _items.isEmpty
                 ? _emptyCart()
 
-                ///  FILLED
+                /// FILLED
                 : Column(
                     children: [
                       Expanded(

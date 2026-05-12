@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/dashboard/data/datasources/favorite_remote_data_source.dart';
 import 'package:mobile/features/dashboard/data/repositories/favorite_repository_impl.dart';
+import 'package:mobile/features/dashboard/presentation/screens/account_page.dart';
 import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
 import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
+import 'package:mobile/features/dashboard/presentation/widgets/auth_required_view.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
 import 'package:provider/provider.dart';
+import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -18,6 +22,7 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPageState extends State<FavoritesPage> {
   bool _isLoading = true;
+
   String? _errorMessage;
   List<Product> _products = [];
 
@@ -37,7 +42,6 @@ class _FavoritesPageState extends State<FavoritesPage> {
       if (userId == null || userId.isEmpty) {
         setState(() {
           _isLoading = false;
-          _errorMessage = "Kullanıcı bulunamadı";
         });
         return;
       }
@@ -71,6 +75,24 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   Widget _buildBody() {
+    final auth = context.watch<AuthProvider>();
+
+    if (!auth.isAuthenticated) {
+      return AuthRequiredView(
+        title: "Favorilerinizi görmek için giriş yapın",
+        description:
+            "Beğendiğiniz ürünleri kaydedebilmek ve tüm cihazlarınızda görüntüleyebilmek için hesabınıza giriş yapın.",
+        onLogin: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const LoginPage(),
+            ),
+          );
+        },
+      );
+    }
+
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -80,7 +102,9 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     if (_products.isEmpty) {
-      return const Center(child: Text("Favori ürün yok"));
+      return const Center(
+        child: Text("Favori ürün yok"),
+      );
     }
 
     return GridView.builder(
