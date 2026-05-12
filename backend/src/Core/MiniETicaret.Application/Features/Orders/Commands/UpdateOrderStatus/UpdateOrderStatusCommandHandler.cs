@@ -1,6 +1,6 @@
 using MediatR;
 using MiniETicaret.Application.Interfaces;
-
+using MiniETicaret.Domain.Enums;
 namespace MiniETicaret.Application.Features.Orders.Commands.UpdateOrderStatus;
 
 public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatusCommand, Unit>
@@ -16,22 +16,32 @@ public class UpdateOrderStatusCommandHandler : IRequestHandler<UpdateOrderStatus
 
     public async Task<Unit> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
-        // 1) Siparişi veritabanından getir
         var order = await _orderRepository.GetByIdAsync(request.OrderId);
 
-        // 2) Sipariş bulunamazsa hata fırlat
         if (order is null)
             throw new KeyNotFoundException($"Sipariş bulunamadı: {request.OrderId}");
 
-        // 3) Durumu güncelle
-        order.Status = request.NewStatus;
+        // Hangi yöne geçmek istediğine göre Order'ın ilgili method'unu çağır.
+        // Geçersiz geçişlerde InvalidOperationException Order'ın kendisinden gelir.
+        switch (request.NewStatus)
+        {
+            case OrderStatus.Confirmed: order.Confirm(); break;
+            case OrderStatus.Shipped: order.Ship(); break;
+            case OrderStatus.Delivered: order.Deliver(); break;
+            case OrderStatus.Cancelled: order.Cancel(); break;
+            case OrderStatus.ReturnRequested: order.RequestReturn(); break;
+            case OrderStatus.ReturnApproved: order.ApproveReturn(); break;
+            case OrderStatus.ReturnRejected: order.RejectReturn(); break;
+            case OrderStatus.Returned: order.CompleteReturn(); break;
+            default:
+                throw new InvalidOperationException($"Desteklenmeyen hedef durum: {request.NewStatus}.");
+        }
+
         order.UpdatedDate = DateTime.UtcNow;
 
-        // 4) Veritabanına kaydet
         await _orderRepository.UpdateAsync(order);
         await _unitOfWork.SaveChangesAsync();
 
-        // 5) Geriye anlamlı bir şey dönmüyoruz
         return Unit.Value;
     }
 }

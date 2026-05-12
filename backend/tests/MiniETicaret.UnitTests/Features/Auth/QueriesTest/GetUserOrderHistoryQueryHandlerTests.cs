@@ -89,6 +89,34 @@ public class GetUserOrderHistoryQueryHandlerTests
         var productId2 = Guid.NewGuid();
         var orderDate = new DateTime(2026, 3, 20);
 
+        // Order'ı önce ayrı kur; Status için domain method'larını çağırabilelim
+        var existingOrder = new Order
+        {
+            Id = orderId,
+            TotalAmount = 350.00m,
+            ShippingAddress = "İstanbul, Kadıköy",
+            CreatedDate = orderDate,
+            OrderItems = new List<OrderItem>
+            {
+                new OrderItem
+                {
+                    ProductId = productId1,
+                    Product = new Product { Id = productId1, Name = "Laptop" },
+                    Quantity = 1,
+                    UnitPrice = 200.00m,
+                },
+                new OrderItem
+                {
+                    ProductId = productId2,
+                    Product = new Product { Id = productId2, Name = "Mouse" },
+                    Quantity = 3,
+                    UnitPrice = 50.00m,
+                }
+            }
+        };
+        existingOrder.Confirm();
+        existingOrder.Ship();
+
         var user = new AppUser
         {
             Id = userId,
@@ -96,34 +124,7 @@ public class GetUserOrderHistoryQueryHandlerTests
             Email = "ahmet@mail.com",
             IsActive = true,
             RoleId = Guid.NewGuid(),
-            Orders = new List<Order>
-              {
-                  new Order
-                  {
-                      Id = orderId,
-                      TotalAmount = 350.00m,
-                      Status = OrderStatus.Shipped,
-                      ShippingAddress = "İstanbul, Kadıköy",
-                      CreatedDate = orderDate,
-                      OrderItems = new List<OrderItem>
-                      {
-                          new OrderItem
-                          {
-                              ProductId = productId1,
-                              Product = new Product { Id = productId1, Name = "Laptop" },
-                              Quantity = 1,
-                              UnitPrice = 200.00m,
-                          },
-                          new OrderItem
-                          {
-                              ProductId = productId2,
-                              Product = new Product { Id = productId2, Name = "Mouse" },
-                              Quantity = 3,
-                              UnitPrice = 50.00m,
-                          }
-                      }
-                  }
-              }
+            Orders = new List<Order> { existingOrder }
         };
 
         _mockUserRepo

@@ -31,9 +31,9 @@ public class UpdateOrderStatusCommandHandlerTests
         {
             Id = orderId,
             UserId = Guid.NewGuid(),
-            Status = OrderStatus.Pending,
             TotalAmount = 500m,
             ShippingAddress = "İstanbul"
+            // Status default Pending — Order.cs'de tanımlı, atamaya gerek yok
         };
 
         _mockOrderRepo
