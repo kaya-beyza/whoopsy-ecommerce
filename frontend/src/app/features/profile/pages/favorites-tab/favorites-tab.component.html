@@ -1,0 +1,50 @@
+<section>
+  <h2 class="page-title">Favorilerim</h2>
+  <p class="page-subtitle">Beğendiğin ürünleri buradan görüntüleyebilirsin.</p>
+
+  @if (errorMessage()) {
+    <div class="alert alert-error">{{ errorMessage() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="card-skel">
+          <div class="skeleton-box img-skel"></div>
+          <div class="skeleton-box short"></div>
+          <div class="skeleton-box medium"></div>
+        </div>
+      }
+    </div>
+  } @else if (favorites().length > 0) {
+    <div class="grid">
+      @for (fav of favorites(); track fav.productId) {
+        <article class="fav-card">
+          <a [routerLink]="['/urunler', fav.productId]" class="img-wrap">
+            <img [src]="imageOrPlaceholder(fav.mainImageUrl)" [alt]="fav.productName" class="fav-img">
+          </a>
+          <div class="fav-body">
+            <a [routerLink]="['/urunler', fav.productId]" class="fav-name">{{ fav.productName }}</a>
+            <div class="fav-price">{{ fav.price | number:'1.2-2' }} ₺</div>
+            <button
+              type="button"
+              class="btn-remove"
+              [disabled]="removingId() === fav.productId"
+              (click)="remove(fav.productId)">
+              {{ removingId() === fav.productId ? 'Çıkarılıyor...' : 'Favoriden Çıkar' }}
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  @if (isEmpty()) {
+    <div class="empty-state">
+      <div class="empty-icon">❤️</div>
+      <h3>Henüz favorin yok</h3>
+      <p>Beğendiğin ürünleri kalp ikonuna tıklayarak favorilerine ekleyebilirsin.</p>
+      <a routerLink="/urunler" class="btn-primary">Ürünlere Göz At</a>
+    </div>
+  }
+</section>

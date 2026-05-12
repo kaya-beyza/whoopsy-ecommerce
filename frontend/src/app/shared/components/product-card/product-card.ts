@@ -1,9 +1,10 @@
-import { Component, Input, signal, computed } from '@angular/core';
+import { Component, Input, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Product } from '../../../features/products/models/product.model';
 import { CartService } from '../../../core/services/cart.service';
-import { inject } from '@angular/core';
+import { FavoritesService } from '../../../features/profile/services/favorites.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-product-card',
@@ -15,12 +16,18 @@ import { inject } from '@angular/core';
 export class ProductCardComponent {
   @Input({ required: true }) product!: Product;
   private cartService = inject(CartService);
-  
-  // Active visual index for the image slider
+  private favoritesService = inject(FavoritesService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   activeImageIndex = signal(0);
   isQuickAddVisible = signal(false);
+  isFavoriteBusy = signal(false);
 
-  // Gösterilecek görseller (ilk 3 fotoğraf ile sınırolıyoruz - SuperStep Style)
+  // Favorideki ürünleri tutan global Set'e bakar — toggle anında tüm kartlar senkron
+  // Not: Product.id model'da number ama backend Guid string döndürüyor (model tipi pre-existing bug)
+  isFavorite = computed(() => this.favoritesService.favoriteIds().has(String(this.product.id)));
+
   displayImages = computed(() => {
     if (!this.product.images || this.product.images.length === 0) {
       return [this.product.imageUrl];
@@ -34,12 +41,9 @@ export class ProductCardComponent {
 
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     const x = event.clientX - rect.left;
-    const width = rect.width;
-    
-    // Kartın genişliğini görsel sayısına göre bölüyoruz
-    const sectionWidth = width / images.length;
+    const sectionWidth = rect.width / images.length;
     const index = Math.floor(x / sectionWidth);
-    
+
     if (index >= 0 && index < images.length) {
       this.activeImageIndex.set(index);
     }
@@ -59,5 +63,27 @@ export class ProductCardComponent {
     event.stopPropagation();
     this.cartService.addToCart(this.product);
     this.isQuickAddVisible.set(false);
+  }
+
+  toggleFavorite(event: Event): void {
+    event.stopPropagation();
+
+    const user = this.authService.currentUser();
+    if (!user?.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isFavoriteBusy()) return;
+    this.isFavoriteBusy.set(true);
+
+    const productId = String(this.product.id);
+    const done = () => this.isFavoriteBusy.set(false);
+
+    if (this.isFavorite()) {
+      this.favoritesService.remove(user.id, productId).subscribe({ next: done, error: done });
+    } else {
+      this.favoritesService.add(user.id, productId).subscribe({ next: done, error: done });
+    }
   }
 }
