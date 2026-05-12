@@ -319,14 +319,95 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               FocusScope.of(context).unfocus();
 
-              // TODO: update user API call burada yapılacak
+              final fullName = nameController.text.trim();
+              final phone = phoneController.text.trim();
+              final address = addressController.text.trim();
+              final birthDate = birthDateController.text.trim();
 
-              setState(() {
-                isEditing = false;
-              });
+              // İsim kontrolü
+              if (fullName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Ad soyad boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              // Telefon kontrolü
+              if (phone.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Telefon numarası boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              if (phone.length != 10) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Geçerli bir telefon numarası giriniz"),
+                  ),
+                );
+                return;
+              }
+
+              // Adres kontrolü
+              if (address.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Adres boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              // Doğum tarihi kontrolü
+              if (birthDate.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Doğum tarihi boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              try {
+                await repository.updateProfile(
+                  fullName: fullName,
+                  phoneNumber: phone,
+                  address: address,
+                  birthDate: birthDate,
+                );
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Profil başarıyla güncellendi"),
+                  ),
+                );
+
+                setState(() {
+                  isEditing = false;
+                });
+
+                await loadUser();
+              } catch (e) {
+                print("UPDATE PROFILE ERROR: $e");
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Profil güncellenemedi"),
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,

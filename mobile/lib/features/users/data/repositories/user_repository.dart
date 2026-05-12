@@ -21,4 +21,18 @@ class UserRepository {
       token: token,
     );
   }
+
+  Future<void> updateProfile({
+    required String fullName,
+    required String phoneNumber,
+    required String address,
+    required String birthDate,
+  }) async {
+    await remote.updateProfile(
+      fullName: fullName,
+      phoneNumber: phoneNumber,
+      address: address,
+      birthDate: birthDate,
+    );
+  }
 }
