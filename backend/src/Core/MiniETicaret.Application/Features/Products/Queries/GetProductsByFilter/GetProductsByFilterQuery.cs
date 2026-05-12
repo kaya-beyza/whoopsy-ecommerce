@@ -10,6 +10,8 @@ public record GetProductsByFilterQuery(
     List<Brand>? Brands = null,
     List<Guid>? CategoryIds = null,
     string? SearchTerm = null,
+    decimal? MinPrice = null,
+    decimal? MaxPrice = null,
     int Page = 1,
     int PageSize = 21
 ) : IRequest<PagedResultDto<ProductDto>>;

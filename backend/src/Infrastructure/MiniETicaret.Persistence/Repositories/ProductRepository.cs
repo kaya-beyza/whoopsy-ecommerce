@@ -147,7 +147,7 @@ public class ProductRepository : IProductRepository
         return (items, totalCount);
     }
 
-    public async Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(List<Gender>? genders, List<Brand>? brands, List<Guid>? categoryIds, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
+    public async Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(List<Gender>? genders, List<Brand>? brands, List<Guid>? categoryIds, string? searchTerm, decimal? minPrice, decimal? maxPrice, CancellationToken cancellationToken, int? page = null, int? pageSize = null)
     {
         var query = _context.Products.AsQueryable();
 
@@ -186,9 +186,15 @@ public class ProductRepository : IProductRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearch = searchTerm.ToLower();
-            query = query.Where(p => p.Name.ToLower().Contains(lowerSearch) || 
+            query = query.Where(p => p.Name.ToLower().Contains(lowerSearch) ||
                                     (p.Description != null && p.Description.ToLower().Contains(lowerSearch)));
         }
+
+        if (minPrice.HasValue)
+            query = query.Where(p => p.Price >= minPrice.Value);
+
+        if (maxPrice.HasValue)
+            query = query.Where(p => p.Price <= maxPrice.Value);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

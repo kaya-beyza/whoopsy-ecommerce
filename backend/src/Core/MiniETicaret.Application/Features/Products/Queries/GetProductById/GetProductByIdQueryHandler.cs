@@ -32,7 +32,8 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, P
             Gender = product.Gender,
             Brand = product.Brand,
             MainImageUrl = product.Images?.FirstOrDefault(i => i.IsMain)?.Url,
-            ImageUrls = product.Images?.Select(i => i.Url).ToList() ?? new()
+            ImageUrls = product.Images?.Select(i => i.Url).ToList() ?? new(),
+            CreatedDate = product.CreatedDate
         };
     }
 }

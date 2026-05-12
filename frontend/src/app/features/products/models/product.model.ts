@@ -17,6 +17,7 @@ export interface Product {
     stock: number;
     isBestseller?: boolean;
     isNew?: boolean;
+    createdDate?: string;
     slug: string;
     sizes: (string | number)[];
     colors: string[];

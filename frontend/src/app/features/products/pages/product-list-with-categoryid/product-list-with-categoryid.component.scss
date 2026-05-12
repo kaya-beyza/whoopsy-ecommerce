@@ -236,7 +236,8 @@
                     align-items: center;
                     cursor: pointer;
                     font-weight: 800;
-                    font-size: 14px;
+                    font-size: 15px;
+                    color: #000;
                     text-transform: uppercase;
                     letter-spacing: 1px;
 
@@ -265,8 +266,9 @@
                         align-items: center;
                         gap: 12px;
                         cursor: pointer;
-                        font-size: 13px;
-                        color: #555;
+                        font-size: 14px;
+                        color: #222;
+                        font-weight: 500;
                         transition: all 0.2s;
 
                         &:hover {
@@ -281,7 +283,7 @@
                         .custom-checkbox {
                             width: 18px;
                             height: 18px;
-                            border: 2px solid #ddd;
+                            border: 2px solid #888;
                             position: relative;
                             transition: all 0.2s;
 
@@ -313,25 +315,121 @@
                         }
                     }
 
-                    .color-swatch-grid {
-                        display: grid;
-                        grid-template-columns: repeat(5, 1fr);
+                    .price-range-box {
+                        display: flex;
+                        flex-direction: column;
                         gap: 12px;
+                        padding-top: 5px;
 
-                        .swatch-item {
-                            width: 32px;
-                            height: 32px;
-                            border-radius: 50%;
-                            border: 1px solid #eee;
-                            cursor: pointer;
-                            transition: transform 0.2s;
+                        .price-presets {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
 
-                            &.active {
-                                border: 2px solid #000;
-                                transform: scale(1.1);
+                            .price-preset-chip {
+                                background: #fff;
+                                color: #222;
+                                border: 1px solid #ddd;
+                                padding: 10px 12px;
+                                font-size: 12px;
+                                font-weight: 600;
+                                font-family: inherit;
+                                cursor: pointer;
+                                text-align: left;
+                                transition: all 0.2s;
+
+                                &:hover {
+                                    border-color: #000;
+                                    color: #000;
+                                }
+
+                                &.active {
+                                    background: #000;
+                                    color: #fff;
+                                    border-color: #000;
+                                }
+                            }
+                        }
+
+                        .price-divider {
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            color: #aaa;
+                            font-size: 10px;
+                            font-weight: 700;
+                            letter-spacing: 1px;
+                            margin: 4px 0;
+
+                            &::before, &::after {
+                                content: '';
+                                flex: 1;
+                                height: 1px;
+                                background: #eee;
+                            }
+                        }
+
+                        .price-inputs {
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+
+                            input {
+                                width: 100%;
+                                padding: 10px 12px;
+                                border: 1px solid #ddd;
+                                font-size: 13px;
+                                font-family: inherit;
+                                outline: none;
+                                transition: border-color 0.2s;
+
+                                &:focus { border-color: #000; }
+
+                                &::-webkit-outer-spin-button,
+                                &::-webkit-inner-spin-button {
+                                    -webkit-appearance: none;
+                                    margin: 0;
+                                }
+                                &[type=number] { -moz-appearance: textfield; }
                             }
 
-                            &.light { border: 1px solid #ddd; }
+                            .dash {
+                                color: #888;
+                                font-weight: 600;
+                            }
+                        }
+
+                        .price-apply-btn {
+                            background: #000;
+                            color: #fff;
+                            border: none;
+                            padding: 10px;
+                            font-weight: 700;
+                            font-size: 12px;
+                            letter-spacing: 1px;
+                            cursor: pointer;
+                            transition: background 0.2s;
+
+                            &:hover { background: #333; }
+                        }
+
+                        .price-clear-link {
+                            background: transparent;
+                            border: 1px solid #000;
+                            color: #000;
+                            font-size: 12px;
+                            font-weight: 700;
+                            letter-spacing: 1px;
+                            cursor: pointer;
+                            padding: 9px 10px;
+                            font-family: inherit;
+                            transition: all 0.2s;
+                            text-transform: uppercase;
+
+                            &:hover {
+                                background: #000;
+                                color: #fff;
+                            }
                         }
                     }
                 }
