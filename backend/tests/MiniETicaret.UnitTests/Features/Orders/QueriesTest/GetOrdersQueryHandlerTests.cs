@@ -31,7 +31,6 @@ public class GetOrdersQueryHandlerTests
                   Id = Guid.NewGuid(),
                   UserId = Guid.NewGuid(),
                   TotalAmount = 300m,
-                  Status = OrderStatus.Pending,
                   ShippingAddress = "İstanbul",
                   CreatedDate = DateTime.UtcNow,
                   OrderItems = new List<OrderItem>
@@ -44,7 +43,6 @@ public class GetOrdersQueryHandlerTests
                   Id = Guid.NewGuid(),
                   UserId = Guid.NewGuid(),
                   TotalAmount = 500m,
-                  Status = OrderStatus.Confirmed,
                   ShippingAddress = "Ankara",
                   CreatedDate = DateTime.UtcNow,
                   OrderItems = new List<OrderItem>

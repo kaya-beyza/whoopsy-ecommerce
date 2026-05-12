@@ -86,22 +86,25 @@ export class ProductService {
   /**
    * Fetches products using combined filters (Genders, Brands, Categories, Search).
    */
-  getProductsByFilter(genders?: number[], brands?: string[], categoryIds?: string[], searchTerm?: string, page: number = 1, pageSize: number = 21): Observable<PagedResult<Product>> {
+  getProductsByFilter(genders?: number[], brands?: string[], categoryIds?: string[], searchTerm?: string, minPrice?: number | null, maxPrice?: number | null, page: number = 1, pageSize: number = 21): Observable<PagedResult<Product>> {
     let url = `${this.apiUrl}/filter?page=${page}&pageSize=${pageSize}`;
-    
+
     if (genders && genders.length > 0) {
       genders.forEach(g => url += `&genders=${g}`);
     }
-    
+
     if (brands && brands.length > 0) {
       brands.filter(b => b && b.trim()).forEach(b => url += `&brands=${encodeURIComponent(b.trim())}`);
     }
-    
+
     if (categoryIds && categoryIds.length > 0) {
       categoryIds.filter(c => c && c.trim()).forEach(c => url += `&categoryIds=${c.trim()}`);
     }
-    
+
     if (searchTerm) url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+
+    if (minPrice != null) url += `&minPrice=${minPrice}`;
+    if (maxPrice != null) url += `&maxPrice=${maxPrice}`;
 
     return this.http.get<PagedResult<any>>(url).pipe(
       map(response => ({
@@ -130,13 +133,9 @@ export class ProductService {
 
   
   getCartRecommendations(): Observable<Product[]> {
-    return this.http.get<any[]>(this.apiUrl).pipe(
-      // Sadece ilk 4 ürünü alıp mapliyoruz
-      map(products => products.slice(0, 10).map(bp => {
-        // 1. Adım: Önce takım arkadaşının kullandığı orijinal mapping'i alıyoruz (Fiyatlar, hover vb. bozulmasın diye)
-        const baseProduct = this.mapToEliteProduct(bp); 
-        
-        // 2. Adım: Sadece resim ve kategori verisini gerçek backend verisiyle ezip döndürüyoruz
+    return this.http.get<PagedResult<any>>(`${this.apiUrl}?page=1&pageSize=10`).pipe(
+      map(response => (response.items || []).map(bp => {
+        const baseProduct = this.mapToEliteProduct(bp);
         return {
           ...baseProduct,
           imageUrl: bp.mainImageUrl || baseProduct.imageUrl,
@@ -166,6 +165,13 @@ export class ProductService {
     // Sanitize image paths or fallback to mock pool
     const backendImage = bp.mainImageUrl && bp.mainImageUrl.startsWith('http') ? bp.mainImageUrl : visualPool.imageUrl;
 
+    // "YENİ" rozeti: ürün son 14 gün içinde eklendiyse true
+    const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+    const createdDate = bp.createdDate ? new Date(bp.createdDate) : null;
+    const isNewProduct = createdDate
+      ? (Date.now() - createdDate.getTime()) < FOURTEEN_DAYS_MS
+      : false;
+
     return {
       id: bp.id || Math.random(),
       name: name,
@@ -185,7 +191,8 @@ export class ProductService {
       discountLabel: bp.price > 4000 ? '%15 İndirim' : undefined,
       rating: 4.8,
       isBestseller: bp.price > 4500,
-      isNew: true,
+      isNew: isNewProduct,
+      createdDate: bp.createdDate,
       slug: slug,
       sizes: [38, 39, 40, 41, 42, 43, 44],
       colors: ['Siyah', 'Beyaz', 'Bej']

@@ -58,11 +58,13 @@ public class ProductsController : ControllerBase
 
     [HttpGet("filter")]
     public async Task<IActionResult> GetByFilter(
-        [FromQuery] List<string>? genders, 
-        [FromQuery] List<string>? brands, 
-        [FromQuery] List<string>? categoryIds, 
-        [FromQuery] string? searchTerm, 
-        [FromQuery] int page = 1, 
+        [FromQuery] List<string>? genders,
+        [FromQuery] List<string>? brands,
+        [FromQuery] List<string>? categoryIds,
+        [FromQuery] string? searchTerm,
+        [FromQuery] decimal? minPrice,
+        [FromQuery] decimal? maxPrice,
+        [FromQuery] int page = 1,
         [FromQuery] int pageSize = 21)
     {
         // Pusuya karşı korunaklı ayrıştırma (Robust Parsing) 🛡️
@@ -70,7 +72,7 @@ public class ProductsController : ControllerBase
         var brandList = brands?.Select(b => Enum.TryParse<Brand>(b, true, out var val) ? val : (Brand?)null).Where(b => b != null).Select(b => b.Value).ToList();
         var categoryIdList = categoryIds?.Select(c => Guid.TryParse(c, out var val) ? val : (Guid?)null).Where(c => c != null).Select(c => c.Value).ToList();
 
-        var result = await _mediator.Send(new GetProductsByFilterQuery(genderList, brandList, categoryIdList, searchTerm, page, pageSize));
+        var result = await _mediator.Send(new GetProductsByFilterQuery(genderList, brandList, categoryIdList, searchTerm, minPrice, maxPrice, page, pageSize));
         return Ok(result);
     }
     [HttpPut("{id}")]

@@ -2,7 +2,7 @@ import { Component, Input, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Product } from '../../../features/products/models/product.model';
-import { CartService } from '../../../core/services/cart.service';
+import { CartService } from '../../../features/cart/services/cart.service';
 import { FavoritesService } from '../../../features/profile/services/favorites.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -61,8 +61,16 @@ export class ProductCardComponent {
 
   addToCart(size: string | number, event: Event): void {
     event.stopPropagation();
-    this.cartService.addToCart(this.product);
-    this.isQuickAddVisible.set(false);
+
+    if (!this.authService.currentUser()?.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.cartService.addToCart(String(this.product.id), 1).subscribe({
+      next: () => this.isQuickAddVisible.set(false),
+      error: () => { /* Toast servis seviyesinde gösteriliyor */ }
+    });
   }
 
   toggleFavorite(event: Event): void {

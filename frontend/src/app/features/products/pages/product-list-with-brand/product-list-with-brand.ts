@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
+import { ProductCardComponent } from '../../../../shared/components/product-card/product-card';
 
 interface FilterOption {
   label: string;
@@ -21,12 +22,12 @@ interface FilterGroup {
 @Component({
   selector: 'app-product-list-with-brand',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   template: `
     <div class="shop-container">
       <!-- Breadcrumb -->
       <div class="breadcrumb-container">
-        <a routerLink="/">ANA SAYFA</a> / <a routerLink="/products">ÜRÜNLER</a> / <span class="active">{{ brandName() | uppercase }}</span>
+        <a routerLink="/">ANA SAYFA</a> / <a routerLink="/urunler">ÜRÜNLER</a> / <span class="active">{{ brandName() | uppercase }}</span>
       </div>
 
       <!-- Header -->
@@ -45,10 +46,16 @@ interface FilterGroup {
           <span class="product-count">{{ totalCount() }} ÜRÜN</span>
         </div>
 
-        <div class="active-filters" *ngIf="selectedFilters().length > 0">
+        <div class="active-filters" *ngIf="hasAnyFilter()">
           <div class="filter-chip" *ngFor="let filter of selectedFilters()">
             {{ filter.option }}
             <button class="remove-chip" (click)="removeFilter(filter)">
+              <span class="material-symbols-sharp">close</span>
+            </button>
+          </div>
+          <div class="filter-chip" *ngIf="isPriceActive()">
+            Fiyat: {{ priceChipLabel() }}
+            <button class="remove-chip" (click)="clearPriceFilter()">
               <span class="material-symbols-sharp">close</span>
             </button>
           </div>
@@ -81,13 +88,28 @@ interface FilterGroup {
               <span class="material-symbols-sharp">{{ group.isExpanded ? 'remove' : 'add' }}</span>
             </div>
             <div class="group-options" [class.expanded]="group.isExpanded">
-              <!-- Special UI for Color Swatches -->
-              <div class="color-swatch-grid" *ngIf="group.key === 'color'; else standardOptions">
-                <button *ngFor="let opt of group.options" class="swatch-item"
-                  [class.active]="isSelected(group.name, opt.label)"
-                  [class.light]="opt.label === 'Beyaz' || opt.label === 'Kemik' || opt.label === 'Krem'" [title]="opt.label"
-                  (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt.label)">
-                </button>
+              <!-- Special UI for Price Range -->
+              <div class="price-range-box" *ngIf="group.key === 'price'; else standardOptions">
+                <div class="price-presets">
+                  <button type="button" class="price-preset-chip"
+                    *ngFor="let preset of pricePresets"
+                    [class.active]="isPresetActive(preset)"
+                    (click)="selectPricePreset(preset)">
+                    {{ preset.label }}
+                  </button>
+                </div>
+                <div class="price-divider"><span>VEYA</span></div>
+                <div class="price-inputs">
+                  <input type="number" min="0" placeholder="Min ₺"
+                    [value]="minPrice() ?? ''"
+                    (input)="minPrice.set($any($event.target).valueAsNumber || null)" />
+                  <span class="dash">—</span>
+                  <input type="number" min="0" placeholder="Max ₺"
+                    [value]="maxPrice() ?? ''"
+                    (input)="maxPrice.set($any($event.target).valueAsNumber || null)" />
+                </div>
+                <button class="price-apply-btn" (click)="applyPriceRange()">UYGULA</button>
+                <button class="price-clear-link" *ngIf="isPriceActive()" (click)="clearPriceFilter()">FİYAT FİLTRESİNİ TEMİZLE</button>
               </div>
 
               <!-- Standard Checkbox Options -->
@@ -115,21 +137,9 @@ interface FilterGroup {
         <!-- Products Grid Area -->
         <section class="products-grid-area">
           <div class="products-grid">
-            <div class="product-card" *ngFor="let product of products()" [routerLink]="['/products', product.id]">
-              <div class="card-image-wrapper">
-                <img [src]="product.imageUrl || 'assets/placeholder.jpg'" [alt]="product.name">
-                <button class="wishlist-btn" (click)="$event.stopPropagation()">
-                  <span class="material-symbols-sharp">favorite</span>
-                </button>
-              </div>
-              <div class="card-info">
-                <span class="brand-name">{{ product.brand }}</span>
-                <h3 class="product-title">{{ product.name }}</h3>
-                <div class="price-row">
-                  <span class="current-price">{{ product.price | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
-                </div>
-              </div>
-            </div>
+            @for (product of products(); track product.id) {
+              <app-product-card [product]="product" />
+            }
           </div>
           
           <div class="load-more-container" *ngIf="hasMore()">
@@ -245,7 +255,7 @@ interface FilterGroup {
                 .filter-group {
                     border-bottom: 1px solid #eee;
                     margin-bottom: 5px;
-                    .group-header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 800; font-size: 14px; text-transform: uppercase; }
+                    .group-header { padding: 20px 0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 800; font-size: 15px; color: #000; text-transform: uppercase; }
                     .group-options {
                         max-height: 0;
                         overflow: hidden;
@@ -258,14 +268,39 @@ interface FilterGroup {
 
                     .option-row { margin-bottom: 12px; }
                     .option-item {
-                        display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 13px; color: #555; transition: all 0.2s;
+                        display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 14px; color: #222; font-weight: 500; transition: all 0.2s;
                         &:hover { color: #000; transform: translateX(3px); }
                         input { display: none; }
-                        .custom-checkbox { width: 18px; height: 18px; border: 2px solid #ddd; position: relative; &::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; background: #000; opacity: 0; } }
+                        .custom-checkbox { width: 18px; height: 18px; border: 2px solid #888; position: relative; &::after { content: ''; position: absolute; top: 3px; left: 3px; width: 8px; height: 8px; background: #000; opacity: 0; } }
                         input:checked + .custom-checkbox { border-color: #000; &::after { opacity: 1; } }
                     }
                     .empty-sub-message { padding: 10px 0; .info-text { font-size: 12px; color: #aaa; font-style: italic; } }
-                        .color-swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; .swatch-item { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #eee; cursor: pointer; &.active { border: 2px solid #000; transform: scale(1.1); } } }
+                        .price-range-box {
+                          display: flex; flex-direction: column; gap: 12px; padding-top: 5px;
+                          .price-presets { display: flex; flex-direction: column; gap: 8px;
+                            .price-preset-chip { background: #fff; color: #222; border: 1px solid #ddd; padding: 10px 12px; font-size: 12px; font-weight: 600; font-family: inherit; cursor: pointer; text-align: left; transition: all 0.2s;
+                              &:hover { border-color: #000; color: #000; }
+                              &.active { background: #000; color: #fff; border-color: #000; }
+                            }
+                          }
+                          .price-divider { display: flex; align-items: center; gap: 10px; color: #aaa; font-size: 10px; font-weight: 700; letter-spacing: 1px; margin: 4px 0;
+                            &::before, &::after { content: ''; flex: 1; height: 1px; background: #eee; }
+                          }
+                          .price-inputs { display: flex; align-items: center; gap: 8px;
+                            input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; font-size: 13px; font-family: inherit; outline: none; transition: border-color 0.2s;
+                              &:focus { border-color: #000; }
+                              &::-webkit-outer-spin-button, &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+                              &[type=number] { -moz-appearance: textfield; }
+                            }
+                            .dash { color: #888; font-weight: 600; }
+                          }
+                          .price-apply-btn { background: #000; color: #fff; border: none; padding: 10px; font-weight: 700; font-size: 12px; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;
+                            &:hover { background: #333; }
+                          }
+                          .price-clear-link { background: transparent; border: 1px solid #000; color: #000; font-size: 12px; font-weight: 700; letter-spacing: 1px; cursor: pointer; padding: 9px 10px; font-family: inherit; transition: all 0.2s; text-transform: uppercase;
+                            &:hover { background: #000; color: #fff; }
+                          }
+                        }
                     }
                 }
             }
@@ -291,43 +326,34 @@ export class ProductListWithBrandComponent implements OnInit {
   brandName = signal<string>('');
   products = signal<Product[]>([]);
   selectedFilters = signal<{ group: string, option: string, value: any }[]>([]);
-  
+
   filterGroups = signal<FilterGroup[]>([
-    { name: 'Cinsiyet', key: 'gender', isExpanded: true, options: [
-      { label: 'Kadın', value: 2 },
-      { label: 'Erkek', value: 1 },
-      { label: 'Çocuk', value: 3 },
-      { label: 'Unisex', value: 0 }
-    ]},
+    {
+      name: 'Cinsiyet', key: 'gender', isExpanded: true, options: [
+        { label: 'Kadın', value: 2 },
+        { label: 'Erkek', value: 1 },
+        { label: 'Çocuk', value: 3 },
+        { label: 'Unisex', value: 0 }
+      ]
+    },
     {
       name: 'Ana Kategori', key: 'main-category', isExpanded: true,
-      options: [] 
+      options: []
     },
     { name: 'Alt Kategori', key: 'sub-category', isExpanded: true, options: [] },
-    { name: 'Marka', key: 'brand', isExpanded: true, options: [
-      { label: 'Adidas', value: 'Adidas' },
-      { label: 'Converse', value: 'Converse' },
-      { label: 'New Balance', value: 'NewBalance' },
-      { label: 'Nike', value: 'Nike' },
-      { label: 'Puma', value: 'Puma' },
-      { label: 'Vans', value: 'Vans' }
-    ]},
-    { name: 'Beden', key: 'size', isExpanded: false, options: [] },
-    { name: 'Renk', key: 'color', isExpanded: false, options: [
-      { label: 'Siyah', value: 'Siyah' },
-      { label: 'Beyaz', value: 'Beyaz' },
-      { label: 'Mavi', value: 'Mavi' },
-      { label: 'Kırmızı', value: 'Kırmızı' },
-      { label: 'Yeşil', value: 'Yeşil' },
-      { label: 'Gri', value: 'Gri' },
-      { label: 'Kemik', value: 'Kemik' },
-      { label: 'Krem', value: 'Krem' }
-    ]},
-    { name: 'Fiyat', key: 'price', isExpanded: false, options: [
-      { label: '0 - 2500 TL', value: '0-2500' },
-      { label: '2.500 - 5.500 TL', value: '2500-5500' },
-      { label: '+ 5.500 TL', value: '5500-up' }
-    ]}
+    {
+      name: 'Marka', key: 'brand', isExpanded: true, options: [
+        { label: 'Adidas', value: 'Adidas' },
+        { label: 'Converse', value: 'Converse' },
+        { label: 'New Balance', value: 'NewBalance' },
+        { label: 'Nike', value: 'Nike' },
+        { label: 'Puma', value: 'Puma' },
+        { label: 'Vans', value: 'Vans' }
+      ]
+    },
+    {
+      name: 'Fiyat', key: 'price', isExpanded: false, options: []
+    }
   ]);
 
   isSidebarVisible = signal(true);
@@ -342,18 +368,58 @@ export class ProductListWithBrandComponent implements OnInit {
 
   private categoryTree: FilterOption[] = [];
 
-  // Akıllı Beden Setleri
-  private readonly sizeSets = {
-    shoes: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'],
-    clothing: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
-    default: ['36', '37', '38', 'XS', 'S', 'M', 'Standart']
-  };
+  // Fiyat aralığı (custom min/max input — backend'e gönderiliyor)
+  minPrice = signal<number | null>(null);
+  maxPrice = signal<number | null>(null);
+
+  // Hazır fiyat aralıkları (preset chip'leri)
+  pricePresets = [
+    { label: '0 - 2.500 ₺', min: 0, max: 2500 },
+    { label: '2.500 - 5.500 ₺', min: 2500, max: 5500 },
+    { label: '+ 5.500 ₺', min: 5500, max: null }
+  ];
+
+  selectPricePreset(preset: { min: number | null, max: number | null }): void {
+    this.minPrice.set(preset.min);
+    this.maxPrice.set(preset.max);
+    this.loadProducts(this.brandName());
+  }
+
+  isPresetActive(preset: { min: number | null, max: number | null }): boolean {
+    return this.minPrice() === preset.min && this.maxPrice() === preset.max;
+  }
+
+  applyPriceRange(): void {
+    this.loadProducts(this.brandName());
+  }
+
+  isPriceActive(): boolean {
+    return this.minPrice() != null || this.maxPrice() != null;
+  }
+
+  hasAnyFilter(): boolean {
+    return this.selectedFilters().length > 0 || this.isPriceActive();
+  }
+
+  priceChipLabel(): string {
+    const min = this.minPrice();
+    const max = this.maxPrice();
+    if (min != null && max != null) return `${min} - ${max} ₺`;
+    if (min != null) return `+ ${min} ₺`;
+    if (max != null) return `Max ${max} ₺`;
+    return '';
+  }
+
+  clearPriceFilter(): void {
+    this.minPrice.set(null);
+    this.maxPrice.set(null);
+    this.loadProducts(this.brandName());
+  }
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.brandName.set(params['brand']);
       this.loadCategories();
-      this.updateDynamicSizes();
       this.loadProducts(params['brand']);
     });
   }
@@ -362,44 +428,25 @@ export class ProductListWithBrandComponent implements OnInit {
     this.productService.getCategoryTree().subscribe({
       next: (categories) => {
         const order = ['Ayakkabı', 'Giyim', 'Aksesuar', 'Diğer'];
-          this.categoryTree = categories
-            .filter(c => order.includes(c.name || c.Name))
-            .sort((a, b) => order.indexOf(a.name || a.Name) - order.indexOf(b.name || b.Name))
-            .map(c => ({
-              label: c.name || c.Name,
-              value: c.id || c.Id,
-              isExpanded: false,
-              subOptions: (c.subCategories || c.SubCategories)?.map((sub: any) => ({
-                label: sub.name || sub.Name,
-                value: sub.id || sub.Id
-              })) || []
-            }));
+        this.categoryTree = categories
+          .filter(c => order.includes(c.name || c.Name))
+          .sort((a, b) => order.indexOf(a.name || a.Name) - order.indexOf(b.name || b.Name))
+          .map(c => ({
+            label: c.name || c.Name,
+            value: c.id || c.Id,
+            isExpanded: false,
+            subOptions: (c.subCategories || c.SubCategories)?.map((sub: any) => ({
+              label: sub.name || sub.Name,
+              value: sub.id || sub.Id
+            })) || []
+          }));
 
-        this.filterGroups.update(groups => groups.map(g => 
+        this.filterGroups.update(groups => groups.map(g =>
           g.key === 'main-category' ? { ...g, options: this.categoryTree } : g
         ));
         this.updateSubCategories();
       }
     });
-  }
-
-  updateDynamicSizes(): void {
-    const selected = this.selectedFilters();
-    const groups = selected.filter(f => f.group === 'Ana Kategori').map(f => f.option);
-    let newSizes: string[] = [];
-
-    if (groups.length === 0) {
-      newSizes = this.sizeSets.default;
-    } else {
-      if (groups.includes('Ayakkabı')) newSizes.push(...this.sizeSets.shoes);
-      if (groups.includes('Giyim')) newSizes.push(...this.sizeSets.clothing);
-      if (newSizes.length === 0) newSizes = ['Standart'];
-    }
-
-    const sizeOptions = [...new Set(newSizes)].map(s => ({ label: s, value: s }));
-    this.filterGroups.update(groups => groups.map(g => 
-      g.key === 'size' ? { ...g, options: sizeOptions } : g
-    ));
   }
 
   loadProducts(brand: string): void {
@@ -411,9 +458,11 @@ export class ProductListWithBrandComponent implements OnInit {
 
     this.productService.getProductsByFilter(
       genders.length > 0 ? genders : undefined,
-      [brand],
+      [brand.replace(/\s/g, '')],
       categoryIds,
       undefined,
+      this.minPrice(),
+      this.maxPrice(),
       1,
       this.pageSize
     ).subscribe({
@@ -443,7 +492,6 @@ export class ProductListWithBrandComponent implements OnInit {
 
     if (groupName === 'Ana Kategori') {
       this.updateSubCategories();
-      this.updateDynamicSizes();
     }
     this.loadProducts(this.brandName());
   }
@@ -451,13 +499,13 @@ export class ProductListWithBrandComponent implements OnInit {
   updateSubCategories(): void {
     const selectedMain = this.selectedFilters().find(f => f.group === 'Ana Kategori');
     let subOptions: FilterOption[] = [];
-    
+
     if (selectedMain) {
       const parent = this.categoryTree.find(c => c.label === selectedMain.option);
       if (parent) subOptions = parent.subOptions || [];
     }
 
-    this.filterGroups.update(groups => groups.map(g => 
+    this.filterGroups.update(groups => groups.map(g =>
       g.key === 'sub-category' ? { ...g, options: subOptions } : g
     ));
   }
@@ -479,15 +527,15 @@ export class ProductListWithBrandComponent implements OnInit {
     this.selectedFilters.update(current => current.filter(f => !(f.group === filter.group && f.option === filter.option)));
     if (filter.group === 'Ana Kategori') {
       this.updateSubCategories();
-      this.updateDynamicSizes();
     }
     this.loadProducts(this.brandName());
   }
 
   clearAllFilters(): void {
     this.selectedFilters.set([]);
+    this.minPrice.set(null);
+    this.maxPrice.set(null);
     this.updateSubCategories();
-    this.updateDynamicSizes();
     this.loadProducts(this.brandName());
   }
 
@@ -503,9 +551,11 @@ export class ProductListWithBrandComponent implements OnInit {
 
     this.productService.getProductsByFilter(
       genders.length > 0 ? genders : undefined,
-      [brand],
+      [brand.replace(/\s/g, '')],
       categoryIds,
       undefined,
+      this.minPrice(),
+      this.maxPrice(),
       nextPage,
       this.pageSize
     ).subscribe({
@@ -524,8 +574,4 @@ export class ProductListWithBrandComponent implements OnInit {
     });
   }
 
-  getColorHex(label: string): string {
-    const colors: any = { 'Siyah': '#000', 'Beyaz': '#fff', 'Mavi': '#0000ff', 'Kırmızı': '#ff0000', 'Yeşil': '#008000', 'Gri': '#808080', 'Kemik': '#f5f5dc', 'Krem': '#fffdd0' };
-    return colors[label] || '#ccc';
-  }
 }

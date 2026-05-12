@@ -9,16 +9,19 @@ public class RegisterCommandHandlerTests
 {
     private readonly Mock<IUserRepository> _mockUserRepo;
     private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IEmailService> _mockEmailService;
     private readonly RegisterCommandHandler _handler;
 
     public RegisterCommandHandlerTests()
     {
         _mockUserRepo = new Mock<IUserRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockEmailService = new Mock<IEmailService>();
 
         _handler = new RegisterCommandHandler(
             _mockUserRepo.Object,
-            _mockUnitOfWork.Object
+            _mockUnitOfWork.Object,
+            _mockEmailService.Object
         );
     }
     // ══════════════════════════════════════════                                                                                                         

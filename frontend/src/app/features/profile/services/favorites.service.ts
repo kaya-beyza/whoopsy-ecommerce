@@ -60,7 +60,7 @@ export class FavoritesService {
   add(userId: string, productId: string): Observable<string> {
     this.favoriteIdsSignal.update(ids => new Set(ids).add(productId));
     return this.http.post<string>(this.baseUrl, { userId, productId }).pipe(
-      tap(() => this.notify.show('Favorilere eklendi', 'success')),
+      tap(() => this.notify.show('Favorilere eklendi', 'success', { label: 'Favorilere git', route: '/profile/favorites' })),
       catchError(err => {
         this.favoriteIdsSignal.update(ids => {
           const next = new Set(ids);

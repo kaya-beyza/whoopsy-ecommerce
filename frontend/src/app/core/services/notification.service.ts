@@ -1,9 +1,15 @@
 import { Injectable, signal } from '@angular/core';
 
+export interface NotificationAction {
+  label: string;
+  route: string;
+}
+
 export interface AppNotification {
   id: number;
   message: string;
   type: 'success' | 'error' | 'info';
+  action?: NotificationAction;
 }
 
 @Injectable({
@@ -16,10 +22,10 @@ export class NotificationService {
 
   private counter = 0;
 
-  show(message: string, type: 'success' | 'error' | 'info' = 'info') {
+  show(message: string, type: 'success' | 'error' | 'info' = 'info', action?: NotificationAction) {
     const id = ++this.counter;
-    const notification: AppNotification = { id, message, type };
-    
+    const notification: AppNotification = { id, message, type, action };
+
     this.notificationsSignal.update(prev => [...prev, notification]);
 
     // Auto-dismiss notification after 5 seconds

@@ -19,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
  TokenService'i kaydet" — hepsi bu iki satırla aktif oluyor*/
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddPersistenceServices(connectionString);
-builder.Services.AddInfrastructureServices();
+builder.Services.AddInfrastructureServices(builder.Configuration);
 
 builder.Services.AddApplicationServices();
 

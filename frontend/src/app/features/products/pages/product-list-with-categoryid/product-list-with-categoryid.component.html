@@ -25,11 +25,18 @@
         </div>
 
         <!-- Dynamic Filter Chips -->
-        <div class="active-filters" *ngIf="selectedFilters().length > 0">
+        <div class="active-filters" *ngIf="hasAnyFilter()">
             <div class="filter-chip" *ngFor="let filter of selectedFilters()">
                 <span class="chip-label">{{ filter.group }}:</span>
                 <span class="chip-value">{{ filter.option }}</span>
                 <button class="remove-chip" (click)="removeFilter(filter)">
+                    <span class="material-symbols-sharp">close</span>
+                </button>
+            </div>
+            <div class="filter-chip" *ngIf="isPriceActive()">
+                <span class="chip-label">Fiyat:</span>
+                <span class="chip-value">{{ priceChipLabel() }}</span>
+                <button class="remove-chip" (click)="clearPriceFilter()">
                     <span class="material-symbols-sharp">close</span>
                 </button>
             </div>
@@ -64,13 +71,28 @@
                         <span class="material-symbols-sharp">{{ group.isExpanded ? 'remove' : 'add' }}</span>
                     </div>
                     <div class="group-options" [class.expanded]="group.isExpanded">
-                        <!-- Special UI for Color Swatches -->
-                        <div class="color-swatch-grid" *ngIf="group.key === 'color'; else standardOptions">
-                            <button *ngFor="let opt of group.options" class="swatch-item"
-                                [class.active]="isSelected(group.name, opt.label)"
-                                [class.light]="opt.label === 'Beyaz' || opt.label === 'Kemik' || opt.label === 'Krem'" [title]="opt.label"
-                                (click)="onFilterToggle(group.name, opt)" [style.background-color]="getColorHex(opt.label)">
-                            </button>
+                        <!-- Special UI for Price Range -->
+                        <div class="price-range-box" *ngIf="group.key === 'price'; else standardOptions">
+                            <div class="price-presets">
+                                <button type="button" class="price-preset-chip"
+                                    *ngFor="let preset of pricePresets"
+                                    [class.active]="isPresetActive(preset)"
+                                    (click)="selectPricePreset(preset)">
+                                    {{ preset.label }}
+                                </button>
+                            </div>
+                            <div class="price-divider"><span>VEYA</span></div>
+                            <div class="price-inputs">
+                                <input type="number" min="0" placeholder="Min ₺"
+                                    [value]="minPrice() ?? ''"
+                                    (input)="minPrice.set($any($event.target).valueAsNumber || null)" />
+                                <span class="dash">—</span>
+                                <input type="number" min="0" placeholder="Max ₺"
+                                    [value]="maxPrice() ?? ''"
+                                    (input)="maxPrice.set($any($event.target).valueAsNumber || null)" />
+                            </div>
+                            <button class="price-apply-btn" (click)="applyPriceRange()">UYGULA</button>
+                            <button class="price-clear-link" *ngIf="isPriceActive()" (click)="clearPriceFilter()">FİYAT FİLTRESİNİ TEMİZLE</button>
                         </div>
 
                         <!-- Standard Checkbox Options -->

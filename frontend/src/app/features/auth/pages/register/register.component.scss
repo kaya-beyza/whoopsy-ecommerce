@@ -191,16 +191,47 @@
 }
 
 .input-hint {
-  font-size: 11px;
-  color: #999;
+  font-size: 12px;
+  color: #555;
   margin-top: 8px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   &::before {
     content: '•';
     margin-right: 5px;
     color: var(--color-primary);
+  }
+}
+
+/* --- Live Password Checklist --- */
+.password-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+
+  li {
+    display: flex;
+      align-items: center;
+      gap: 6px;              
+      font-size: 12px;      
+      font-weight: 700;      
+      color: #555;           
+      transition: color 0.2s ease;
+
+    .material-symbols-sharp {
+      font-size: 16px;
+      color: #aaa;
+      transition: color 0.2s ease;
+    }
+
+    &.met {
+      color: #1a8f3b;
+      .material-symbols-sharp { color: #1a8f3b; }
+    }
   }
 }
 
@@ -429,6 +460,22 @@ input[type="date"] {
   gap: 10px;
   animation: slideDown 0.3s ease-out;
   .material-symbols-sharp { font-size: 18px; }
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 6px;
+  padding-left: 4px;
+  animation: slideDown 0.2s ease-out;
+
+  .material-symbols-sharp {
+    font-size: 14px;
+  }
 }
 
 @keyframes slideDown {
