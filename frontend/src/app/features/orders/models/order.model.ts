@@ -18,7 +18,16 @@ export interface OrderResponse {
 // Kullanıcının kendi siparişleri (/profile/orders)
 // Backend OrderStatus enum string olarak geliyor (JsonStringEnumConverter)
 // ─────────────────────────────────────────────────────────────
-export type OrderStatus = 'Pending' | 'Confirmed' | 'Shipped' | 'Delivered' | 'Cancelled';
+export type OrderStatus =
+  | 'Pending'
+  | 'Confirmed'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled'
+  | 'ReturnRequested'
+  | 'ReturnApproved'
+  | 'ReturnRejected'
+  | 'Returned';
 
 export interface MyOrderItem {
   productId: string;

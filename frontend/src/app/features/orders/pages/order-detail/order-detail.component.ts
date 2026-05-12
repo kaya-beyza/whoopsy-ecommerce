@@ -5,11 +5,15 @@ import { OrderService } from '../../services/order.service';
 import { MyOrderDetail, OrderStatus } from '../../models/order.model';
 
 const STATUS_META: Record<OrderStatus, { label: string; cssClass: string }> = {
-  Pending:   { label: 'Bekliyor',      cssClass: 'badge-warning' },
-  Confirmed: { label: 'Onaylandı',     cssClass: 'badge-info' },
-  Shipped:   { label: 'Kargolandı',    cssClass: 'badge-primary' },
+  Pending: { label: 'Bekliyor', cssClass: 'badge-warning' },
+  Confirmed: { label: 'Onaylandı', cssClass: 'badge-info' },
+  Shipped: { label: 'Kargolandı', cssClass: 'badge-primary' },
   Delivered: { label: 'Teslim Edildi', cssClass: 'badge-success' },
-  Cancelled: { label: 'İptal Edildi',  cssClass: 'badge-danger' },
+  Cancelled: { label: 'İptal Edildi', cssClass: 'badge-danger' },
+  ReturnRequested: { label: 'İade Bekliyor', cssClass: 'badge-warning' },
+  ReturnApproved: { label: 'İade Onaylandı', cssClass: 'badge-info' },
+  ReturnRejected: { label: 'İade Reddedildi', cssClass: 'badge-danger' },
+  Returned: { label: 'İade Tamamlandı', cssClass: 'badge-success' },
 };
 
 @Component({

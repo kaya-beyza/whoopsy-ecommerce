@@ -1,7 +1,6 @@
 using MediatR;
 using MiniETicaret.Application.Interfaces;
 using MiniETicaret.Domain.Entities;
-using MiniETicaret.Domain.Enums;
 
 namespace MiniETicaret.Application.Features.Orders.Commands.CreateOrder;
 
@@ -10,7 +9,9 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
     private readonly IOrderRepository _orderRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CreateOrderCommandHandler(IOrderRepository orderRepository, IUnitOfWork unitOfWork)
+    public CreateOrderCommandHandler(
+        IOrderRepository orderRepository,
+        IUnitOfWork unitOfWork)
     {
         _orderRepository = orderRepository;
         _unitOfWork = unitOfWork;
@@ -35,7 +36,6 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
         {
             UserId = request.UserId,
             ShippingAddress = request.ShippingAddress,
-            Status = OrderStatus.Pending,
             TotalAmount = totalAmount,
             OrderItems = orderItems,
             CreatedDate = DateTime.UtcNow.AddHours(3)
@@ -44,7 +44,11 @@ public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Gui
         // 4) Veritabanına kaydet
         await _orderRepository.AddAsync(order);
         await _unitOfWork.SaveChangesAsync();
-        // 5) Yeni siparişin Id'sini döndür
+
+        // 5) Sipariş onay maili burada GÖNDERİLMEZ.
+        //    Mail, CreatePaymentCommandHandler'da ödeme başarılı olduğunda yollanır
+        //    (başarısız ödemede kullanıcıya yanıltıcı "siparişin alındı" maili gitmesin diye).
+
         return order.Id;
     }
 }

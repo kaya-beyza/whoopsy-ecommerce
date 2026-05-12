@@ -62,16 +62,7 @@
     <h2 class="recommendations-title">BUNLAR DA İLGİNİZİ ÇEKEBİLİR</h2>
     <div class="recommendations-grid">
       @for (prod of recommendedProducts(); track prod.id) {
-        <div class="rec-card">
-          <div class="rec-image">
-            <img [src]="prod.imageUrl" [alt]="prod.name">
-            <button class="btn-quick-add" (click)="addRecommendedToCart(prod)">+ SEPETE EKLE</button>
-          </div>
-          <div class="rec-info">
-            <h3 class="rec-name">{{ prod.name }}</h3>
-            <p class="rec-price">{{ prod.price | currency:'TRY':'symbol-narrow':'1.2-2' }}</p>
-          </div>
-        </div>
+        <app-product-card [product]="prod" />
       }
     </div>
   </section>

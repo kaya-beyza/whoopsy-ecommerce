@@ -13,7 +13,7 @@ public interface IProductRepository
     Task<(List<Product> Items, int TotalCount)> GetByCategoryIdAsync(Guid categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null);
     Task<(List<Product> Items, int TotalCount)> GetByGenderAsync(Gender? gender, Guid? categoryId, CancellationToken cancellationToken, int? page = null, int? pageSize = null);
     Task<(List<Product> Items, int TotalCount)> GetByBrandAsync(Brand brand, CancellationToken cancellationToken, int? page = null, int? pageSize = null);
-    Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(List<Gender>? genders, List<Brand>? brands, List<Guid>? categoryIds, string? searchTerm, CancellationToken cancellationToken, int? page = null, int? pageSize = null);
+    Task<(List<Product> Items, int TotalCount)> GetByFilterAsync(List<Gender>? genders, List<Brand>? brands, List<Guid>? categoryIds, string? searchTerm, decimal? minPrice, decimal? maxPrice, CancellationToken cancellationToken, int? page = null, int? pageSize = null);
     // Image metodları
     Task<ProductImage> AddImageAsync(Guid productId, ProductImage image, CancellationToken cancellationToken);
     Task<bool> DeleteImageAsync(Guid productId, Guid imageId, CancellationToken cancellationToken);

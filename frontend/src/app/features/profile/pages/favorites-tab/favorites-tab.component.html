@@ -20,11 +20,11 @@
     <div class="grid">
       @for (fav of favorites(); track fav.productId) {
         <article class="fav-card">
-          <a [routerLink]="['/urunler', fav.productId]" class="img-wrap">
+          <a [routerLink]="['/urunler/detay', fav.productId]" class="img-wrap">
             <img [src]="imageOrPlaceholder(fav.mainImageUrl)" [alt]="fav.productName" class="fav-img">
           </a>
           <div class="fav-body">
-            <a [routerLink]="['/urunler', fav.productId]" class="fav-name">{{ fav.productName }}</a>
+            <a [routerLink]="['/urunler/detay', fav.productId]" class="fav-name">{{ fav.productName }}</a>
             <div class="fav-price">{{ fav.price | number:'1.2-2' }} ₺</div>
             <button
               type="button"

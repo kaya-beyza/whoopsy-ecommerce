@@ -16,7 +16,9 @@ public class CreateOrderCommandHandlerTests
     {
         _mockOrderRepo = new Mock<IOrderRepository>();
         _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _handler = new CreateOrderCommandHandler(_mockOrderRepo.Object, _mockUnitOfWork.Object);
+        _handler = new CreateOrderCommandHandler(
+            _mockOrderRepo.Object,
+            _mockUnitOfWork.Object);
     }
 
     // ══════════════════════════════════════════

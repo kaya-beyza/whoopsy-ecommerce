@@ -33,7 +33,6 @@ public class GetOrderDetailQueryHandlerTests
             Id = orderId,
             UserId = userId,
             TotalAmount = 450m,
-            Status = OrderStatus.Shipped,
             ShippingAddress = "İzmir, Bornova",
             CreatedDate = DateTime.UtcNow,
             User = new AppUser
@@ -55,6 +54,9 @@ public class GetOrderDetailQueryHandlerTests
                   }
               }
         };
+        // Status için domain method'larını kullan — rich domain modeli (Pending → Confirmed → Shipped)
+        order.Confirm();
+        order.Ship();
 
         _mockOrderRepo
             .Setup(repo => repo.GetByIdWithDetailsAsync(orderId))

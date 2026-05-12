@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService } from '../../../core/services/notification.service';
+import { Router } from '@angular/router';
+import { NotificationService, AppNotification } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-notification',
@@ -18,6 +19,12 @@ import { NotificationService } from '../../../core/services/notification.service
             </span>
             <span class="toast-msg">{{ note.message }}</span>
           </div>
+          @if (note.action) {
+            <button class="action-btn" (click)="onActionClick($event, note)">
+              {{ note.action.label }}
+              <span class="material-symbols-sharp">arrow_forward</span>
+            </button>
+          }
           <button class="close-btn">
             <span class="material-symbols-sharp">close</span>
           </button>
@@ -91,6 +98,35 @@ import { NotificationService } from '../../../core/services/notification.service
       }
     }
 
+    .action-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      font-family: var(--font-body, 'Inter', sans-serif);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 6px;
+      transition: background 0.2s, transform 0.2s;
+      white-space: nowrap;
+
+      &:hover {
+        background: #333;
+        transform: translateX(2px);
+      }
+
+      .material-symbols-sharp {
+        font-size: 16px;
+        font-variation-settings: 'wght' 400;
+      }
+    }
+
     .close-btn {
       background: transparent;
       border: none;
@@ -112,4 +148,13 @@ import { NotificationService } from '../../../core/services/notification.service
 })
 export class NotificationComponent {
   public notificationService = inject(NotificationService);
+  private router = inject(Router);
+
+  onActionClick(event: MouseEvent, note: AppNotification) {
+    event.stopPropagation();
+    if (note.action) {
+      this.router.navigateByUrl(note.action.route);
+    }
+    this.notificationService.remove(note.id);
+  }
 }

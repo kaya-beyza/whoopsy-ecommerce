@@ -30,7 +30,8 @@ public class GetProductsByBrandHandler : IRequestHandler<GetProductsByBrandQuery
             Gender = p.Gender,
             Brand = p.Brand,
             MainImageUrl = p.Images?.FirstOrDefault(i => i.IsMain)?.Url,
-            ImageUrls = p.Images?.Select(i => i.Url).ToList() ?? new()
+            ImageUrls = p.Images?.Select(i => i.Url).ToList() ?? new(),
+            CreatedDate = p.CreatedDate
         }).ToList();
 
         return new PagedResultDto<ProductDto>(items, totalCount, request.Page, request.PageSize);
