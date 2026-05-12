@@ -7,6 +7,11 @@ namespace MiniETicaret.API.Middlewares;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
+    // JSON yanıtlarını camelCase üret — frontend (Angular) bu konvansiyonu bekliyor.
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     public ExceptionMiddleware(RequestDelegate next)
     {
@@ -90,7 +95,7 @@ public class ExceptionMiddleware
                 break;
         }
 
-        var json = JsonSerializer.Serialize(response);
+        var json = JsonSerializer.Serialize(response,_jsonOptions);
         await context.Response.WriteAsync(json);
     }
 }

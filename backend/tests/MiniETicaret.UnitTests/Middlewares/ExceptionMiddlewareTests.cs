@@ -33,7 +33,7 @@ public class ExceptionMiddlewareTests
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var json = await new StreamReader(context.Response.Body).ReadToEndAsync();
         var response = JsonSerializer.Deserialize<JsonElement>(json);
-        Assert.Equal("Yetkisiz erişim", response.GetProperty("Message").GetString());
+        Assert.Equal("Yetkisiz erişim", response.GetProperty("message").GetString());
     }
 
     // ══════════════════════════════════════════
@@ -59,7 +59,7 @@ public class ExceptionMiddlewareTests
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var json = await new StreamReader(context.Response.Body).ReadToEndAsync();
         var response = JsonSerializer.Deserialize<JsonElement>(json);
-        Assert.Equal("Kayıt bulunamadı", response.GetProperty("Message").GetString());
+        Assert.Equal("Kayıt bulunamadı", response.GetProperty("message").GetString());
     }
 
     // ══════════════════════════════════════════
@@ -85,7 +85,7 @@ public class ExceptionMiddlewareTests
         context.Response.Body.Seek(0, SeekOrigin.Begin);
         var json = await new StreamReader(context.Response.Body).ReadToEndAsync();
         var response = JsonSerializer.Deserialize<JsonElement>(json);
-        Assert.Equal("Beklenmeyen hata", response.GetProperty("Message").GetString());
+        Assert.Equal("Beklenmeyen hata", response.GetProperty("message").GetString());
     }
 
     // ══════════════════════════════════════════
