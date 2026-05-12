@@ -147,6 +147,15 @@ export class CheckoutComponent implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  fillTestShipping(): void {
+    this.buyerName = 'Ahmet';
+    this.buyerSurname = 'Eren';
+    this.buyerEmail = 'test@whoopsy.com';
+    this.buyerPhone = '+90 555 123 45 67';
+    this.buyerAddress = 'Atatürk Mah. Cumhuriyet Cad. No:1 D:5';
+    this.buyerCity = 'İstanbul';
+  }
+
   fillTestCard(cardNumber: string): void {
     const digits = cardNumber.replace(/\D/g, '').slice(0, 16);
     const formatted = digits.match(/.{1,4}/g)?.join(' ') ?? '';
