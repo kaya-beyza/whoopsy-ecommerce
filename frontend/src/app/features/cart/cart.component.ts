@@ -1,9 +1,10 @@
-import { Component, computed, signal, inject, OnInit } from '@angular/core';
+import { Component, computed, signal, inject, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router'; 
-import { ProductService } from '../products/services/product.service'; 
+import { Router, RouterModule } from '@angular/router';
+import { ProductService } from '../products/services/product.service';
 import { Product } from '../products/models/product.model';
 import { CartService } from './services/cart.service';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card';
 
 interface CartItem {
   id: string;
@@ -18,7 +19,7 @@ interface CartItem {
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterModule], 
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css'
 })
@@ -33,6 +34,14 @@ export class CartComponent implements OnInit {
 
   subTotal = computed(() => this.cartItems().reduce((acc, item) => acc + (item.price * item.quantity), 0));
   total = computed(() => this.subTotal() > 0 ? this.subTotal() + this.shippingCost() : 0);
+
+  // app-product-card cart'a ekleme yapınca cartService.cartCount değişir → cart listesini tazele
+  private cartCountWatcher = effect(() => {
+    const count = this.cartService.cartCount();
+    if (count !== this.cartItems().length) {
+      this.loadMyCart();
+    }
+  });
 
   ngOnInit(): void {
     this.loadMyCart();
@@ -92,8 +101,13 @@ export class CartComponent implements OnInit {
   }
 
   removeItem(id: string) {
-    // Burada cartService.removeItem(...) çağrısı da eklenmeli
+    const previous = this.cartItems();
+    // Optimistik: UI'dan hemen kaldır
     this.cartItems.update(items => items.filter(item => item.id !== id));
+
+    this.cartService.removeItem(id).subscribe({
+      error: () => this.cartItems.set(previous)  // Toast servis seviyesinde
+    });
   }
 
   goToCheckout() {
@@ -103,29 +117,4 @@ export class CartComponent implements OnInit {
     });
   }
 
-  addRecommendedToCart(product: Product) {
-    const productIdStr = product.id.toString(); 
-
-    this.cartService.addToCart(productIdStr, 1).subscribe({
-      next: () => {
-        this.cartItems.update(items => {
-          const existingItem = items.find(i => i.id === productIdStr);
-          if (existingItem) {
-            return items.map(i => i.id === productIdStr ? { ...i, quantity: i.quantity + 1 } : i);
-          }
-          
-          return [...items, {
-            id: productIdStr,
-            name: product.name,
-            price: product.price,
-            quantity: 1,
-            imageUrl: product.imageUrl,
-            size: 'Standart',
-            color: product.colors?.[0] || 'Standart'
-          }];
-        });
-      },
-      error: (err) => alert(err.message || 'Ürün sepete eklenemedi.')
-    });
-  }
 }
