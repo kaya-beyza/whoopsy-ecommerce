@@ -189,16 +189,31 @@ class _OrdersPageState extends State<OrdersPage> {
     switch (status.toLowerCase()) {
       case "confirmed":
         return "ONAYLANDI";
+
       case "pending":
         return "HAZIRLANIYOR";
+
       case "shipped":
         return "GÖNDERİLDİ";
+
       case "delivered":
         return "TESLİM EDİLDİ";
+
       case "cancelled":
-        return "İPTAL EDİLDİ";
-      case "returned":
+        return "X İPTAL EDİLDİ";
+
+      case "returnrequested":
         return "İADE TALEBİ OLUŞTURULDU";
+
+      case "returnapproved":
+        return "İADE ONAYLANDI";
+
+      case "returnrejected":
+        return "İADE REDDEDİLDİ";
+
+      case "returned":
+        return "İADE TAMAMLANDI";
+
       default:
         return status.toUpperCase();
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 import 'package:mobile/features/dashboard/presentation/screens/orders_page.dart';
+import 'package:mobile/features/dashboard/presentation/screens/returns_page.dart';
 import 'package:mobile/features/users/presentation/profile_page.dart';
 import 'package:provider/provider.dart';
 
@@ -44,7 +45,18 @@ class AccountPage extends StatelessWidget {
                 );
               },
             ),
-            _buildMenuItem(Icons.assignment_return, "İADELER"),
+            _buildMenuItem(
+              Icons.assignment_return,
+              "İADELER",
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ReturnsPage(),
+                  ),
+                );
+              },
+            ),
 
             _buildMenuItem(
               Icons.person,

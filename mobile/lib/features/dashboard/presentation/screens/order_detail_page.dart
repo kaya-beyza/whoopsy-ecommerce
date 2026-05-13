@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:mobile/features/products/data/datasources/product_remote_data_source.dart';
 import 'package:mobile/features/products/data/repositories/product_repository_impl.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
+
 import '../../data/datasources/order_remote_data_source.dart';
 import '../../data/repositories/order_repository.dart';
 import '../../data/models/order_model.dart';
@@ -16,7 +17,6 @@ class OrderDetailPage extends StatefulWidget {
 
 class _OrderDetailPageState extends State<OrderDetailPage> {
   late final OrderRepository _repo;
-  String? _returnCode;
 
   OrderModel? _order;
   bool _isLoading = true;
@@ -46,18 +46,51 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
       setState(() {
         _order = data;
-      });
-
-      if (!mounted) return;
-
-      setState(() {
         _isLoading = false;
       });
     } catch (e) {
       print("DETAIL ERROR: $e");
+
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+        });
       }
+    }
+  }
+
+  Future<void> _updateStatus(String status) async {
+    try {
+      await _repo.updateOrderStatus(
+        orderId: _order!.id,
+        status: status,
+      );
+
+      final updated = await _repo.getOrderDetail(_order!.id);
+
+      if (!mounted) return;
+
+      setState(() {
+        _order = updated;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            status == "Cancelled"
+                ? "Sipariş iptal edildi"
+                : "İade talebi oluşturuldu",
+          ),
+        ),
+      );
+    } catch (e) {
+      print(e);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("İşlem başarısız"),
+        ),
+      );
     }
   }
 
@@ -82,12 +115,18 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Widget _buildContent() {
     final date = DateFormat("dd/MM/yyyy").format(_order!.createdDate);
 
+    final status = _order!.status.toLowerCase();
+
+    final canCancel = status == "pending" || status == "confirmed";
+
+    final canReturn = status == "shipped" || status == "delivered";
+
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
         /// STATUS
         Text(
-          _mapStatus(_order!.status ?? ""),
+          _mapStatus(_order!.status),
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -109,8 +148,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
         /// ADDRESS
         Text(
-          _order!.shippingAddress ?? "",
-          style: const TextStyle(color: Colors.black87),
+          _order!.shippingAddress,
+          style: const TextStyle(
+            color: Colors.black87,
+          ),
         ),
 
         const SizedBox(height: 20),
@@ -136,6 +177,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             child: Container(
               margin: const EdgeInsets.only(bottom: 12),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
                     width: 80,
@@ -156,12 +198,25 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(item.productName ?? ""),
-                        const SizedBox(height: 6),
-                        Text("Adet: ${item.quantity ?? 0}"),
+                        Text(
+                          item.productName,
+                          style: const TextStyle(
+                            fontSize: 14,
+                          ),
+                        ),
                         const SizedBox(height: 6),
                         Text(
-                          "${(item.totalPrice ?? 0).toStringAsFixed(2)} TL",
+                          "Adet: ${item.quantity}",
+                          style: const TextStyle(
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "${item.totalPrice.toStringAsFixed(2)} TL",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -180,39 +235,29 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           children: [
             const Text(
               "TOPLAM",
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
-              "${(_order!.totalAmount ?? 0).toStringAsFixed(2)} TL",
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              "${_order!.totalAmount.toStringAsFixed(2)} TL",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
+
         const SizedBox(height: 30),
 
-        /// ACTION BUTTONS
-        if (_order != null &&
-            (_order!.status.toLowerCase() == "pending" ||
-                _order!.status.toLowerCase() == "confirmed"))
+        /// CANCEL BUTTON
+        if (canCancel)
           SizedBox(
             width: double.infinity,
             height: 48,
             child: OutlinedButton(
               onPressed: () async {
-                try {
-                  await _repo.updateOrderStatus(
-                    orderId: _order!.id,
-                    status: "Cancelled",
-                  );
-
-                  final updated = await _repo.getOrderDetail(_order!.id);
-
-                  setState(() {
-                    _order = updated;
-                  });
-                } catch (e) {
-                  print(e);
-                }
+                await _updateStatus("Cancelled");
               },
               style: OutlinedButton.styleFrom(
                 elevation: 0,
@@ -237,37 +282,14 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             ),
           ),
 
-        if (_order != null &&
-            (_order!.status.toLowerCase() == "shipped" ||
-                _order!.status.toLowerCase() == "delivered"))
+        /// RETURN BUTTON
+        if (canReturn)
           SizedBox(
             width: double.infinity,
             height: 48,
             child: OutlinedButton(
               onPressed: () async {
-                final code =
-                    "RT${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
-
-                await _repo.updateOrderStatus(
-                  orderId: _order!.id,
-                  status: "Returned",
-                );
-
-                final updated = await _repo.getOrderDetail(_order!.id);
-
-                setState(() {
-                  _returnCode = code;
-
-                  _order = OrderModel(
-                    id: updated.id,
-                    totalAmount: updated.totalAmount,
-                    status: updated.status,
-                    shippingAddress: updated.shippingAddress,
-                    createdDate: updated.createdDate,
-                    items: updated.items,
-                    mainImageUrl: updated.mainImageUrl,
-                  );
-                });
+                await _updateStatus("ReturnRequested");
               },
               style: OutlinedButton.styleFrom(
                 elevation: 0,
@@ -279,7 +301,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 ),
               ),
               child: const Text(
-                "İADE ET",
+                "İADE TALEBİ OLUŞTUR",
                 style: TextStyle(
                   fontSize: 12,
                   letterSpacing: 1.2,
@@ -288,42 +310,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ),
             ),
           ),
-        if (_returnCode != null) ...[
-          const SizedBox(height: 16),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              border: Border.all(
-                color: Colors.grey.shade300,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "İADE KODU",
-                  style: TextStyle(
-                    fontSize: 11,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  _returnCode!,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -332,16 +318,31 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     switch (status.toLowerCase()) {
       case "confirmed":
         return "ONAYLANDI";
+
       case "pending":
         return "HAZIRLANIYOR";
+
       case "shipped":
         return "GÖNDERİLDİ";
+
       case "delivered":
         return "TESLİM EDİLDİ";
+
       case "cancelled":
-        return "İPTAL EDİLDİ";
-      case "returned":
+        return "X İPTAL EDİLDİ";
+
+      case "returnrequested":
         return "İADE TALEBİ OLUŞTURULDU";
+
+      case "returnapproved":
+        return "İADE ONAYLANDI";
+
+      case "returnrejected":
+        return "İADE REDDEDİLDİ";
+
+      case "returned":
+        return "İADE TAMAMLANDI";
+
       default:
         return status.toUpperCase();
     }
