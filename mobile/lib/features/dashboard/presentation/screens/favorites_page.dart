@@ -21,47 +21,12 @@ class FavoritesPage extends StatefulWidget {
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
-  bool _isLoading = true;
-
-  String? _errorMessage;
-  List<Product> _products = [];
-
-  late final FavoriteRepositoryImpl _repo;
-
   @override
   void initState() {
     super.initState();
-    _repo = FavoriteRepositoryImpl(FavoriteRemoteDataSource());
-    _loadFavorites();
-  }
-
-  Future<void> _loadFavorites() async {
-    try {
-      final userId = await AuthLocalDataSource().getUserId();
-
-      if (userId == null || userId.isEmpty) {
-        setState(() {
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final data = await _repo.getUserFavorites(userId);
-      context.read<FavoriteService>().setFavorites(
-            data.map((e) => e.id).toList(),
-          );
-      setState(() {
-        _products = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("FAVORITES ERROR: $e");
-
-      setState(() {
-        _errorMessage = "Favoriler yüklenemedi";
-        _isLoading = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FavoriteService>().loadFavorites();
+    });
   }
 
   @override
@@ -76,7 +41,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   Widget _buildBody() {
     final auth = context.watch<AuthProvider>();
-
+    final favService = context.watch<FavoriteService>();
     if (!auth.isAuthenticated) {
       return AuthRequiredView(
         title: "Favorilerinizi görmek için giriş yapın",
@@ -93,15 +58,11 @@ class _FavoritesPageState extends State<FavoritesPage> {
       );
     }
 
-    if (_isLoading) {
+    if (favService.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_errorMessage != null) {
-      return Center(child: Text(_errorMessage!));
-    }
-
-    if (_products.isEmpty) {
+    if (favService.products.isEmpty) {
       return const Center(
         child: Text("Favori ürün yok"),
       );
@@ -113,8 +74,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
         crossAxisCount: 2,
         childAspectRatio: 0.7,
       ),
-      itemCount: _products.length,
-      itemBuilder: (_, i) => FavoriteCard(product: _products[i]),
+      itemCount: favService.products.length,
+      itemBuilder: (_, i) => FavoriteCard(product: favService.products[i]),
     );
   }
 }

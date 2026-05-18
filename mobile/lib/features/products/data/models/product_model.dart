@@ -14,7 +14,7 @@ class ProductModel extends Product {
     super.imageUrls,
   });
 
-  /// 🔥 STRING → INT MAP
+  ///  STRING → INT MAP
   static int _genderFromString(dynamic gender) {
     if (gender is int) return gender;
 

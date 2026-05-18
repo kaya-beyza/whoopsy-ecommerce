@@ -37,7 +37,7 @@ class OrderRemoteDataSource {
       Uri.parse("$baseUrl/Users/$userId/orders"),
       headers: headers,
     );
-
+    print("REQUEST URL: $baseUrl/Users/$userId/orders");
     print("ORDERS STATUS: ${response.statusCode}");
     print("ORDERS BODY: ${response.body}");
 
@@ -95,6 +95,50 @@ class OrderRemoteDataSource {
 
     if (response.statusCode != 200 && response.statusCode != 204) {
       throw Exception("Status update failed");
+    }
+  }
+
+  /// PAYMENT
+  Future<void> createPayment({
+    required String orderId,
+    required String cardHolderName,
+    required String cardNumber,
+    required String expireMonth,
+    required String expireYear,
+    required String cvc,
+    required String buyerName,
+    required String buyerSurname,
+    required String buyerEmail,
+    required String buyerPhone,
+    required String buyerAddress,
+    required String buyerCity,
+  }) async {
+    final headers = await _getHeaders();
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/payments"),
+      headers: headers,
+      body: jsonEncode({
+        "orderId": orderId,
+        "cardHolderName": cardHolderName,
+        "cardNumber": cardNumber,
+        "expireMonth": expireMonth,
+        "expireYear": expireYear,
+        "cvc": cvc,
+        "buyerName": buyerName,
+        "buyerSurname": buyerSurname,
+        "buyerEmail": buyerEmail,
+        "buyerPhone": buyerPhone,
+        "buyerAddress": buyerAddress,
+        "buyerCity": buyerCity,
+      }),
+    );
+
+    print("PAYMENT STATUS: ${response.statusCode}");
+    print("PAYMENT BODY: ${response.body}");
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw Exception("Ödeme başarısız");
     }
   }
 }

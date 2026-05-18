@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/dashboard/data/datasources/cart_remote_data_source.dart';
+import 'package:mobile/features/dashboard/presentation/checkout_page.dart';
 import 'package:mobile/features/dashboard/presentation/screens/favorites_page.dart';
+import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/widgets/auth_required_view.dart';
 import 'package:mobile/features/products/data/models/product_model.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
@@ -18,91 +19,20 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   final _remote = CartRemoteDataSource();
-  final _local = AuthLocalDataSource();
-
-  List<dynamic> _items = [];
-  bool _loading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadCart();
-  }
 
-  Future<void> _loadCart() async {
-    final userId = await _local.getUserId();
-    if (userId == null) {
-      setState(() {
-        _loading = false;
-      });
-      return;
-    }
-
-    final data = await _remote.getUserCart(userId);
-
-    setState(() {
-      _items = data;
-      _loading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartService>().loadCart();
     });
-  }
-
-  Future<void> _update(dynamic item, int newQty) async {
-    if (newQty <= 0) return _remove(item);
-
-    final userId = await _local.getUserId();
-    if (userId == null) return;
-
-    try {
-      await _remote.updateQuantity(
-        userId,
-        item["productId"],
-        newQty,
-      );
-
-      _loadCart();
-    } catch (e) {
-      print("UPDATE ERROR: $e");
-    }
-  }
-
-  Future<void> _remove(dynamic item) async {
-    final userId = await _local.getUserId();
-    if (userId == null) return;
-
-    try {
-      await _remote.removeItem(
-        userId,
-        item["productId"],
-      );
-
-      _loadCart();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.black,
-          elevation: 0,
-          margin: const EdgeInsets.fromLTRB(12, 0, 12, 90),
-          content: const Text(
-            "Ürün sepetten çıkarıldı",
-            style: TextStyle(color: Colors.white, fontSize: 12),
-          ),
-          duration: const Duration(milliseconds: 1200),
-        ),
-      );
-    } catch (e) {
-      print("REMOVE ERROR: $e");
-    }
-  }
-
-  int get totalPrice {
-    return _items.fold(
-        0, (sum, item) => sum + (item["totalPrice"] as num).toInt());
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final cartService = context.watch<CartService>();
 
     if (!auth.isAuthenticated) {
       return Scaffold(
@@ -138,32 +68,27 @@ class _CartPageState extends State<CartPage> {
         elevation: 0,
       ),
       body: SafeArea(
-        child: _loading
+        child: cartService.loading
             ? const Center(child: CircularProgressIndicator())
-
-            /// EMPTY
-            : _items.isEmpty
+            : cartService.items.isEmpty
                 ? _emptyCart()
-
-                /// FILLED
                 : Column(
                     children: [
                       Expanded(
                         child: ListView.builder(
-                          itemCount: _items.length,
+                          itemCount: cartService.items.length,
                           itemBuilder: (_, i) {
-                            return _cartItem(_items[i]);
+                            return _cartItem(cartService.items[i]);
                           },
                         ),
                       ),
-                      _bottomSection(),
+                      _bottomSection(cartService),
                     ],
                   ),
       ),
     );
   }
 
-  /// ================= EMPTY =================
   Widget _emptyCart() {
     return Center(
       child: Column(
@@ -219,7 +144,6 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  /// ================= CART ITEM =================
   Widget _cartItem(dynamic item) {
     return GestureDetector(
       onTap: () {
@@ -243,7 +167,6 @@ class _CartPageState extends State<CartPage> {
           padding: const EdgeInsets.all(10),
           child: Row(
             children: [
-              /// IMAGE
               Container(
                 width: 90,
                 height: 110,
@@ -255,10 +178,7 @@ class _CartPageState extends State<CartPage> {
                   fit: BoxFit.cover,
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              /// INFO
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -283,8 +203,20 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         _qtyButton(
                           icon: Icons.remove,
-                          onTap: () =>
-                              _update(item, (item["quantity"] as int) - 1),
+                          onTap: () async {
+                            final qty = (item["quantity"] as int) - 1;
+
+                            if (qty <= 0) {
+                              await context
+                                  .read<CartService>()
+                                  .removeItem(item["productId"]);
+                            } else {
+                              await context.read<CartService>().updateQuantity(
+                                    item["productId"],
+                                    qty,
+                                  );
+                            }
+                          },
                         ),
                         Container(
                           width: 40,
@@ -293,14 +225,41 @@ class _CartPageState extends State<CartPage> {
                         ),
                         _qtyButton(
                           icon: Icons.add,
-                          onTap: () =>
-                              _update(item, (item["quantity"] as int) + 1),
+                          onTap: () async {
+                            await context.read<CartService>().updateQuantity(
+                                  item["productId"],
+                                  (item["quantity"] as int) + 1,
+                                );
+                          },
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     GestureDetector(
-                      onTap: () => _remove(item),
+                      onTap: () async {
+                        await context
+                            .read<CartService>()
+                            .removeItem(item["productId"]);
+
+                        if (!context.mounted) return;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.black,
+                            elevation: 0,
+                            margin: const EdgeInsets.fromLTRB(12, 0, 12, 90),
+                            content: const Text(
+                              "Ürün sepetten çıkarıldı",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
+                            ),
+                            duration: const Duration(milliseconds: 1200),
+                          ),
+                        );
+                      },
                       child: const Text(
                         "Sepetten çıkar",
                         style: TextStyle(
@@ -320,7 +279,6 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  /// ================= QTY BUTTON =================
   Widget _qtyButton({
     required IconData icon,
     required VoidCallback onTap,
@@ -338,8 +296,7 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  /// ================= BOTTOM =================
-  Widget _bottomSection() {
+  Widget _bottomSection(CartService cartService) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
@@ -355,8 +312,10 @@ class _CartPageState extends State<CartPage> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               Text(
-                "$totalPrice ₺",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                "${cartService.totalPrice} ₺",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -364,7 +323,38 @@ class _CartPageState extends State<CartPage> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () async {
+                try {
+                  final userId = await _remote.local.getUserId();
+
+                  if (userId == null) return;
+
+                  final createdOrder = await _remote.createOrder(
+                    userId: userId,
+                    items: cartService.items,
+                  );
+
+                  if (!context.mounted) return;
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CheckoutPage(
+                        orderId: createdOrder,
+                        totalPrice: cartService.totalPrice.toDouble(),
+                      ),
+                    ),
+                  );
+                } catch (e) {
+                  print(e);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Sipariş oluşturulamadı"),
+                    ),
+                  );
+                }
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF0E7A5F),
                 elevation: 0,

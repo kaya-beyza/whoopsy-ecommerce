@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: WhoopsyLogo(size: 70), // 🔥 BÜYÜK LOGO
+        child: WhoopsyLogo(size: 70),
       ),
     );
   }
