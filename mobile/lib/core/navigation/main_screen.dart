@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoggedIn = context.watch<AuthProvider>().isLoggedIn;
+    final isLoggedIn = context.watch<AuthProvider>().isAuthenticated;
 
     ///  SAYFALAR BURADA
     final List<Widget> pages = [

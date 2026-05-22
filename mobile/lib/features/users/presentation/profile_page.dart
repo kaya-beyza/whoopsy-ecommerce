@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:mobile/features/users/data/datasources/user_remote_data_source.dart';
 import 'package:mobile/features/users/data/repositories/user_repository.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -43,8 +45,22 @@ class _ProfilePageState extends State<ProfilePage> {
       nameController.text = user.fullName;
       emailController.text = user.email;
       addressController.text = user.address ?? "";
-      phoneController.text = user.phoneNumber ?? "";
-      birthDateController.text = user.birthDate ?? "";
+      final phone = user.phoneNumber ?? "";
+
+      if (phone.startsWith("+90")) {
+        phoneController.text = phone.substring(3);
+      } else if (phone.startsWith("90")) {
+        phoneController.text = phone.substring(2);
+      } else if (phone.startsWith("0")) {
+        phoneController.text = phone.substring(1);
+      } else {
+        phoneController.text = phone;
+      }
+      if (user.birthDate != null && user.birthDate!.isNotEmpty) {
+        final parsedDate = DateTime.parse(user.birthDate!);
+
+        birthDateController.text = DateFormat('yyyy-MM-dd').format(parsedDate);
+      }
       gender = user.gender ?? "Kadın";
     } catch (e) {
       debugPrint("LOAD USER ERROR: $e");
@@ -98,32 +114,33 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : GestureDetector(
-              onTap: () => FocusScope.of(context).unfocus(),
-              child: SafeArea(
-                child: SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    top: 12,
-                    bottom: isEditing ? 120 : 24,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _sectionTitle("KİŞİSEL BİLGİLER"),
-                      const SizedBox(height: 12),
-                      _buildField("İsim", nameController),
-                      _buildField("Email", emailController),
-                      _buildField("Doğum Tarihi", birthDateController),
-                      _buildField("Adres", addressController),
-                      _buildGenderField(),
-                      _buildField("Telefon", phoneController),
-                      const SizedBox(height: 40),
-                    ],
-                  ),
+          : SafeArea(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.manual,
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 12,
+                  bottom: isEditing ? 120 : 24,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionTitle("KİŞİSEL BİLGİLER"),
+                    const SizedBox(height: 12),
+                    _buildField("İsim", nameController),
+                    _buildField("Email", emailController),
+                    _buildField(
+                      "Doğum Tarihi",
+                      birthDateController,
+                      hintText: "yyyy-mm-dd",
+                    ),
+                    _buildField("Adres", addressController),
+                    _buildGenderField(),
+                    _buildField("Telefon", phoneController),
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
             ),
@@ -157,12 +174,31 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller) {
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    String? hintText,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
       child: TextField(
         controller: controller,
         enabled: isEditing,
+        readOnly: label == "Doğum Tarihi",
+        onTap: label == "Doğum Tarihi"
+            ? () async {
+                final pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime(2000),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now(),
+                );
+
+                if (pickedDate != null) {
+                  controller.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                }
+              }
+            : null,
         cursorColor: Colors.black,
         style: const TextStyle(
           fontSize: 15,
@@ -170,6 +206,11 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         decoration: InputDecoration(
           labelText: label,
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: Colors.grey.shade400,
+            fontSize: 13,
+          ),
           labelStyle: TextStyle(
             color: Colors.grey.shade600,
             fontSize: 13,
@@ -187,7 +228,16 @@ class _ProfilePageState extends State<ProfilePage> {
           focusedBorder: const UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.black),
           ),
+          prefixText: label == "Telefon" ? "+90 " : null,
         ),
+        keyboardType:
+            label == "Telefon" ? TextInputType.phone : TextInputType.text,
+        inputFormatters: label == "Telefon"
+            ? [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(10),
+              ]
+            : [],
       ),
     );
   }
@@ -269,14 +319,95 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               FocusScope.of(context).unfocus();
 
-              // TODO: update user API call burada yapılacak
+              final fullName = nameController.text.trim();
+              final phone = phoneController.text.trim();
+              final address = addressController.text.trim();
+              final birthDate = birthDateController.text.trim();
 
-              setState(() {
-                isEditing = false;
-              });
+              // İsim kontrolü
+              if (fullName.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Ad soyad boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              // Telefon kontrolü
+              if (phone.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Telefon numarası boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              if (phone.length != 10) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Geçerli bir telefon numarası giriniz"),
+                  ),
+                );
+                return;
+              }
+
+              // Adres kontrolü
+              if (address.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Adres boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              // Doğum tarihi kontrolü
+              if (birthDate.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Doğum tarihi boş olamaz"),
+                  ),
+                );
+                return;
+              }
+
+              try {
+                await repository.updateProfile(
+                  fullName: fullName,
+                  phoneNumber: phone,
+                  address: address,
+                  birthDate: birthDate,
+                );
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Profil başarıyla güncellendi"),
+                  ),
+                );
+
+                setState(() {
+                  isEditing = false;
+                });
+
+                await loadUser();
+              } catch (e) {
+                print("UPDATE PROFILE ERROR: $e");
+
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Profil güncellenemedi"),
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.black,

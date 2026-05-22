@@ -30,7 +30,11 @@ public class UpdateUserProfileCommandHandler : IRequestHandler<UpdateUserProfile
         user.FullName = request.FullName;
         user.PhoneNumber = request.PhoneNumber;
         user.Address = request.Address;
-        user.BirthDate = request.BirthDate;
+        user.BirthDate = DateTime.SpecifyKind(
+            request.BirthDate,
+                DateTimeKind.Utc
+        );
+        
         user.UpdatedDate = DateTime.UtcNow.AddHours(3);
 
         await _unitOfWork.SaveChangesAsync();

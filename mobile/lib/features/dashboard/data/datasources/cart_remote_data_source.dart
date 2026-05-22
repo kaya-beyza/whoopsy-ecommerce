@@ -86,4 +86,55 @@ class CartRemoteDataSource {
       throw Exception("Silinemedi");
     }
   }
+
+  Future<String> createOrder({
+    required String userId,
+    required List<dynamic> items,
+  }) async {
+    final token = await local.getToken();
+
+    final response = await http.post(
+      Uri.parse("$baseUrl/orders"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "userId": userId,
+        "shippingAddress": "İstanbul / Kadıköy",
+        "orderItems": items.map((e) {
+          return {
+            "productId": e["productId"],
+            "quantity": e["quantity"],
+            "unitPrice": e["price"],
+          };
+        }).toList(),
+      }),
+    );
+
+    print("CREATE ORDER STATUS: ${response.statusCode}");
+    print("CREATE ORDER BODY: ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body).toString();
+    }
+
+    throw Exception("Sipariş oluşturulamadı");
+  }
+
+  Future<void> clearCart(String userId) async {
+    final token = await local.getToken();
+
+    final response = await http.delete(
+      Uri.parse("$baseUrl/cart/$userId/clear"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception("Sepet temizlenemedi");
+    }
+  }
 }

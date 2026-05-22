@@ -72,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       print("NAME: $name");
 
-      // 🔥 PROVIDER UPDATE
+      //  PROVIDER UPDATE
       context.read<AuthProvider>().login(
             newToken: token,
             userName: name,

@@ -9,12 +9,12 @@ class ProfileWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
+    final auth = context.watch<AuthProvider>();
 
-    if (auth.isLoggedIn) {
+    if (auth.isAuthenticated) {
       return const AccountPage();
-    } else {
-      return const LoginPage();
     }
+
+    return const LoginPage();
   }
 }
