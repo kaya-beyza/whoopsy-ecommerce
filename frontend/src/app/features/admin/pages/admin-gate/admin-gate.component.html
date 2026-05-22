@@ -1,0 +1,74 @@
+<div class="login-viewport">
+    <!-- Left Panel: Premium Lifestyle Asset -->
+    <div class="brand-panel">
+        <div class="asset-overlay"></div>
+        <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1777374553/log-in_lprtkj.jpg" alt="Whoopsy Brand Image" class="brand-asset">
+        <div class="brand-tagline">
+            <a class="logo-light" routerLink="/">
+                <span class="logo-w">w</span>
+                <span class="logo-h">h</span>
+                <span class="logo-oopsy">
+                    <span class="eye-o">O</span>
+                    <span class="eye-o">O</span>
+                    <span class="logo-ps">PS</span>
+                </span>
+                <span class="logo-y">y</span>
+            </a>
+            <p>Admin · Yetkili · Erişim</p>
+        </div>
+    </div>
+
+    <!-- Right Panel: Gate Form -->
+    <div class="form-panel">
+        <div class="login-container">
+            <header class="form-header">
+                <a class="logo-main" routerLink="/">
+                    <span class="logo-w">w</span>
+                    <span class="logo-h">h</span>
+                    <span class="logo-oopsy">
+                        <span class="eye-o">O</span>
+                        <span class="eye-o">O</span>
+                        <span class="logo-ps">PS</span>
+                    </span>
+                    <span class="logo-y">y</span>
+                </a>
+
+                <div class="header-titles">
+                    <div class="admin-badge">
+                        <span class="material-symbols-sharp">shield_lock</span>
+                        ADMIN ALANI
+                    </div>
+                    <h1 class="welcome-title">Erişim Şifresi</h1>
+                    <p class="subtitle">Admin başvuru sayfasına geçmek için sistem erişim şifresini gir.</p>
+                </div>
+            </header>
+
+            <form (ngSubmit)="onSubmit()" class="login-form">
+                <div class="form-group">
+                    <label for="gatePassword">ERİŞİM ŞİFRESİ</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">key</span>
+                        <input id="gatePassword" type="password" [(ngModel)]="gatePassword"
+                               name="gatePassword" required autocomplete="off"
+                               placeholder="••••••••••••" />
+                    </div>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-sharp">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <button type="submit" [disabled]="isLoading" class="primary-btn">
+                    <span *ngIf="!isLoading">DEVAM ET</span>
+                    <span *ngIf="isLoading">Doğrulanıyor...</span>
+                </button>
+            </form>
+
+            <footer class="form-footer">
+                <span>Zaten admin misin?</span>
+                <a routerLink="/admin/login" class="signup-link">ADMİN GİRİŞİ</a>
+            </footer>
+        </div>
+    </div>
+</div>

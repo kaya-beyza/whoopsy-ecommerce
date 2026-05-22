@@ -1,0 +1,82 @@
+<div class="login-viewport">
+    <!-- Left Panel: Aynı brand görseli -->
+    <div class="brand-panel">
+        <div class="asset-overlay"></div>
+        <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1777374553/log-in_lprtkj.jpg" alt="Whoopsy Brand Image" class="brand-asset">
+        <div class="brand-tagline">
+            <a class="logo-light" routerLink="/">
+                <span class="logo-w">w</span>
+                <span class="logo-h">h</span>
+                <span class="logo-oopsy">
+                    <span class="eye-o">O</span>
+                    <span class="eye-o">O</span>
+                    <span class="logo-ps">PS</span>
+                </span>
+                <span class="logo-y">y</span>
+            </a>
+            <p>Admin · Yetkili · Erişim</p>
+        </div>
+    </div>
+
+    <!-- Right Panel: Admin Login Form -->
+    <div class="form-panel">
+        <div class="login-container">
+            <header class="form-header">
+                <a class="logo-main" routerLink="/">
+                    <span class="logo-w">w</span>
+                    <span class="logo-h">h</span>
+                    <span class="logo-oopsy">
+                        <span class="eye-o">O</span>
+                        <span class="eye-o">O</span>
+                        <span class="logo-ps">PS</span>
+                    </span>
+                    <span class="logo-y">y</span>
+                </a>
+
+                <div class="header-titles">
+                    <div class="admin-badge">
+                        <span class="material-symbols-sharp">shield_person</span>
+                        ADMIN GİRİŞİ
+                    </div>
+                    <h1 class="welcome-title">Hoş Geldin</h1>
+                    <p class="subtitle">Yönetim paneline erişmek için admin hesabınla giriş yap.</p>
+                </div>
+            </header>
+
+            <form (ngSubmit)="onLogin()" class="login-form">
+                <div class="form-group">
+                    <label for="email">E-POSTA</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">mail</span>
+                        <input id="email" type="email" [(ngModel)]="email" name="email" required
+                               autocomplete="email" placeholder="admin@whoopsy.com" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">ŞİFRE</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">lock</span>
+                        <input id="password" type="password" [(ngModel)]="password" name="password" required
+                               autocomplete="current-password" placeholder="••••••••" />
+                    </div>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-sharp">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <button type="submit" [disabled]="isLoading" class="primary-btn">
+                    <span *ngIf="!isLoading">GİRİŞ YAP</span>
+                    <span *ngIf="isLoading">Doğrulanıyor...</span>
+                </button>
+            </form>
+
+            <footer class="form-footer">
+                <span>Henüz admin değil misin?</span>
+                <a routerLink="/admin/gate" class="signup-link">ADMİN BAŞVURUSU</a>
+            </footer>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<div class="admin-shell">
+    <header class="admin-header">
+        <a class="logo-main" routerLink="/">
+            <span class="logo-w">w</span>
+            <span class="logo-h">h</span>
+            <span class="logo-oopsy">
+                <span>O</span>
+                <span>O</span>
+                <span class="logo-ps">PS</span>
+            </span>
+            <span class="logo-y">y</span>
+        </a>
+        <div class="admin-tag">
+            <span class="material-symbols-sharp">shield_person</span>
+            ADMIN PANELİ
+        </div>
+        <button class="logout-btn" (click)="logout()">
+            <span class="material-symbols-sharp">logout</span>
+            Çıkış
+        </button>
+    </header>
+
+    <main class="admin-body">
+        <section class="welcome-card">
+            <span class="material-symbols-sharp welcome-icon">verified_user</span>
+            <h1>Hoş geldin{{ user()?.fullName ? ', ' + user()?.fullName : '' }}</h1>
+            <p>Admin paneli yapım aşamasında. İlerleyen sürümde ürün, sipariş ve kullanıcı yönetim modülleri burada listelenecek.</p>
+            <div class="info-line">
+                <span><strong>E-posta:</strong> {{ user()?.email }}</span>
+                <span><strong>Rol:</strong> {{ user()?.role }}</span>
+            </div>
+        </section>
+
+        <section class="placeholder-grid">
+            <div class="placeholder-card">
+                <span class="material-symbols-sharp">inventory_2</span>
+                <h3>Ürün Yönetimi</h3>
+                <p>Yakında</p>
+            </div>
+            <div class="placeholder-card">
+                <span class="material-symbols-sharp">receipt_long</span>
+                <h3>Sipariş Yönetimi</h3>
+                <p>Yakında</p>
+            </div>
+            <div class="placeholder-card">
+                <span class="material-symbols-sharp">group</span>
+                <h3>Kullanıcı Yönetimi</h3>
+                <p>Yakında</p>
+            </div>
+            <div class="placeholder-card">
+                <span class="material-symbols-sharp">monitoring</span>
+                <h3>Raporlar</h3>
+                <p>Yakında</p>
+            </div>
+        </section>
+    </main>
+</div>
