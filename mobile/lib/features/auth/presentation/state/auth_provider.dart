@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
 
 class AuthProvider extends ChangeNotifier {
   String? token;
   String? name;
   String? email;
 
-  bool get isLoggedIn => token != null;
+  bool get isAuthenticated => token != null;
+
+  Future<void> logout() async {
+    await AuthLocalDataSource().clear();
+
+    token = null;
+    name = null;
+    email = null;
+
+    notifyListeners();
+  }
 
   void login({
     required String newToken,
@@ -15,14 +26,6 @@ class AuthProvider extends ChangeNotifier {
     token = newToken;
     name = userName;
     email = userEmail;
-
-    notifyListeners();
-  }
-
-  void logout() {
-    token = null;
-    name = null;
-    email = null;
 
     notifyListeners();
   }

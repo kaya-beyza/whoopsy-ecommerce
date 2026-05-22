@@ -33,7 +33,7 @@ class Product {
       price: (json['price'] as num).toDouble(),
       stockQuantity: json['stockQuantity'],
       categoryId: json['categoryId'],
-      brand: json['brand'], // 🔥 önemli
+      brand: json['brand'],
       gender: json['gender'] ?? 0,
       mainImageUrl: json['mainImageUrl'],
       imageUrls: (json['imageUrls'] as List<dynamic>?)

@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/features/auth/data/datasources/auth_local_data_source.dart';
+import 'package:mobile/features/auth/presentation/pages/login_page.dart';
 import 'package:mobile/features/dashboard/data/datasources/favorite_remote_data_source.dart';
 import 'package:mobile/features/dashboard/data/repositories/favorite_repository_impl.dart';
+import 'package:mobile/features/dashboard/presentation/screens/account_page.dart';
 import 'package:mobile/features/dashboard/presentation/screens/cart_page.dart';
 import 'package:mobile/features/dashboard/presentation/state/cart_service.dart';
 import 'package:mobile/features/dashboard/presentation/state/favorite_service.dart';
+import 'package:mobile/features/dashboard/presentation/widgets/auth_required_view.dart';
 import 'package:mobile/features/products/domain/entities/product.dart';
 import 'package:mobile/features/products/presentation/product_detail_page.dart';
 import 'package:provider/provider.dart';
+import 'package:mobile/features/auth/presentation/state/auth_provider.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -17,47 +21,12 @@ class FavoritesPage extends StatefulWidget {
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
-  bool _isLoading = true;
-  String? _errorMessage;
-  List<Product> _products = [];
-
-  late final FavoriteRepositoryImpl _repo;
-
   @override
   void initState() {
     super.initState();
-    _repo = FavoriteRepositoryImpl(FavoriteRemoteDataSource());
-    _loadFavorites();
-  }
-
-  Future<void> _loadFavorites() async {
-    try {
-      final userId = await AuthLocalDataSource().getUserId();
-
-      if (userId == null || userId.isEmpty) {
-        setState(() {
-          _isLoading = false;
-          _errorMessage = "Kullanıcı bulunamadı";
-        });
-        return;
-      }
-
-      final data = await _repo.getUserFavorites(userId);
-      context.read<FavoriteService>().setFavorites(
-            data.map((e) => e.id).toList(),
-          );
-      setState(() {
-        _products = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      print("FAVORITES ERROR: $e");
-
-      setState(() {
-        _errorMessage = "Favoriler yüklenemedi";
-        _isLoading = false;
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<FavoriteService>().loadFavorites();
+    });
   }
 
   @override
@@ -71,16 +40,32 @@ class _FavoritesPageState extends State<FavoritesPage> {
   }
 
   Widget _buildBody() {
-    if (_isLoading) {
+    final auth = context.watch<AuthProvider>();
+    final favService = context.watch<FavoriteService>();
+    if (!auth.isAuthenticated) {
+      return AuthRequiredView(
+        title: "Favorilerinizi görmek için giriş yapın",
+        description:
+            "Beğendiğiniz ürünleri kaydedebilmek ve tüm cihazlarınızda görüntüleyebilmek için hesabınıza giriş yapın.",
+        onLogin: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const LoginPage(),
+            ),
+          );
+        },
+      );
+    }
+
+    if (favService.loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_errorMessage != null) {
-      return Center(child: Text(_errorMessage!));
-    }
-
-    if (_products.isEmpty) {
-      return const Center(child: Text("Favori ürün yok"));
+    if (favService.products.isEmpty) {
+      return const Center(
+        child: Text("Favori ürün yok"),
+      );
     }
 
     return GridView.builder(
@@ -89,8 +74,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
         crossAxisCount: 2,
         childAspectRatio: 0.7,
       ),
-      itemCount: _products.length,
-      itemBuilder: (_, i) => FavoriteCard(product: _products[i]),
+      itemCount: favService.products.length,
+      itemBuilder: (_, i) => FavoriteCard(product: favService.products[i]),
     );
   }
 }

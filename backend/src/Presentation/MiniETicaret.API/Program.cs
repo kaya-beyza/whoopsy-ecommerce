@@ -31,20 +31,41 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    /*Kullanıcı her istekte token gönderecek. Bu ayarlar "token'ı nasıl kontrol edeceğim" diyor.
-     4 şeyi doğruluyor — hepsi geçerse istek kabul edilir.*/
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
+
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
-        
+
         NameClaimType = ClaimTypes.NameIdentifier
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("JWT ERROR: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+
+        OnChallenge = context =>
+        {
+            Console.WriteLine("JWT CHALLENGE ERROR");
+            return Task.CompletedTask;
+        },
+
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("TOKEN VALIDATED");
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -53,7 +74,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")  // Angular'ın çalıştığı adres
+        policy.WithOrigins( 
+            "http://localhost:4200", // Angular
+                "http://10.0.2.2:5277",  // Android emulator
+                "http://localhost:5277"
+            )  // Angular'ın çalıştığı adres
               .AllowAnyHeader()                       // Her türlü header'a izin ver
               .AllowAnyMethod()                       // GET, POST, PUT, DELETE hepsine izin ver
               .AllowCredentials();                    // Cookie/token göndermeye izin ver

@@ -105,7 +105,7 @@ class CategorySection extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => ProductListPage(
-                                    genderId: genderId, // ✅ BURASI
+                                    genderId: genderId,
                                   ),
                                 ),
                               );
