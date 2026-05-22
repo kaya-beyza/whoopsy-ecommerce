@@ -18,6 +18,12 @@ export const routes: Routes = [
     component: RegisterComponent
   },
 
+  // 2.5. ADMİN AKIŞI (Layout dışında — kendi tam ekran sayfaları var)
+  {
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin.routes').then(m => m.adminRoutes)
+  },
+
   // 3. ANA ŞABLON (Tüm iç sayfalar MainLayout içinde)
   {
     path: '',

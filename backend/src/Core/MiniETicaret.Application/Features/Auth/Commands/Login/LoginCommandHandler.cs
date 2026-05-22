@@ -1,6 +1,7 @@
 using MediatR;
 using MiniETicaret.Application.DTOs;
 using MiniETicaret.Application.Interfaces;
+using MiniETicaret.Domain.Enums;
 namespace MiniETicaret.Application.Features.Auth.Commands.Login;
 /*  LoginCommand'ı hatırlıyorsun — sadece Email ve Password taşıyordu. Şimdi Handler bu bilgiyi alıp şunları yapacak:
 
@@ -40,6 +41,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, TokenDto>
 
         if (!isPasswordValid)
             throw new UnauthorizedAccessException("E-posta veya şifre hatalı.");
+
+        // 2.1 Admin Approval Flow: Admin rolünde olup henüz onaylanmamışsa login engelle.
+        //     Normal kullanıcılarda IsApproved=true default'u var, etkilenmezler.
+        if (!user.IsApproved)
+        {
+            var message = user.ApprovalStatus switch
+            {
+                AdminApprovalStatus.Pending => "Admin başvurun henüz onay bekliyor.",
+                AdminApprovalStatus.Rejected => "Admin başvurun reddedildi.",
+                _ => "Hesabın onaylanmadı."
+            };
+            throw new UnauthorizedAccessException(message);
+        }
 
         // 3.Token Üret
         var accessToken = _tokenService.GenerateAccessToken(user);

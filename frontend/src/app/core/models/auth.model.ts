@@ -21,3 +21,21 @@
     refreshToken: string;
     expiresAt: string;
   }
+
+  // Admin başvuru isteği — Backend'deki RegisterAdminCommand karşılığı.
+  // GatePassword .env'deki AdminApproval__GatePassword ile eşleşmeli.
+  export interface AdminRegisterRequest {
+    gatePassword: string;
+    fullName: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    gender?: number | null;
+    birthDate?: string | null;
+  }
+
+  // Gate password doğrulama isteği.
+  export interface GatePasswordRequest {
+    gatePassword: string;
+  }
+

@@ -71,4 +71,11 @@ public class UserRepository : IUserRepository
         .FirstOrDefaultAsync(u => u.Id == id);
 }
 
+    public async Task<AppUser?> GetByApprovalTokenAsync(Guid token)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.ApprovalToken == token);
+    }
+
 }

@@ -105,7 +105,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<MiniETicaretDbContext>();
-    await SeedData.SeedAsync(context);
+    var bootstrapEmail = builder.Configuration["BootstrapAdmin:Email"];
+    var bootstrapPassword = builder.Configuration["BootstrapAdmin:Password"];
+    await SeedData.SeedAsync(context, bootstrapEmail, bootstrapPassword);
     //await ProductSeedData.SeedAsync(context);
     //await SubCategorySeedData.SeedAsync(context);
 }

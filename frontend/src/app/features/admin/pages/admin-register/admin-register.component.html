@@ -1,0 +1,196 @@
+<div class="login-viewport">
+    <!-- Left Panel -->
+    <div class="brand-panel">
+        <div class="asset-overlay"></div>
+        <img src="https://res.cloudinary.com/dkwthtwgg/image/upload/q_auto/f_auto/v1777374553/log-in_lprtkj.jpg" alt="Whoopsy Brand Image" class="brand-asset">
+        <div class="brand-tagline">
+            <a class="logo-light" routerLink="/">
+                <span class="logo-w">w</span>
+                <span class="logo-h">h</span>
+                <span class="logo-oopsy">
+                    <span class="eye-o">O</span>
+                    <span class="eye-o">O</span>
+                    <span class="logo-ps">PS</span>
+                </span>
+                <span class="logo-y">y</span>
+            </a>
+            <p>Admin · Yetkili · Erişim</p>
+        </div>
+    </div>
+
+    <!-- Right Panel: Admin Register Form -->
+    <div class="form-panel">
+        <div class="login-container">
+            <header class="form-header">
+                <a class="logo-main" routerLink="/">
+                    <span class="logo-w">w</span>
+                    <span class="logo-h">h</span>
+                    <span class="logo-oopsy">
+                        <span class="eye-o">O</span>
+                        <span class="eye-o">O</span>
+                        <span class="logo-ps">PS</span>
+                    </span>
+                    <span class="logo-y">y</span>
+                </a>
+
+                <div class="header-titles">
+                    <div class="admin-badge">
+                        <span class="material-symbols-sharp">admin_panel_settings</span>
+                        ADMİN BAŞVURUSU
+                    </div>
+                    <h1 class="welcome-title">Hesap Oluştur</h1>
+                    <p class="subtitle">Başvurun sistem yöneticisi tarafından onaylandığında giriş yapabileceksin.</p>
+                </div>
+            </header>
+
+            <!-- Başarılı başvuru durumu -->
+            <div class="success-card" *ngIf="successMessage">
+                <span class="material-symbols-sharp success-icon">mark_email_read</span>
+                <h2>Başvurun Alındı</h2>
+                <p>{{ successMessage }}</p>
+                <a routerLink="/admin/login" class="primary-btn-link">ADMİN GİRİŞİNE GİT</a>
+            </div>
+
+            <form *ngIf="!successMessage" (ngSubmit)="onRegister()" class="login-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">İSİM*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">person</span>
+                            <input id="firstName" type="text" [(ngModel)]="firstName" name="firstName" required
+                                   (ngModelChange)="clearFieldError('FullName')" placeholder="Adınız" />
+                        </div>
+                        <small class="field-error" *ngIf="fieldErrors['FullName']">
+                            <span class="material-symbols-sharp">error</span>
+                            {{ fieldErrors['FullName'] }}
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">SOYİSİM*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">person</span>
+                            <input id="lastName" type="text" [(ngModel)]="lastName" name="lastName" required
+                                   (ngModelChange)="clearFieldError('FullName')" placeholder="Soyadınız" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-POSTA*</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">mail</span>
+                        <input id="email" type="email" [(ngModel)]="email" name="email" required autocomplete="email"
+                               (ngModelChange)="clearFieldError('Email')" placeholder="ornek@whoopsy.com" />
+                    </div>
+                    <small class="field-error" *ngIf="fieldErrors['Email']">
+                        <span class="material-symbols-sharp">error</span>
+                        {{ fieldErrors['Email'] }}
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">TELEFON*</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">call</span>
+                        <input id="phone" type="tel" [(ngModel)]="phone" name="phone" required
+                               (ngModelChange)="clearFieldError('PhoneNumber')" placeholder="05xx xxx xx xx" />
+                    </div>
+                    <small class="field-error" *ngIf="fieldErrors['PhoneNumber']">
+                        <span class="material-symbols-sharp">error</span>
+                        {{ fieldErrors['PhoneNumber'] }}
+                    </small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">ŞİFRE*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">lock</span>
+                            <input id="password" type="password" [(ngModel)]="password" name="password" required
+                                   (ngModelChange)="clearFieldError('Password')" placeholder="••••••••" />
+                        </div>
+                        <ul class="password-checklist" *ngIf="password">
+                            <li [class.met]="passwordChecks.length">
+                                <span class="material-symbols-sharp">{{ passwordChecks.length ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                                En az 8 karakter
+                            </li>
+                            <li [class.met]="passwordChecks.upper">
+                                <span class="material-symbols-sharp">{{ passwordChecks.upper ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                                Bir büyük harf
+                            </li>
+                            <li [class.met]="passwordChecks.lower">
+                                <span class="material-symbols-sharp">{{ passwordChecks.lower ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                                Bir küçük harf
+                            </li>
+                            <li [class.met]="passwordChecks.number">
+                                <span class="material-symbols-sharp">{{ passwordChecks.number ? 'check_circle' : 'radio_button_unchecked' }}</span>
+                                Bir rakam
+                            </li>
+                        </ul>
+                        <small class="field-error" *ngIf="fieldErrors['Password']">
+                            <span class="material-symbols-sharp">error</span>
+                            {{ fieldErrors['Password'] }}
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">ŞİFRE TEKRAR*</label>
+                        <div class="input-wrapper">
+                            <span class="material-symbols-sharp input-icon">lock</span>
+                            <input id="confirmPassword" type="password" [(ngModel)]="confirmPassword"
+                                   name="confirmPassword" required placeholder="••••••••" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>CİNSİYET</label>
+                    <div class="gender-selection">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="0">
+                            <span class="radio-custom"></span>
+                            Erkek
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="1">
+                            <span class="radio-custom"></span>
+                            Kadın
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" [(ngModel)]="gender" [value]="2">
+                            <span class="radio-custom"></span>
+                            Belirtmek istemiyorum
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthDate">DOĞUM TARİHİ*</label>
+                    <div class="input-wrapper">
+                        <span class="material-symbols-sharp input-icon">calendar_month</span>
+                        <input id="birthDate" type="date" [(ngModel)]="birthDate" name="birthDate" required
+                               (ngModelChange)="clearFieldError('BirthDate')" />
+                    </div>
+                    <small class="field-error" *ngIf="fieldErrors['BirthDate']">
+                        <span class="material-symbols-sharp">error</span>
+                        {{ fieldErrors['BirthDate'] }}
+                    </small>
+                </div>
+
+                <div class="error-msg" *ngIf="errorMessage">
+                    <span class="material-symbols-sharp">error</span>
+                    {{ errorMessage }}
+                </div>
+
+                <button type="submit" [disabled]="isLoading" class="primary-btn">
+                    <span *ngIf="!isLoading">BAŞVURUYU GÖNDER</span>
+                    <span *ngIf="isLoading">Gönderiliyor...</span>
+                </button>
+            </form>
+
+            <footer class="form-footer" *ngIf="!successMessage">
+                <span>Zaten admin misin?</span>
+                <a routerLink="/admin/login" class="signup-link">ADMİN GİRİŞİ</a>
+            </footer>
+        </div>
+    </div>
+</div>

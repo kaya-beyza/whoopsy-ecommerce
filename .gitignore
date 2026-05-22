@@ -69,6 +69,7 @@ linux/flutter/ephemeral/
 *.dll
 *.exe
 *.pdb
+*.lscache
 
 ############################################
 # NUGET
@@ -103,6 +104,13 @@ coverage/
 *.tmp
 *.bak
 *.swp
+
+############################################
+# KIŞISEL / DEFTER (commit edilmemeli)
+############################################
+tarihler*.jpg
+tarihler*.jpeg
+tarihler*.png
 
 ############################################
 # SEED DATA (MAIN'DEN GELEN)

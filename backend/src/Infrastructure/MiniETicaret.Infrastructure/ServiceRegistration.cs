@@ -19,6 +19,10 @@ public static class ServiceRegistration
         services.Configure<SmtpSettings>(configuration.GetSection("Smtp"));
         services.AddScoped<IEmailService, SmtpEmailService>();
 
+        // Admin Approval Flow ayarları (gate password, notification email, api base url).
+        services.Configure<AdminApprovalSettings>(configuration.GetSection("AdminApproval"));
+        services.AddScoped<IAdminApprovalSettings, AdminApprovalSettingsProvider>();
+
         return services;
     }
 }

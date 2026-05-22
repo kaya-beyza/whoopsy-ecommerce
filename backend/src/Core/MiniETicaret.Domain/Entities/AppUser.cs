@@ -14,6 +14,19 @@ public class AppUser : BaseEntity
     public UserGender? Gender { get; set; }
     public DateTime? BirthDate { get; set; }
 
+    // ─── Admin Approval Flow ───
+    // Admin başvurularında onaylanana kadar false kalır. Login engellenir.
+    public bool IsApproved { get; set; } = true;
+
+    // Başvurunun yaşam döngüsü. Normal kullanıcılar Approved.
+    public AdminApprovalStatus ApprovalStatus { get; set; } = AdminApprovalStatus.Approved;
+
+    // Email'deki onay/red linkinin token'ı. Tek kullanımlık.
+    public Guid? ApprovalToken { get; set; }
+
+    // Token'ın geçerlilik süresi (24 saat).
+    public DateTime? ApprovalTokenExpiresAt { get; set; }
+
     // Navigation Properties
     public Guid RoleId { get; set; }
     public Role Role { get; set; } = null!;

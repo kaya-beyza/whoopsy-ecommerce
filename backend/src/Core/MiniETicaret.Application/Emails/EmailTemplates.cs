@@ -83,6 +83,92 @@ public static class EmailTemplates
         );
     }
 
+    // Admin başvurusu yapıldığında kurucu admin'e gider — onay/red linkleri içerir.
+    public static string AdminApprovalRequest(
+        string applicantName,
+        string applicantEmail,
+        string applicantPhone,
+        string approveUrl,
+        string rejectUrl)
+    {
+        var safeName = string.IsNullOrWhiteSpace(applicantName) ? "(isimsiz)" : applicantName;
+        var safePhone = string.IsNullOrWhiteSpace(applicantPhone) ? "—" : applicantPhone;
+
+        return BaseShell(
+            title: "Yeni Admin Başvurusu",
+            heading: "Yeni admin başvurusu 🛡️",
+            bodyHtml: $@"
+                  <p style=""margin:0 0 24px;color:#222222;font-size:16px;line-height:1.7;"">
+                      Aşağıdaki kullanıcı admin olmak için başvuru yaptı. Detayları kontrol et,
+                      ardından <b>Onayla</b> veya <b>Reddet</b> linkine tıkla. Token 24 saat
+                      sonra geçersiz olacak.
+                  </p>
+                  <div style=""background:#f9f9f9;padding:18px 22px;border-radius:6px;margin:24px 0;border-left:3px solid {BrandColor};"">
+                      <p style=""margin:0;color:#666666;font-size:13px;letter-spacing:0.5px;font-weight:bold;"">AD SOYAD</p>
+                      <p style=""margin:6px 0 16px;color:#000000;font-weight:bold;font-size:16px;"">{safeName}</p>
+                      <p style=""margin:0;color:#666666;font-size:13px;letter-spacing:0.5px;font-weight:bold;"">E-POSTA</p>
+                      <p style=""margin:6px 0 16px;color:#000000;font-size:15px;font-family:'Courier New',monospace;"">{applicantEmail}</p>
+                      <p style=""margin:0;color:#666666;font-size:13px;letter-spacing:0.5px;font-weight:bold;"">TELEFON</p>
+                      <p style=""margin:6px 0 0;color:#000000;font-size:15px;"">{safePhone}</p>
+                  </div>
+                  <div style=""text-align:center;margin:36px 0;"">
+                      <a href=""{approveUrl}"" style=""background:#1a8f3b;color:#ffffff;text-decoration:none;padding:16px 36px;border-radius:4px;display:inline-block;font-weight:bold;font-size:15px;letter-spacing:0.5px;margin:4px;"">
+                          ✓ ONAYLA
+                      </a>
+                      <a href=""{rejectUrl}"" style=""background:{BrandColor};color:#ffffff;text-decoration:none;padding:16px 36px;border-radius:4px;display:inline-block;font-weight:bold;font-size:15px;letter-spacing:0.5px;margin:4px;"">
+                          ✗ REDDET
+                      </a>
+                  </div>
+                  <p style=""margin:24px 0 0;color:#888888;font-size:13px;line-height:1.6;text-align:center;"">
+                      Bu istek senin tarafından beklenmiyorsa <b>Reddet</b> linkine tıkla.
+                  </p>"
+        );
+    }
+
+    // Admin başvurusu onaylandığında başvurucuya gider.
+    public static string AdminApproved(string fullName)
+    {
+        var safeName = string.IsNullOrWhiteSpace(fullName) ? "değerli kullanıcı" : fullName;
+
+        return BaseShell(
+            title: "Admin Başvurun Onaylandı",
+            heading: $"Tebrikler, {safeName}! 🎉",
+            bodyHtml: $@"
+                  <p style=""margin:0 0 24px;color:#222222;font-size:16px;line-height:1.7;"">
+                      Admin başvurun onaylandı. Artık whoopsy yönetim paneline giriş yapabilirsin.
+                  </p>
+                  <div style=""text-align:center;margin:36px 0;"">
+                      <a href=""{FrontendUrl}/admin/login"" style=""background:{BrandColor};color:#ffffff;text-decoration:none;padding:16px 44px;border-radius:4px;display:inline-block;font-weight:bold;font-size:15px;letter-spacing:0.5px;"">
+                          ADMİN GİRİŞİ
+                      </a>
+                  </div>
+                  <p style=""margin:24px 0 0;color:#555555;font-size:14px;line-height:1.6;"">
+                      Kayıt sırasında belirlediğin e-posta ve şifre ile giriş yapabilirsin.
+                  </p>"
+        );
+    }
+
+    // Admin başvurusu reddedildiğinde başvurucuya gider.
+    public static string AdminRejected(string fullName)
+    {
+        var safeName = string.IsNullOrWhiteSpace(fullName) ? "değerli kullanıcı" : fullName;
+
+        return BaseShell(
+            title: "Admin Başvurun Reddedildi",
+            heading: $"Üzgünüz, {safeName}",
+            bodyHtml: $@"
+                  <p style=""margin:0 0 24px;color:#222222;font-size:16px;line-height:1.7;"">
+                      Admin başvurun bu kez onaylanmadı. whoopsy hesabın normal kullanıcı olarak
+                      açık kalmaya devam edebilir.
+                  </p>
+                  <div style=""text-align:center;margin:36px 0;"">
+                      <a href=""{FrontendUrl}"" style=""background:{BrandDark};color:#ffffff;text-decoration:none;padding:16px 44px;border-radius:4px;display:inline-block;font-weight:bold;font-size:15px;letter-spacing:0.5px;"">
+                          ANA SAYFAYA DÖN
+                      </a>
+                  </div>"
+        );
+    }
+
     // Tüm mailler için ortak shell — header (siyah + kırmızı vurgu) + body + footer.
     private static string BaseShell(string title, string heading, string bodyHtml) => $@"
   <!DOCTYPE html>
