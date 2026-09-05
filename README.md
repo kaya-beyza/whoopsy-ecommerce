@@ -1,5 +1,11 @@
 # whOOPSy — Full-Stack E-Ticaret Platformu
 
+[![Canlı Demo](https://img.shields.io/badge/Canlı_Demo-whoopsy--ecommerce.onrender.com-success?style=for-the-badge&logo=render)](https://whoopsy-ecommerce.onrender.com)
+[![Swagger API](https://img.shields.io/badge/Swagger_API-Dokümantasyon-blue?style=for-the-badge&logo=swagger)](https://whoopsy-ecommerce.onrender.com/swagger)
+
+> 🌐 **Canlı Web Sitesi:** [https://whoopsy-ecommerce.onrender.com](https://whoopsy-ecommerce.onrender.com)  
+> 📑 **Canlı Swagger API:** [https://whoopsy-ecommerce.onrender.com/swagger](https://whoopsy-ecommerce.onrender.com/swagger)
+
 Bu proje; lisans mezuniyet bitirme projesi (Graduation Capstone Project) ve staj çalışmamız kapsamında ekip olarak hayata geçirdiğimiz modern bir Full-Stack E-Ticaret platformudur.
 
 Proje kapsamında **.NET 10** tabanlı katmanlı bir backend mimarisi, **Angular 21** ile modern bir web arayüzü ve **Flutter** ile mobil istemci bir araya getirilmiştir.
