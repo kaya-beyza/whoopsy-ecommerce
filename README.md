@@ -1,4 +1,4 @@
-# <img src="https://api.iconify.design/lucide:shopping-bag.svg?color=%236366f1" width="26" height="26" align="center" /> whOOPSy — Full-Stack E-Ticaret Platformu
+# whOOPSy — Full-Stack E-Ticaret Platformu
 
 Bu proje; lisans mezuniyet bitirme projesi (Graduation Capstone Project) ve staj çalışmamız kapsamında ekip olarak hayata geçirdiğimiz modern bir Full-Stack E-Ticaret platformudur.
 
@@ -6,7 +6,7 @@ Proje kapsamında **.NET 10** tabanlı katmanlı bir backend mimarisi, **Angular
 
 ---
 
-## <img src="https://api.iconify.design/lucide:user-check.svg?color=%2310b981" width="20" height="20" align="center" /> Benim Rolüm ve Katkılarım (Front-End Developer)
+## Benim Rolüm ve Katkılarım (Front-End Developer)
 
 Bu ekip çalışmasında web arayüzünün (**Front-End**) geliştirilmesini baştan sona bizzat üstlendim. Kullanıcının ve yöneticinin etkileşime girdiği tüm ekranlar, görsel deneyim ve API entegrasyonları tarafımdan geliştirilmiştir:
 
@@ -20,7 +20,7 @@ Bu ekip çalışmasında web arayüzünün (**Front-End**) geliştirilmesini ba�
 
 ---
 
-## <img src="https://api.iconify.design/lucide:layers.svg?color=%238b5cf6" width="20" height="20" align="center" /> Genel Mimari ve Teknoloji Yığını
+## Genel Mimari ve Teknoloji Yığını
 
 Ekip olarak projenin sürdürülebilirliğini sağlamak adına katmanlı mimari prensiplerini benimsedik:
 
@@ -45,7 +45,7 @@ MiniETicaret/
 
 ---
 
-## <img src="https://api.iconify.design/lucide:sparkles.svg?color=%23f59e0b" width="20" height="20" align="center" /> Öne Çıkan Fonksiyonlar & İş Akışı
+## Öne Çıkan Fonksiyonlar & İş Akışı
 
 - **Uçtan Uca Müşteri Deneyimi:** Ürün arama ve filtreleme $\rightarrow$ Detaylı ürün ve galeri inceleme $\rightarrow$ Sepete ekleme $\rightarrow$ Iyzico Sandbox ile güvenli ödeme simülasyonu.
 - **Dinamik Kategori & Ürün Ağacı:** 4.000'den fazla ürün üzerinde gecikmesiz çalışan hiyerarşik kategori navigasyonu ve anlık fiyat/özellik filtreleme.
@@ -53,7 +53,7 @@ MiniETicaret/
 
 ---
 
-## <img src="https://api.iconify.design/lucide:terminal.svg?color=%23ec4899" width="20" height="20" align="center" /> Projeyi Bilgisayarınızda Çalıştırma
+## Projeyi Bilgisayarınızda Çalıştırma
 
 Projeyi yerel geliştirme ortamınızda ayağa kaldırmak için:
 
@@ -82,15 +82,20 @@ npm start
 
 ---
 
-## <img src="https://api.iconify.design/lucide:users.svg?color=%236366f1" width="20" height="20" align="center" /> Ekip ve Katkıda Bulunanlar
+## Ekip ve Katkıda Bulunanlar
 
 Bu proje bir bitirme ve staj ekip çalışması olarak geliştirilmiştir:
 
 - **Beyza Kaya** — *Front-End Developer (Angular Arayüzleri, UI/UX & API Entegrasyonu)* — [GitHub Profilim](https://github.com/kaya-beyza)
+- Ahmet Bıçakçı
+- Ahmet Eren Zembilören
+- Nurgül Tunç
+- Beyza Karaköse
+- Samet Arar
 
 ---
 
-## <img src="https://api.iconify.design/lucide:mail.svg?color=%2364748b" width="20" height="20" align="center" /> İletişim
+## İletişim
 
 Geliştirme sürecine dair sorularınız, önerileriniz veya iş fırsatları için bana dilediğiniz zaman ulaşabilirsiniz:
 
