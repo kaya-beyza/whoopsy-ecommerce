@@ -587,29 +587,104 @@
 // ── MOBİL UYUMLULUK (HOME) ───────────────────
 @media (max-width: 768px) {
   .hero-slider {
-    min-height: 440px;
-    height: 70vh;
+    aspect-ratio: 16 / 10;
+    min-height: 240px;
+    max-height: 480px;
+    height: auto;
 
     .slide {
-      .hero-content-block {
-        left: 20px;
-        bottom: 40px;
-        max-width: calc(100% - 40px);
+      flex-direction: row;
 
-        h1 {
-          font-size: 36px;
-          line-height: 1.1;
+      .hero-media-wrapper {
+        flex: 0 0 100%;
+        width: 100%;
+        height: 100%;
+
+        .hero-main-media {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+
+      &.is-video {
+        .hero-media-wrapper {
+          flex: 0 0 100%;
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
         }
 
-        p {
-          font-size: 13px;
-          margin: 10px 0 16px;
+        .hero-content-block {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          flex: none;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.4) 65%, transparent 100%);
+          padding: 16px 20px 24px;
+          z-index: 5;
+          text-align: left;
+
+          &::before {
+            display: none;
+          }
+
+          .hero-title {
+            font-size: 22px;
+            line-height: 1.15;
+            margin-bottom: 4px;
+          }
+
+          .hero-desc {
+            font-size: 11px;
+            margin: 4px 0 10px;
+            opacity: 0.9;
+          }
+
+          .btn-black-primary {
+            display: inline-block;
+            padding: 8px 18px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            background: #fff;
+            color: #000;
+            border-radius: 2px;
+            font-weight: 700;
+          }
         }
       }
     }
 
     .slider-nav {
-      display: none;
+      display: flex !important;
+      width: 34px;
+      height: 34px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.4);
+
+      &.prev {
+        left: 8px;
+      }
+
+      &.next {
+        right: 8px;
+      }
+    }
+
+    .slider-dots {
+      bottom: 10px;
+
+      .dot {
+        width: 6px;
+        height: 6px;
+
+        &.active {
+          width: 18px;
+        }
+      }
     }
   }
 

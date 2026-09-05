@@ -434,4 +434,25 @@
   .brand-panel {
     display: none;
   }
+
+  .form-panel {
+    flex: 1;
+    width: 100%;
+
+    .login-container {
+      padding: 40px 24px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .form-panel {
+    .login-container {
+      padding: 30px 16px;
+    }
+
+    .form-header .welcome-title {
+      font-size: 28px;
+    }
+  }
 }
