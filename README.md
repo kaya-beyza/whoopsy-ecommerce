@@ -59,8 +59,8 @@ Projeyi yerel geliştirme ortamınızda ayağa kaldırmak için:
 
 ### 1. Depoyu Klonlayın
 ```bash
-git clone https://github.com/Havali-bir-isim/E-Ticaret.git
-cd E-Ticaret
+git clone https://github.com/kaya-beyza/whoopsy-ecommerce.git
+cd whoopsy-ecommerce
 ```
 
 ### 2. Backend'i Başlatın (.NET 10)
