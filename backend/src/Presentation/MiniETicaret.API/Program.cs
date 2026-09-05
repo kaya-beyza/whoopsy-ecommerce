@@ -114,17 +114,19 @@ using (var scope = app.Services.CreateScope())
 
 // Middleware Pipelinem 
 app.UseMiddleware<ExceptionMiddleware>();
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-app.UseCors("AllowFrontend"); // yukarıda tanımladığımız kuralı aktif eder frontendden gelen istekleri onaylar
-app.UseHttpsRedirection();
-app.UseAuthentication(); // Önce: "Kim bu kullanıcı?"
-app.UseAuthorization(); // Sonra: "Bu kullanıcının yetkisi var mı?"
-app.MapControllers(); // Son: Controller'lara yönlendir
+
+app.MapOpenApi();
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+app.UseCors("AllowFrontend");
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 
