@@ -89,8 +89,8 @@ Bu proje bir bitirme ve staj ekip çalışması olarak geliştirilmiştir:
 - **Beyza Kaya** — *Front-End Developer (Angular Arayüzleri, UI/UX & API Entegrasyonu)* — [GitHub Profilim](https://github.com/kaya-beyza)
 - Ahmet Bıçakçı
 - Ahmet Eren Zembilören
-- Nurgül Tunç
 - Beyza Karaköse
+- Nurgül Tunç
 - Samet Arar
 
 ---
