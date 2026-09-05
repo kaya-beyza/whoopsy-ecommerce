@@ -177,4 +177,31 @@
     25% { transform: translate(-20%, -60%); }
     50% { transform: translate(-70%, -40%); }
     75% { transform: translate(-20%, -40%); }
-}
+}
+
+// ── MOBİL UYUMLULUK (FOOTER) ─────────────────
+@media (max-width: 900px) {
+  .footer-container {
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .footer-middle {
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .payment-methods {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+

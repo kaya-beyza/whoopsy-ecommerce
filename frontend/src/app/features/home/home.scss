@@ -583,3 +583,96 @@
     }
   }
 }
+
+// ── MOBİL UYUMLULUK (HOME) ───────────────────
+@media (max-width: 768px) {
+  .hero-slider {
+    min-height: 440px;
+    height: 70vh;
+
+    .slide {
+      .hero-content-block {
+        left: 20px;
+        bottom: 40px;
+        max-width: calc(100% - 40px);
+
+        h1 {
+          font-size: 36px;
+          line-height: 1.1;
+        }
+
+        p {
+          font-size: 13px;
+          margin: 10px 0 16px;
+        }
+      }
+    }
+
+    .slider-nav {
+      display: none;
+    }
+  }
+
+  .category-section {
+    padding: 40px 0;
+
+    .category-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .cat-card {
+      height: 380px;
+
+      .cat-info {
+        bottom: 24px;
+        left: 24px;
+
+        .cat-btn {
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .handpicked-section {
+    padding: 40px 0 60px;
+
+    .section-header {
+      margin-bottom: 24px;
+
+      .section-title {
+        font-size: 24px;
+      }
+    }
+
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 16px 12px;
+    }
+  }
+
+  .style-section {
+    padding-bottom: 60px;
+
+    .section-header {
+      .section-title {
+        font-size: 24px;
+      }
+    }
+
+    .style-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .style-card {
+      height: 180px;
+
+      .style-label {
+        font-size: 16px;
+      }
+    }
+  }
+}

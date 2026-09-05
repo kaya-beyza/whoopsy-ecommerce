@@ -503,3 +503,106 @@
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+// ── MOBİL UYUMLULUK (RESPONSIVE) ─────────────
+@media (max-width: 992px) {
+  .top-bar {
+    padding: 0 16px;
+    height: 38px;
+
+    &__text {
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    &__right {
+      .top-bar__link {
+        font-size: 11px;
+      }
+    }
+  }
+
+  .main-bar {
+    padding: 10px 16px 6px;
+    height: auto;
+    flex-wrap: wrap;
+
+    .logo {
+      font-size: 26px;
+      order: 1;
+    }
+
+    .header-icons {
+      order: 2;
+      gap: 4px;
+
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    .navbar-wrapper {
+      order: 3;
+      position: relative;
+      left: auto;
+      top: auto;
+      transform: none;
+      width: 100%;
+      margin-top: 6px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+
+  .search-overlay__container {
+    padding: 30px 20px;
+    max-width: 100%;
+  }
+
+  .search-field .search-input {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    &__left {
+      display: none;
+    }
+
+    &__text {
+      text-align: left;
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    &__right {
+      .top-bar__link {
+        font-size: 10px;
+      }
+      .top-bar__divider {
+        margin: 0 4px;
+      }
+      .top-bar__icon {
+        display: none;
+      }
+    }
+  }
+
+  .main-bar {
+    padding: 8px 12px 4px;
+
+    .logo {
+      font-size: 22px;
+    }
+  }
+}

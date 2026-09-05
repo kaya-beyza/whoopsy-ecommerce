@@ -9,6 +9,8 @@
 
 html {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden;
   @include mat.theme((color: (primary: mat.$rose-palette,
         tertiary: mat.$red-palette ),
       typography: Roboto,
@@ -16,6 +18,8 @@ html {
 }
 
 body {
+  overflow-x: hidden;
+  width: 100%;
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.

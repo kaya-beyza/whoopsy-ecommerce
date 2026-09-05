@@ -473,4 +473,74 @@
             &:disabled { opacity: 0.5; cursor: not-allowed; }
         }
     }
-}
+
+    /* --- Mobil Uyumluluk --- */
+    @media (max-width: 900px) {
+        padding: 15px 16px;
+
+        .shop-header {
+            margin-bottom: 24px;
+            .category-name {
+                font-size: 26px;
+            }
+        }
+
+        .controls-bar {
+            padding: 12px 0;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            .left-controls {
+                gap: 16px;
+            }
+
+            .active-filters {
+                order: 3;
+                width: 100%;
+                margin: 4px 0 0;
+            }
+
+            .sort-dropdown {
+                order: 2;
+            }
+        }
+
+        .products-layout {
+            flex-direction: column;
+            gap: 20px;
+
+            .filter-sidebar {
+                width: 100%;
+
+                &.sidebar-hidden {
+                    display: none;
+                }
+            }
+
+            .products-grid-area {
+                .products-grid {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 20px 12px;
+                }
+            }
+        }
+
+        .load-more-container {
+            margin: 40px 0;
+
+            .load-more-btn {
+                width: 100%;
+                padding: 16px 20px;
+            }
+        }
+    }
+
+    @media (max-width: 480px) {
+        .products-layout .products-grid-area .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px 8px;
+        }
+    }
+}
+
