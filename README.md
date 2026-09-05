@@ -1,12 +1,41 @@
 # whOOPSy — Full-Stack E-Ticaret Platformu
 
-[![Canlı Demo](https://img.shields.io/badge/Canlı_Demo-whoopsy--ecommerce.onrender.com-success?style=for-the-badge&logo=render)](https://whoopsy-ecommerce.onrender.com)
-[![Swagger API](https://img.shields.io/badge/Swagger_API-Dokümantasyon-blue?style=for-the-badge&logo=swagger)](https://whoopsy-ecommerce.onrender.com/swagger)
+<p align="center">
+  <img src="public/whoopsy-logo.png" alt="whOOPSy Logo" width="190" />
+</p>
 
-> 🌐 **Canlı Web Sitesi:** [https://whoopsy-ecommerce.onrender.com](https://whoopsy-ecommerce.onrender.com)  
-> 📑 **Canlı Swagger API:** [https://whoopsy-ecommerce.onrender.com/swagger](https://whoopsy-ecommerce.onrender.com/swagger)
+<p align="center">
+  Modern web teknolojileri, .NET 10 Onion Architecture ve zengin alışveriş deneyimini buluşturan yeni nesil Full-Stack E-Ticaret platformu.
+</p>
 
-Bu proje; lisans mezuniyet bitirme projesi (Graduation Capstone Project) ve staj çalışmamız kapsamında ekip olarak hayata geçirdiğimiz modern bir Full-Stack E-Ticaret platformudur.
+<p align="center">
+  <a href="https://whoopsy-ecommerce.onrender.com" target="_blank">
+    <img src="https://img.shields.io/badge/Canlı%20Demo-Render-46E3B7?style=flat-square&logo=render&logoColor=white" alt="Canlı Demo" />
+  </a>
+  <a href="https://whoopsy-ecommerce.onrender.com/swagger" target="_blank">
+    <img src="https://img.shields.io/badge/Swagger%20API-Dokümantasyon-85EA2D?style=flat-square&logo=swagger&logoColor=black" alt="Swagger API" />
+  </a>
+  <img src="https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet&logoColor=white" alt=".NET 10" />
+  <img src="https://img.shields.io/badge/Angular-21.1.0-DD0031?style=flat-square&logo=angular&logoColor=white" alt="Angular 21" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-17-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Iyzico-Sandbox-00A651?style=flat-square" alt="Iyzico" />
+</p>
+
+---
+
+## Canlı Demo & API Dokümantasyonu
+
+Projeyi canlı ortamda deneyimlemek ve REST API uç noktalarını incelemek için:
+
+- 🌐 **Canlı Web Sitesi:** [whoopsy-ecommerce.onrender.com](https://whoopsy-ecommerce.onrender.com)  
+- 📑 **Canlı Swagger API:** [whoopsy-ecommerce.onrender.com/swagger](https://whoopsy-ecommerce.onrender.com/swagger)
+
+---
+
+## Projenin Hikayesi ve Amacı
+
+Bu proje; lisans mezuniyet bitirme projesi (**Graduation Capstone Project**) ve staj çalışmamız kapsamında ekip olarak hayata geçirdiğimiz modern bir Full-Stack E-Ticaret platformudur.
 
 Proje kapsamında **.NET 10** tabanlı katmanlı bir backend mimarisi, **Angular 21** ile modern bir web arayüzü ve **Flutter** ile mobil istemci bir araya getirilmiştir.
 

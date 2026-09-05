@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Deep Obsidian Squircle Background -->
+  <rect width="512" height="512" rx="110" fill="#0e0e0e"/>
+  <rect x="2" y="2" width="508" height="508" rx="108" fill="none" stroke="#262626" stroke-width="4"/>
+
+  <!-- Red Bag Handle Arch -->
+  <path d="M 185 185 A 71 71 0 0 1 327 185" fill="none" stroke="#e8000d" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- White Luxury Shopping Bag Body -->
+  <polygon points="130,185 382,185 410,435 102,435" fill="#ffffff" filter="url(#softShadow)"/>
+
+  <!-- Left Eye -->
+  <g>
+    <!-- Red outer eye -->
+    <ellipse cx="212" cy="295" rx="32" ry="40" fill="#e8000d"/>
+    <!-- Black pupil -->
+    <ellipse cx="210" cy="288" rx="20" ry="24" fill="#0a0a0a"/>
+    <!-- White highlight glint -->
+    <circle cx="202" cy="278" r="6" fill="#ffffff"/>
+  </g>
+
+  <!-- Right Eye -->
+  <g>
+    <!-- Red outer eye -->
+    <ellipse cx="300" cy="295" rx="32" ry="40" fill="#e8000d"/>
+    <!-- Black pupil -->
+    <ellipse cx="297" cy="288" rx="20" ry="24" fill="#0a0a0a"/>
+    <!-- White highlight glint -->
+    <circle cx="289" cy="278" r="6" fill="#ffffff"/>
+  </g>
+</svg>
